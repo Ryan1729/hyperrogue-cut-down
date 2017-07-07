@@ -42,7 +42,11 @@ string itsh(int i) {static char buf[16]; sprintf(buf, "%03X", i); return buf; }
 extern FILE *debugfile;
 extern int debugflags;
 
+#if 0
+#define DEBB(r,x) {}
+#else
 #define DEBB(r,x) { if(debugfile && (!(r) || (debugflags & (r)))) { fprintf x; fflush(debugfile); } }
+#endif
 
 #define DF_INIT              0 // always display these
 #define DF_MSG               0 // always display these
