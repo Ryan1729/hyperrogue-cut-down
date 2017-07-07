@@ -88,10 +88,6 @@ struct polytodraw {
     qchr   chr;
     qcir   cir;
     } u;
-#ifdef ROGUEVIZ
-  string* info;
-  polytodraw() { info = NULL; }
-#endif
   };
 
 vector<polytodraw> ptds;
@@ -501,9 +497,6 @@ void drawqueue() {
     polytodraw& ptd (*ptds2[i]);
 #endif
 
-#ifdef ROGUEVIZ
-    svg::info = ptd.info;
-#endif
 
     // if(ptd.prio == 46) printf("eye size %d\n", polyi);
     
@@ -1877,9 +1870,6 @@ namespace svg {
     vid.usingGL = false;
     vid.xres = vid.yres = svgsize ? svgsize : min(1 << (sightrange+7), 16384);
     calcparam();
-#ifdef ROGUEVIZ
-    rogueviz::fixparam();
-#endif
     inHighQual = true; 
     darken = 0;
     

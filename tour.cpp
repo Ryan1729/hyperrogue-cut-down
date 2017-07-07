@@ -195,16 +195,6 @@ static struct { const char *name; int id; int legal; const char *help; } slides[
   {"Conformal square model", 46, LEGAL_HYPERBOLIC,
     "The world can be mapped conformally to a square too."
     },
-#ifdef ROGUEVIZ
-  {"Collatz conjecture", 51, LEGAL_NONE,
-    "Your version of HyperRogue includes RogueViz, which "
-    "is an adaptation of HyperRogue as a visualization tool "
-    "rather than a game. Hyperbolic space is great "
-    "for visualizing some kinds of data because of the vast amount "
-    "of space.\n\n"
-    "The following slide is a visualization of the Collatz conjecture. "
-    "Press '5' for a spiral rendering of the Collatz conjecture visualization."},
-#endif
   {"Shoot'em up mode", 52, LEGAL_NONE,
     "In the shoot'em up mode, space and time is continuous. "
     "You attack by throwing knives. "
@@ -387,39 +377,6 @@ void presentation(int mode) {
     if(mode == 3) pmodel = mdDisk, conformal::rotation = 0;
     }
 
-#ifdef ROGUEVIZ
-  if(id == 51) {
-    setCanvas(mode, 'd');
-    if(mode == 1) {
-      rogueviz::dftcolor = 0x206020FF;
-
-      rogueviz::collatz::s2 = .3;
-      rogueviz::collatz::p2 = .5;
-      rogueviz::collatz::s3 = -.4;
-      rogueviz::collatz::p3 = .4;
-
-      rogueviz::showlabels = true;
-      
-      rogueviz::on = true;
-      gmatrix.clear();
-      drawthemap();
-      gmatrix0 = gmatrix;
-
-      rogueviz::collatz::start();
-      }
-    
-    if(mode == 3) {
-      rogueviz::close();
-      shmup::clearMonsters();
-      }
-
-    if(mode == 4) 
-      pmodel = mdBand, conformal::create(), conformal::rotation = 0,
-      conformal::createImage(true),
-      conformal::clear(), pmodel = mdDisk;      
-    }
-
-#endif
 
   if(id == 52 && mode == 1) {
     firstland = cwt.c->land;

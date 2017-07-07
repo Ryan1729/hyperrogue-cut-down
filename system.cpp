@@ -206,10 +206,6 @@ void initgame() {
       addMessage(XLAT("Good luck in the elliptic plane!"));
     else if(sphere)
       addMessage(XLAT("Welcome to Spherogue!"));
-#ifdef ROGUEVIZ
-    else if(rogueviz::on)
-      addMessage(XLAT("Welcome to RogueViz!"));
-#endif
     else {
       addMessage(XLAT("Welcome to HyperRogue!"));
       addMessage(XLAT("Press F1 or right-click things for help."));
@@ -1047,9 +1043,6 @@ void clearGameMemory() {
   prairie::tchoices.clear();
   prairie::beaststogen.clear();
   butterflies.clear();
-  #ifdef ROGUEVIZ
-  rogueviz::close();
-  #endif
   }
 
 static int orbid = 0;

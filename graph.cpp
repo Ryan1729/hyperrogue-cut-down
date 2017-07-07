@@ -22,12 +22,6 @@ int detaillevel = 0;
 
 #define K(c) (c->type==6?0:1)
 
-#ifdef ROGUEVIZ
-#define DOSHMUP (shmup::on || rogueviz::on)
-#else
-#define DOSHMUP shmup::on
-#endif
-
 // #define PANDORA
 
 #include <SDL/SDL.h>
@@ -1085,10 +1079,7 @@ int fc(int ph, int col, int z) {
   for(int i=0; i<numplayers(); i++) if(multi::playerActive(i))
     if(items[itOrbFish] && isWatery(playerpos(i)) && z != 3) return watercolor(ph);
   if(invismove) 
-    col = 
-      shmup::on ?
-        (col &~0XFF) | (int((col&0xFF) * .25))
-      : (col &~0XFF) | (int((col&0xFF) * (100+100*sin(ticks / 500.)))/200);
+    col = (col &~0XFF) | (int((col&0xFF) * (100+100*sin(ticks / 500.)))/200);
   return col;
   }
 
@@ -1204,8 +1195,8 @@ transmatrix ddspin(cell *c, int d, int bonus = 0) {
 
 void drawPlayerEffects(const transmatrix& V, cell *c, bool onplayer) {
   if(!onplayer && !items[itOrbEmpathy]) return;
-  if(items[itOrbShield] > (shmup::on ? 0 : ORBBASE)) drawShield(V, itOrbShield);
-  if(items[itOrbShell] > (shmup::on ? 0 : ORBBASE)) drawShield(V, itOrbShell);
+  if(items[itOrbShield] > ORBBASE) drawShield(V, itOrbShield);
+  if(items[itOrbShell] > ORBBASE) drawShield(V, itOrbShell);
 
   if(items[itOrbSpeed]) drawSpeed(V); 
 
@@ -1215,16 +1206,7 @@ void drawPlayerEffects(const transmatrix& V, cell *c, bool onplayer) {
     using namespace sword;
   
     double esh = euclid ? M_PI - M_PI*3/S84 + 2.5 * M_PI/S42: 0;
-    
-    if(shmup::on) {
-      if(items[itOrbSword])
-        queuepoly(V*spin(esh+shmup::pc[multi::cpid]->swordangle), shMagicSword, darkena(iinf[itOrbSword].color, 0, 0xC0 + 0x30 * sin(ticks / 200.0)));
-  
-      if(items[itOrbSword2])
-        queuepoly(V*spin(esh+shmup::pc[multi::cpid]->swordangle+M_PI), shMagicSword, darkena(iinf[itOrbSword2].color, 0, 0xC0 + 0x30 * sin(ticks / 200.0)));
-      }                  
-    
-    else {
+    {
       int& ang = angle[multi::cpid];
       ang %= S42;
       
@@ -1578,11 +1560,11 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
           animallegs(VALEGS, moWolf, fc(500, cs.dresscolor, 4), footphase);
           }
         queuepoly(VAHEAD, shFamiliarHead, fc(500, cs.haircolor, 2));
-        if(!shmup::on || shmup::curtime >= shmup::getPlayer()->nextshot) {
+        
           int col = items[itOrbDiscord] ? watercolor(0) : fc(314, cs.swordcolor, 3);
           queuepoly(VAHEAD, shFamiliarEye, col);
           queuepoly(VAHEAD * Mirror, shFamiliarEye, col);
-          }
+        
         }
       else if(cs.charid >= 6) {
         if(!mmspatial && !footphase)
@@ -1594,12 +1576,12 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
           }
         queuepoly(VAHEAD, shDogHead, fc(150, cs.haircolor, 2));
 
-        if(!shmup::on || shmup::curtime >= shmup::getPlayer()->nextshot) {
+        
           int col = items[itOrbDiscord] ? watercolor(0) : fc(314, cs.swordcolor, 3);
           queuepoly(VAHEAD, shWolf1, col);
           queuepoly(VAHEAD, shWolf2, col);
           queuepoly(VAHEAD, shWolf3, col);
-          }
+        
         }
       else if(cs.charid >= 4) {
         queuepoly(VABODY, shCatBody, fc(0, cs.skincolor, 0));
@@ -1610,11 +1592,11 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
           ShadowV(V, shCatBody);
           animallegs(VALEGS, moRunDog, fc(500, cs.dresscolor, 4), footphase);
           }
-        if(!shmup::on || shmup::curtime >= shmup::getPlayer()->nextshot) {
+        
           int col = items[itOrbDiscord] ? watercolor(0) : fc(314, cs.swordcolor, 3);
           queuepoly(VAHEAD * xpush(.04), shWolf1, col);
           queuepoly(VAHEAD * xpush(.04), shWolf2, col);
-          }
+          
         }
       else {
 
@@ -1631,14 +1613,12 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
         }
       if(items[itOrbThorns])
         queuepoly(VBODY, shHedgehogBladePlayer, items[itOrbDiscord] ? watercolor(0) : 0x00FF00FF);
-      else if(!shmup::on && items[itOrbDiscord])
+      else if(items[itOrbDiscord])
         queuepoly(VBODY, cs.charid >= 2 ? shSabre : shPSword, watercolor(0));
       else if(items[itRevolver])
         queuepoly(VBODY, shGunInHand, fc(314, cs.swordcolor, 3)); // 3 not colored
-      else if(!shmup::on)
+      else
         queuepoly(VBODY, cs.charid >= 2 ? shSabre : shPSword, fc(314, cs.swordcolor, 3)); // 3 not colored
-      else if(shmup::curtime >= shmup::getPlayer()->nextshot)
-        queuepoly(VBODY, shPKnife, fc(314, cs.swordcolor, 3)); // 3 not colored
       
       if(items[itOrbBeauty]) {
         if(cs.charid&1)
@@ -1727,10 +1707,8 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
       otherbodyparts(V, darkena(col, 0, 0x40), m, footphase);
       queuepoly(VBODY, (cs.charid&1) ? shFemaleBody : shPBody,  darkena(col, 0, 0X80));
   
-      if(!shmup::on)
+      
         queuepoly(VBODY, (cs.charid >= 2 ? shSabre : shPSword), darkena(col, 0, 0XC0));
-      else if(shmup::curtime >= shmup::getPlayer()->nextshot)
-        queuepoly(VBODY, shPKnife, darkena(col, 0, 0XC0));
   
       queuepoly(VHEAD, (cs.charid&1) ? shFemaleHair : shPHead,  darkena(col, 1, 0XC0));
       queuepoly(VHEAD, shPFace,  darkena(col, 0, 0XC0));
@@ -2316,7 +2294,7 @@ bool applyAnimation(cell *c, transmatrix& V, double& footphase, int layer) {
   int td = ticks - a.ltick;
   ld aspd = td / 1000.0 * exp(vid.mspeed);
   ld R = hdist0(tC0(a.wherenow));
-  aspd *= (1+R+(shmup::on?1:0));
+  aspd *= (1+R);
   
   if(R < aspd || isnan(R) || isnan(aspd) || R > 10) {
     animations[layer].erase(c);
@@ -2617,7 +2595,7 @@ bool drawMonster(const transmatrix& Vparam, int ct, cell *c, int col) {
     return drawMonsterTypeDH(m, c, Vs, col, darkhistory, footphase);
     }
   
-  for(int i=0; i<numplayers(); i++) if(c == playerpos(i) && !shmup::on && mapeditor::drawplayer) {
+  for(int i=0; i<numplayers(); i++) if(c == playerpos(i) && mapeditor::drawplayer) {
     if(!nospins) {
       Vs = playerV;
       if(multi::players > 1 ? multi::flipped[i] : flipplayer) Vs = Vs * pispin;
@@ -2959,15 +2937,6 @@ void drawMobileArrow(cell *c, transmatrix V) {
   
   queuepoly(
     screenpos(dx, dy) * spin(-alpha) * m2, shArrow, col);
-  /*
-      if(c->type != 6 && (isStunnable(c->monst) || c->wall == waThumperOn)) {
-        transmatrix Centered = rgpushxto0(tC0(cwtV));
-        int sd = md.subdir;
-        if(sphere) sd = -sd;
-        queuepoly(inverse(Centered) * rgpushxto0(Centered * tC0(V)) * rspintox(Centered*tC0(V)) * spin(-sd * M_PI/S7) * xpush(0.2), shArrow, col);
-        }
-      else break;
-      } */
   }
 
 int celldistAltPlus(cell *c) { return 1000000 + celldistAlt(c); }
@@ -3330,7 +3299,7 @@ void setcolors(cell *c, int& wcol, int &fcol) {
     wcol = gradient(0x804060, wcol, 0,2,3),
     fcol = gradient(0x804060, fcol, 0,2,3);
   
-  if(items[itRevolver] && c->pathdist > GUNRANGE && !shmup::on)
+  if(items[itRevolver] && c->pathdist > GUNRANGE)
     fcol = gradient(fcol, 0, 0, 25, 100),
     wcol = gradient(wcol, 0, 0, 25, 100);
     
@@ -3365,7 +3334,7 @@ int away(const transmatrix& V2) {
 void floorShadow(cell *c, const transmatrix& V, int col, bool warp) {
   if(pmodel == mdHyperboloid || pmodel == mdBall) 
     return; // shadows break the depth testing
-  if(shmup::on || purehepta) warp = false;
+  if(purehepta) warp = false;
   dynamicval<int> p(poly_outline, OUTLINE_TRANS);
   if(wmescher && qfi.special) {
     queuepolyat(V * qfi.spin * shadowmulmatrix, *qfi.shape, col, PPR_WALLSHADOW);
@@ -3418,7 +3387,7 @@ void qplainfloor(cell *c, bool warp, const transmatrix &V, int col) {
   }
 
 void warpfloor(cell *c, const transmatrix& V, int col, int prio, bool warp) {
-  if(shmup::on || purehepta) warp = false;
+  if(purehepta) warp = false;
   if(wmescher && qfi.special)
     queuepolyat(V*qfi.spin, *qfi.shape, col, prio);
   else plainfloor(c, warp, V, col, prio);
@@ -3475,7 +3444,7 @@ void escherSidewall(cell *c, int sidepar, const transmatrix& V, int col) {
   }
 
 void placeSidewall(cell *c, int i, int sidepar, const transmatrix& V, bool warp, bool mirr, int col) {
-  if(shmup::on || purehepta) warp = false;
+  if(purehepta) warp = false;
   if(warp && !ishept(c) && (!c->mov[i] || !ishept(c->mov[i]))) return;
   int prio;
   if(mirr) prio = PPR_GLASS - 2;
@@ -3671,7 +3640,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     }
   
   // save the player's view center
-  if(isPlayerOn(c) && !shmup::on) {
+  if(isPlayerOn(c)) {
     playerfound = true;
 
 /*   if(euclid)
@@ -3890,11 +3859,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     const transmatrix& Vf = (chasmg && wmspatial) ? (Vf0=mscale(V, geom3::BOTTOM)) : V;
 
     const transmatrix *Vboat = &(*Vdp);
-      
-    if(DOSHMUP) {
-      ld zlev = -geom3::factor_to_lev(zlevel(tC0((*Vdp))));
-      shmup::drawMonster(V, c, Vboat, Vboat0, zlev);
-      }
 
     poly_outline = (backcolor << 8) + 0xFF;
 
@@ -4024,7 +3988,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       else if(isWarped(c) && euclid)
         qfloor(c, Vf, shTriheptaEuc[ishept(c)?1:ishex1(c)?0:2], darkena(fcol, fd, 0xFF));
 
-      else if(isWarped(c) && !purehepta && !shmup::on) {
+      else if(isWarped(c) && !purehepta) {
         int np = mapeditor::nopattern(c);
         if(c->landparam == 1337) np = 0; // for the achievement screenshot
         if(np < 11)
@@ -4792,7 +4756,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
           !isMultitile(c->monst), false);
       }
       
-    if(!shmup::on && sword::at(c)) {
+    if(sword::at(c)) {
       queuepolyat(V, shDisk, 0xC0404040, PPR_SWORDMARK);
       }
     
@@ -5132,7 +5096,7 @@ void drawMarkers() {
     // process mouse
 
 
-    if((vid.axes == 4 || (vid.axes == 1 && !mousing)) && !shmup::on) {
+    if((vid.axes == 4 || (vid.axes == 1 && !mousing))) {
       if(multi::players == 1) {
         forCellAll(c2, cwt.c) IG(c2) drawMovementArrows(c2, Gm(c2));
         }
@@ -5152,7 +5116,6 @@ void drawMarkers() {
   orbToTarget = itNone;
 
   if(mouseover && targetclick && cmode == emNormal) {
-    shmup::cpid = 0;
     orbToTarget = targetRangedOrb(mouseover, roCheck);
     if(orbToTarget == itOrbSummon) {
       monsterToSummon = summonedAt(mouseover);
@@ -5609,7 +5572,6 @@ string generateHelpForLand(eLand l) {
       "getting a highscore of at least 10 %2.", l, treasureType(l));
 
   if(l == laPrincessQuest) {
-    s += XLAT("Unavailable in the shmup mode.\n");
     s += XLAT("Unavailable in the multiplayer mode.\n");
     }
   
@@ -5673,9 +5635,6 @@ void describeMouseover() {
     if(c->land == laOcean && chaosmode)
       out += " (" + its(c->CHAOSPARAM)+"S"+its(c->SEADIST)+"L"+its(c->LANDDIST)+")";
     else if(c->land == laOcean && c->landparam <= 25) {
-      if(shmup::on)
-        out += " (" + its(c->landparam)+")";
-      else {
         bool b = c->landparam >= tide[(turncount-1) % tidalsize];
         int t = 1;
         for(; t < 1000 && b == (c->landparam >= tide[(turncount+t-1) % tidalsize]); t++) ;
@@ -5683,7 +5642,6 @@ void describeMouseover() {
           out += " (" + its(t) + " turns to surface)";
         else 
           out += " (" + its(t) + " turns to submerge)";
-        }
       }
 
     if(c->land == laTortoise && tortoise::seek()) out += " " + tortoise::measure(getBits(c));
@@ -5820,26 +5778,7 @@ void describeMouseover() {
       if(!c->monst) help = generateHelpForItem(c->item);
       }
     
-    if(isPlayerOn(c) && !shmup::on) out += XLAT(", you");
-
-    if(shmup::mousetarget && intval(mouseh, tC0(shmup::mousetarget->pat)) < .1) {
-      out += ", "; 
-#ifdef ROGUEVIZ
-      if(shmup::mousetarget->type == moRogueviz) {
-        help = XLAT(minf[shmup::mousetarget->type].help);
-        out += rogueviz::describe(shmup::mousetarget);
-        }
-      else 
-#endif
-      {
-        out += XLAT1(minf[shmup::mousetarget->type].name);
-        help = XLAT(minf[shmup::mousetarget->type].help);
-        }
-/*    char buf[64];
-      sprintf(buf, "%Lf", intval(mouseh, shmup::mousetarget->pat*C0));
-      mouseovers = mouseovers + " D: " + buf;
-      printf("ms = %s\n", mouseovers.c_str());*/
-      }
+    if(isPlayerOn(c)) out += XLAT(", you");
 
     if(rosedist(c) == 1)
       out += ", wave of scent (front)";
@@ -5915,18 +5854,9 @@ void describeMouseover() {
 
   if(mousey < vid.fsize * 3/2) getcstat = SDLK_F1;
 
-  if(false && shmup::mousetarget) {
-    char buf[64];
-    sprintf(buf, "%Lf", (long double) intval(mouseh, tC0(shmup::mousetarget->pat)));
-    mouseovers = mouseovers + " D: " + buf;
-    return;
-    }
   }
 
 void drawrec(const heptspin& hs, int lev, hstate s, const transmatrix& V) {
-
-  // shmup::calc_relative_matrix(cwt.c, hs.h);
-    
   cell *c = hs.h->c7;
   
   transmatrix V10;
@@ -6064,7 +5994,6 @@ void drawthemap() {
   pirateTreasureFound = pirateTreasureSeek;
   pirateTreasureSeek = NULL;
   straightDownSeek = NULL; downspin = 0;
-  shmup::mousetarget = NULL;
   showPirateX = false;
   for(int i=0; i<numplayers(); i++) if(multi::playerActive(i))
     if(playerpos(i)->item == itCompass) showPirateX = true;
@@ -6083,9 +6012,6 @@ void drawthemap() {
   modist = 1e20; mouseover = NULL; 
   modist2 = 1e20; mouseover2 = NULL; 
   mouseovers = XLAT("Press F1 or right click for help");
-#ifdef ROGUEVIZ
-  if(rogueviz::on) mouseovers = " ";
-#endif
 #ifdef TOUR
   if(tour::on) mouseovers = tour::tourhelp;
 #endif
@@ -6116,9 +6042,6 @@ void drawthemap() {
       hsOrigin, ypush(vid.yshift) * sphereflip * View);
     }
   
-  #ifdef ROGUEVIZ
-  rogueviz::drawExtra();
-  #endif
 
   #ifdef TOUR
   if(tour::on) tour::presentation(2);
@@ -6130,10 +6053,8 @@ void drawthemap() {
   profile_stop(4);
   drawFlashes();
   
-  if(multi::players > 1 && !shmup::on) {
-    if(shmup::centerplayer != -1) 
-      cwtV = multi::whereis[shmup::centerplayer];
-    else {
+  if(multi::players > 1) {
+
       hyperpoint h;
       for(int i=0; i<3; i++) h[i] = 0;
       for(int p=0; p<multi::players; p++) if(multi::playerActive(p)) {
@@ -6142,24 +6063,7 @@ void drawthemap() {
         }
       h = mid(h, h);
       cwtV = rgpushxto0(h);
-      }
-    }
-  
-  if(shmup::on) {
-    if(shmup::players == 1)
-      cwtV = shmup::pc[0]->pat;
-    else if(shmup::centerplayer != -1) 
-      cwtV = shmup::pc[shmup::centerplayer]->pat;
-    else {
-      hyperpoint h;
-      for(int i=0; i<3; i++) h[i] = 0;
-      for(int p=0; p<multi::players; p++) {
-        hyperpoint h1 = tC0(shmup::pc[p]->pat);
-        for(int i=0; i<3; i++) h[i] += h1[i];
-        }
-      h = mid(h, h);
-      cwtV = rgpushxto0(h);
-      }
+      
     }
 
   Uint8 *keystate = SDL_GetKeyState(NULL);
@@ -6214,7 +6118,7 @@ void centerpc(ld aspd) {
     }
   
   else {
-    aspd *= (1+R+(shmup::on?1:0));
+    aspd *= (1+R);
 
     if(R < aspd) {
       View = gpushxto0(H) * View;
@@ -6234,7 +6138,6 @@ void drawmovestar(double dx, double dy) {
   DEBB(DF_GRAPH, (debugfile,"draw movestar\n"));
   if(!playerfound) return;
   
-  if(shmup::on) return;
 #ifndef NORUG
   if(rug::rugged && multi::players == 1 && !multi::alwaysuse) return;
 #endif
@@ -6345,7 +6248,9 @@ void movepckeydir(int d) {
 void calcMousedest() {
   if(outofmap(mouseh)) return;
   if(revcontrol == true) { mouseh[0] = -mouseh[0]; mouseh[1] = -mouseh[1]; }
+  //BROKE?
   ld mousedist = intval(mouseh, tC0(shmup::ggmatrix(cwt.c)));
+  
   mousedest.d = -1;
   
   cellwalker bcwt = cwt;
@@ -6413,9 +6318,6 @@ void checkjoy() {
   }
 
 void checkpanjoy(double t) {
- 
-  if(shmup::on) return;
-  
   if(vid.joypanspeed < 1e-7) return;
   
   if(sqr(panjoyx) + sqr(panjoyy) < sqr(vid.joypanthreshold))
@@ -6515,11 +6417,7 @@ string timeline() {
     int timespent = (int) (savetime + (timerstopped ? 0 : (time(NULL) - timerstart)));
   char buf[20];
   sprintf(buf, "%d:%02d", timespent/60, timespent % 60);
-  return 
-    shmup::on ? 
-      XLAT("%1 knives (%2)", its(turncount), buf)
-    :
-      XLAT("%1 turns (%2)", its(turncount), buf);
+  return XLAT("%1 turns (%2)", its(turncount), buf);
   }
 
 void showGameover() {
@@ -6740,8 +6638,7 @@ void loadScores() {
   boxid = 0; applyBoxes();
   scoresort = 2; reverse(scores.begin(), scores.end());
   scoremode = 0;
-  if(shmup::on) scoremode = 1;
-  else if(hardcore) scoremode = 2;
+  if(hardcore) scoremode = 2;
   scorefrom = 0;
   stable_sort(scores.begin(), scores.end(), scorecompare);
   }
@@ -6943,9 +6840,6 @@ bool displayglyph(int cx, int cy, int buttonsize, char glyph, int color, int qty
   }
 
 void drawStats() {
-#ifdef ROGUEVIZ
-  if(rogueviz::on) return;
-#endif
   if(viewdists && sidescreen) {
     dialog::init("");
     int qty[64];
@@ -7163,9 +7057,6 @@ void saveHighQualityShot(const char *fname) {
   vid.usingGL = false;
   // if(vid.pmodel == 0) vid.scale = 0.99;
   calcparam();
-  #ifdef ROGUEVIZ
-  rogueviz::fixparam();
-  #endif
 
   dynamicval<SDL_Surface*> v5(s, SDL_CreateRGBSurface(SDL_SWSURFACE,vid.xres,vid.yres,32,0,0,0,0));
 
@@ -7286,9 +7177,6 @@ void drawscreen() {
   DEBB(DF_GRAPH, (debugfile,"drawscreen\n"));
 
   calcparam();
-  #ifdef ROGUEVIZ
-  rogueviz::fixparam();
-  #endif
 #ifdef GL
   if(vid.usingGL) setGLProjection();
 #endif
@@ -7380,7 +7268,7 @@ void drawscreen() {
         vid.fsize, 
         XLAT(minetexts[mines[p]]), minecolors[mines[p]], 8);
 
-    if(minefieldNearby && !shmup::on && cwt.c->land != laMinefield && cwt.c->mov[cwt.spin]->land != laMinefield) {
+    if(minefieldNearby && cwt.c->land != laMinefield && cwt.c->mov[cwt.spin]->land != laMinefield) {
       displayfr(vid.xres/2, vid.ycenter - vid.radius * 3/4 - vid.fsize*3/2, 2,
         vid.fsize, 
         XLAT("WARNING: you are entering a minefield!"), 
@@ -8080,12 +7968,11 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     
     shmup::cpid = 0;
     if(mouseover && 
-      targetclick && (!shmup::on || numplayers() == 1) && targetRangedOrb(mouseover, forcetarget ? roMouseForce : roMouse)) {
+      targetclick && targetRangedOrb(mouseover, forcetarget ? roMouseForce : roMouse)) {
       }
     else if(forcetarget)
       ;
     else if(!DEFAULTCONTROL) {
-      if(!shmup::on)
         multi::mousemovement(mouseover);
       }
     else mousemovement();
@@ -8096,9 +7983,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     cmode = emHelp;
     }
 
-#ifdef ROGUEVIZ
-  rogueviz::processKey(sym, uni);
-#endif
 
 #ifdef LOCAL
   process_local0(sym);
@@ -8202,9 +8086,6 @@ void handlekey(int sym, int uni, extra& ev) {
   else if(cmode == emHelp) handleHelp(sym, uni);    
   else if(cmode == em3D) handle3D(sym, uni);
   else if(cmode == emQuit) handleKeyQuit(sym, uni);
-#ifdef ROGUEVIZ
-  else if(cmode == emRogueviz) rogueviz::handleMenu(sym, uni);
-#endif
   }
 
 
@@ -8240,11 +8121,8 @@ void mainloopiter() {
   if(outoffocus && cframelimit > 10) cframelimit = 10;
   
   int timetowait = lastt + 1000 / cframelimit - ticks;
-
-  if(DOSHMUP && cmode == emNormal) 
-    timetowait = 0, shmup::turn(ticks - lastt);
     
-  if(!DOSHMUP && (multi::alwaysuse || multi::players > 1) && cmode == emNormal)
+  if((multi::alwaysuse || multi::players > 1) && cmode == emNormal)
     timetowait = 0, multi::handleMulti(ticks - lastt);
 
   if(vid.sspeed >= 5 && gmatrix.count(cwt.c) && !elliptic) {

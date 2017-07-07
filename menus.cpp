@@ -211,9 +211,6 @@ void showMainMenu() {
 
   if(checkHalloweenDate()) dialog::addItem(XLAT("Halloween mini-game"), 'y'-96);
 
-#ifdef ROGUEVIZ
-  dialog::addItem(XLAT("rogueviz menu"), 'g'); 
-#endif
   
 
 #ifdef ANDROIDSHARE
@@ -271,9 +268,6 @@ void handleMenuKey(int sym, int uni) {
     cmode = emQuit;
     achievement_final(false);
     }
-#ifdef ROGUEVIZ
-  else if(uni == 'g') cmode = emRogueviz;
-#endif
   else if(uni || sym == SDLK_F10) {
     cmode = emNormal;
     msgs.clear();
@@ -1469,7 +1463,4 @@ void displayMenus() {
 #endif
   if(cmode == emHelp) showHelp();
   if(cmode == em3D) show3D();
-#ifdef ROGUEVIZ
-  if(cmode == emRogueviz) rogueviz::showMenu();
-#endif
   }

@@ -355,9 +355,6 @@ namespace arg {
 #ifdef LOCAL
       r = readLocal(); if(r == 2) return; if(r == 0) { lshift(); continue; }
 #endif
-#ifdef ROGUEVIZ
-      r = rogueviz::readArgs(); if(r == 2) return; if(r == 0) { lshift(); continue; }
-#endif
       printf("Unknown option: %s\n", args());
       exit(3);
       }

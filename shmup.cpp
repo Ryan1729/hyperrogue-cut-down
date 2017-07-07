@@ -1041,12 +1041,6 @@ bool isMonster(monster *m) { return m->type != moPlayer && m->type != moBullet; 
 
 void killMonster(monster* m, eMonster who_kills, int flags = 0) {
   int tk = tkills();
-#ifdef ROGUEVIZ
-  if(m->type == moRogueviz) {
-    rogueviz::activate(m);
-    return;
-    }
-#endif
   if(m->dead) return;
   m->dead = true;
   if(isBullet(m) || isPlayer(m)) return;
@@ -1846,9 +1840,6 @@ eItem targetRangedOrbKey(orbAction a) {
   for(int j=0; j<size(active); j++) {
     monster* m2 = active[j];
     if(m2->dead) continue;
-#ifdef ROGUEVIZ
-    if(rogueviz::virt(m2)) continue;
-#endif
     if(!mousetarget || intval(mouseh, mousetarget->pat*C0) > intval(mouseh, m2->pat*C0)) 
       mousetarget = m2;
     }
@@ -2823,9 +2814,6 @@ void turn(int delta) {
     safety = false;
     }
 
-#ifdef ROGUEVIZ
-  rogueviz::turn(delta);
-#endif
   }
 
 void recall() {
@@ -2889,9 +2877,6 @@ bool drawMonster(const transmatrix& V, cell *c, const transmatrix*& Vboat, trans
     transmatrix view = V * m->at;
     
     if(!outofmap(mouseh)) {
-#ifdef ROGUEVIZ
-      if(rogueviz::virt(m)) ; else
-#endif
       if(mapeditor::drawplayer || m->type != moPlayer)
       if(!mousetarget || intval(mouseh, mousetarget->pat*C0) > intval(mouseh, m->pat*C0)) 
         mousetarget = m;
@@ -2965,11 +2950,6 @@ bool drawMonster(const transmatrix& V, cell *c, const transmatrix*& Vboat, trans
         break;
         }
 
-#ifdef ROGUEVIZ      
-      case moRogueviz:
-        rogueviz::drawVertex(V, c, m);
-        break;
-#endif
 
       default:
         if(m->inBoat) m->footphase = 0;
@@ -3182,6 +3162,3 @@ void virtualRebase(shmup::monster *m, bool tohex) {
 
 }
 
-#ifdef ROGUEVIZ
-#include "rogueviz.cpp"
-#endif
