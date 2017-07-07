@@ -751,9 +751,6 @@ void showChangeMode() {
   
   // gameplay modes
 
-#ifdef TOUR
-  dialog::addBoolItem(XLAT("tutorial"), tour::on, 'T');
-#endif
 
   dialog::addBoolItem(XLAT("Euclidean/elliptic mode"), (euclid || sphere), 'e');
   dialog::addBoolItem(XLAT(SHMUPTITLE), (shmup::on || multi::players > 1), 's');
@@ -772,17 +769,9 @@ void showChangeMode() {
   // cheating and map editor
 
   dialog::addBoolItem(XLAT("cheat mode"), (cheater), 'c');
-#ifndef NOEDIT
-  dialog::addBoolItem(XLAT("map editor"), (false), 'm');
-  dialog::addBreak(50);
-  dialog::addBoolItem(XLAT("vector graphics editor"), (false), 'g');
-#endif
 
   // display modes
   
-#ifndef NORUG
-  dialog::addBoolItem(XLAT("hypersian rug mode"), (rug::rugged), 'u');
-#endif
 #ifndef NOMODEL
   dialog::addBoolItem(XLAT("paper model creator"), (false), 'n');
 #endif
@@ -818,12 +807,6 @@ void handleChangeMode(int sym, int uni) {
       }
     }
   
-#ifndef NOEDIT
-  else if(xuni == 'g') {
-    cmode = emDraw;
-    mapeditor::drawcell = cwt.c;
-  }
-#endif
   else if(xuni == 'e') {
     cmode = emPickEuclidean;
   }
@@ -835,12 +818,6 @@ void handleChangeMode(int sym, int uni) {
     clearMessages();
     cmode = emTactic;
   }
-#ifndef NORUG
-  else if(xuni == 'u') {
-    if(sphere) projectionDialog();
-    else rug::select();
-    }
-#endif
   else if(xuni == 'y') {
     clearMessages();
     if(yendor::everwon || autocheat)
@@ -855,12 +832,6 @@ void handleChangeMode(int sym, int uni) {
       restartGame('7');
   else if(uni == 'a')
       cmode = emConformal;
-#ifdef TOUR
-  else if(uni == 'T') {
-    cmode = emNormal;
-    tour::start();
-    }
-#endif
   else if(uni == 'C') {
     if(!chaosmode) {
       cmode = emHelp;
@@ -881,18 +852,6 @@ void handleChangeMode(int sym, int uni) {
       cmode = emNormal;
       }
     }
-#ifndef NOEDIT
-  else if(xuni == 'm') {
-    if(tactic::on) 
-      addMessage(XLAT("Not available in the pure tactics mode!"));
-    else {
-      cheater++;
-      cmode = emMapEditor;
-      lastexplore = turncount;
-      addMessage(XLAT("You activate your terraforming powers!"));
-      }
-    }
-#endif
   else if(xuni == 's') {
     multi::shmupcfg = shmup::on;
     cmode = emShmupConfig;
@@ -1361,13 +1320,6 @@ void displayMenus() {
 
 #ifndef NOMODEL
   if(cmode == emNetgen) netgen::show();
-#endif
-#ifndef NORUG
-  if(cmode == emRugConfig) rug::show();
-#endif
-#ifndef NOEDIT
-  if(cmode == emMapEditor) mapeditor::showMapEditor();
-  if(cmode == emDraw) mapeditor::showDrawEditor();
 #endif
 
 #ifndef NOSAVE

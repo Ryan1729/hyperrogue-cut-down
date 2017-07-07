@@ -5392,9 +5392,6 @@ void movecost(cell* from, cell *to) {
       addMessage(XLAT("As you leave, your powers are drained!"));
     }
   
-  if(from->land != to->land && tour::on)
-    tour::checkGoodLand(to->land);
-  
   if(to->land ==laCrossroads4 && !chaosUnlocked) {
     achievement_gain("CR4");
     chaosUnlocked = true;

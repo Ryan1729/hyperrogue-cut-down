@@ -1399,9 +1399,6 @@ void clearMemory() {
   clearGameMemory();
   shmup::clearMemory();
   cleargraphmemory();
-#ifndef NOEDIT
-  mapeditor::clearModelCells();
-#endif
   clearCellMemory();
   DEBMEM ( printf("ok\n"); )
   }

@@ -141,9 +141,6 @@ void initgame() {
   
   yendor::init(3);
   multi::revive_queue.clear();
-#ifdef TOUR
-  if(tour::on) tour::presentation(5);
-#endif
   
   if(multi::players > 1 && !shmup::on) {
     for(int i=0; i<numplayers(); i++) 
@@ -173,9 +170,6 @@ void initgame() {
       if(firstland != (princess::challenge ? laPalace : laIce)) cheater++;
       }
     if(tactic::trailer) ;
-#ifdef TOUR
-    else if(tour::on) ; // displayed by tour
-#endif
     else if(princess::challenge) {
       kills[moVizier] = 1;
       princess::forceMouse = true;
@@ -613,9 +607,6 @@ void saveStats(bool emergency = false) {
   DEBB(DF_INIT, (debugfile,"saveStats [%s]\n", scorefile));
 
   if(autocheat) return;
-  #ifdef TOUR
-  if(tour::on) return;
-  #endif
   if(randomPatternsMode) return;
   
   remove_emergency_save();
@@ -736,9 +727,6 @@ void saveStats(bool emergency = false) {
 // load the save
 void loadsave() {
   if(autocheat) return;
-#ifdef TOUR
-  if(tour::on) return;
-#endif
   DEBB(DF_INIT, (debugfile,"loadSave\n"));
 
   for(int xc=0; xc<MODECODES; xc++)
@@ -936,16 +924,6 @@ void restartGame(char switchWhat, bool push) {
     resetGeometry();
     chaosmode = !chaosmode;
     }
-#ifdef TOUR
-  if(switchWhat == 'T') {
-    geometry = gNormal;
-    yendor::on = tactic::on = princess::challenge = false;
-    chaosmode = purehepta = randomPatternsMode = false;
-    shmup::on = false;
-    resetGeometry();    
-    tour::on = !tour::on;
-    }
-#endif
   if(switchWhat == '7') {
     if(euclid) geometry = gNormal;
     purehepta = !purehepta;
@@ -1181,18 +1159,6 @@ bool applyCheat(char u, cell *c = NULL) {
     return true;
     }
   if(u == 'R'-64) buildRosemap();
-#ifndef NOEDIT
-  if(u == 'A') {
-    lastexplore = turncount;
-    cmode = emMapEditor;
-    return true;
-    }
-  if(u == 'A'-64) {
-    mapeditor::drawcell = mouseover ? mouseover : cwt.c;
-    cmode = emDraw;
-    return true;
-    }
-#endif
   if(u == 'Y') {
     items[itOrbYendor] ++;
     cheater++; addMessage(XLAT("Orb of Yendor gained!"));

@@ -89,11 +89,6 @@ int arg::readCommon() {
   else if(argis("-s")) { PHASE(1); shift(); scorefile = args(); }
   else if(argis("-m")) { PHASE(1); shift(); musicfile = args(); }
   else if(argis("-se")) { PHASE(1); shift(); wheresounds = args(); }
-#ifndef NOEDIT
-  else if(argis("-lev")) { shift(); levelfile = args(); }
-  else if(argis("-pic")) { shift(); picfile = args(); }
-  else if(argis("-load")) { PHASE(3); shift(); mapstream::loadMap(loadlevel); }
-#endif
   else if(argis("-canvas")) {
     firstland = euclidland = laCanvas;
     shift();
@@ -236,15 +231,6 @@ else if(args()[0] == '-' && args()[1] == x && args()[2] == '0') { PHASE(2); para
   else if(argis("--run")) {
     PHASE(3); mainloop(); quitmainloop = false;
     }
-#ifdef TOUR
-  else if(argis("--tour")) {
-    PHASE(3); tour::start();
-    }
-  else if(argis("--presentation")) {
-    PHASE(3); tour::texts = false;
-    tour::start();
-    }
-#endif
   else if(argis("--draw")) {
     PHASE(3); drawscreen();
     }

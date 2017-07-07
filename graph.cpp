@@ -1272,35 +1272,6 @@ bool drawUserShape(transmatrix V, int group, int id, int color) {
       queuepoly(V, sh, ds.color ? ds.color : color);
     }
 
-#ifndef NOEDIT  
-  if(cmode == emDraw && mapeditor::editingShape(group, id)) {
-
-    usershapelayer &ds(usershapes[group][id]->d[mapeditor::dslayer]);
-    
-    /* for(int a=0; a<size(ds.list); a++) {
-      hyperpoint P2 = V * ds.list[a];
-
-      int xc, yc, sc;
-      getcoord(P2, xc, yc, sc);
-      queuechr(xc, yc, sc, 10, 'x', 
-        a == 0 ? 0x00FF00 : 
-        a == size(ds.list)-1 ? 0xFF0000 :
-        0xFFFF00);
-      } */
-    
-    hyperpoint mh = inverse(mapeditor::drawtrans) * mouseh;
-
-    for(int a=0; a<ds.rots; a++) 
-    for(int b=0; b<(ds.sym?2:1); b++) {
-
-      if(outofmap(mouseh)) break;
-
-      hyperpoint P2 = V * spin(2*M_PI*a/ds.rots) * (b?Mirror*mh:mh);
-    
-      queuechr(P2, 10, 'x', 0xFF00FF);
-      }
-    }
-#endif
 
   return true;
   }
@@ -1525,10 +1496,6 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
 
   char xch = minf[m].glyph;
 
-#ifndef NOEDIT
-  if(where == mapeditor::drawcell)
-    mapeditor::drawtrans = V;
-#endif
 
   if(m == moTortoise && where && where->stuntime >= 3)
     drawStunStars(V, where->stuntime-2);
@@ -2389,9 +2356,6 @@ bool drawMonster(const transmatrix& Vparam, int ct, cell *c, int col) {
         else 
           Vb = Vb * ddspin(c, c->mondir);
 
-#ifndef NOEDIT
-        if(c == mapeditor::drawcell) mapeditor::drawtrans = Vb;
-#endif
 
         if(drawUserShape(Vb, 1, c->monst, (col << 8) + 0xFF)) return false;
 
@@ -3107,12 +3071,6 @@ void setcolors(cell *c, int& wcol, int &fcol) {
 
   if(c->land == laCamelot) {
     int d = showoff ? 0 : ((euclid||c->master->alt) ? celldistAltRelative(c) : 0);
-#ifdef TOUR
-    if(!tour::on) camelotcheat = false;
-    if(camelotcheat) 
-        fcol = (d&1) ? 0xC0C0C0 : 0x606060;
-    else 
-#endif
     if(d < 0) {
       fcol = 0xA0A0A0;
       }
@@ -3866,17 +3824,9 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     
       // floor
       
-#ifndef NOEDIT
-      transmatrix Vpdir = V * applyPatterndir(c);
-#endif
         
       bool eoh = euclid || purehepta;
 
-#ifndef NOEDIT
-      if(c == mapeditor::drawcell && c != cwt.c && !c->monst && !c->item) {
-        mapeditor::drawtrans = Vpdir;
-        }
-#endif
 
       if(c->wall == waChasm) {
         if(c->land == laZebra) fd++;
@@ -3887,32 +3837,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
           }
         }
               
-#ifndef NOEDIT
-      if(drawUserShape(Vpdir, mapeditor::cellShapeGroup(), mapeditor::realpatternsh(c),
-        darkena(fcol, fd, cmode == emDraw ? 0xC0 : 0xFF)));
-      
-      else if(mapeditor::whichShape == '7') {
-        if(ishept(c))
-          qfloor(c, Vf, wmblack ? shBFloor[ct6] : 
-            euclid ? shBigHex :
-            shBigHepta, darkena(fcol, fd, 0xFF));
-        }
-      
-      else if(mapeditor::whichShape == '8') {
-        if(euclid) 
-          qfloor(c, Vf, shTriheptaEuc[ishept(c) ? 1 : ishex1(c) ? 0 : 2], darkena(fcol, fd, 0xFF));
-        else
-          qfloor(c, Vf, shTriheptaFloor[ishept(c) ? 1 : 0], darkena(fcol, fd, 0xFF));
-        }
-      
-      else if(mapeditor::whichShape == '6') {
-        if(!ishept(c))
-          qfloor(c, Vf, 
-            wmblack ? shBFloor[ct6] : 
-            euclid ? (ishex1(c) ? shBigHexTriangle : shBigHexTriangleRev) :
-            shBigTriangle, darkena(fcol, fd, 0xFF));
-        }
-#endif
       
       else if(c->land == laWineyard && cellHalfvine(c)) {
 
@@ -4183,23 +4107,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
         }
       // walls
 
-#ifndef NOEDIT
-
-      if(mapeditor::displaycodes) {
-
-        int labeli = mapeditor::displaycodes == 1 ? mapeditor::realpattern(c) : mapeditor::subpattern(c);
-        
-        string label = its(labeli);
-        if(svg::in)
-          queuestr(V, .5, label, 0xFF000000);
-        else
-          queuestr(V, .2, label, 0xFFFFFFFF);
-        
-        /* transmatrix V2 = V * applyPatterndir(c);
-        qfloor(c, V2, shNecro, 0x80808080);
-        qfloor(c, V2, shStatue, 0x80808080); */
-        }
-#endif
 
       if(cmode == emNumber && (dialog::editingDetail())) {
         int col = 
@@ -4659,10 +4566,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     
     if(conformal::includeHistory && eq(c->aitmp, sval)) poly_outline = OUTLINE_DEAD;
       
-#ifndef NOEDIT
-    if(c == mapeditor::drawcell && mapeditor::drawcellShapeGroup() == 2)
-      mapeditor::drawtrans = V;
-#endif
       
     if(!mmitem && it)
       error = true;
@@ -4929,16 +4832,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       
   if(!inHighQual) {
     
-#ifndef NOEDIT
-    if(cmode == emMapEditor && !mapeditor::subscreen && lmouseover && darken == 0 &&
-      (mapeditor::whichPattern ? mapeditor::subpattern(c) == mapeditor::subpattern(lmouseover) : c == lmouseover)) {
-      queuecircle(V, .78, 0x00FFFFFF);
-      }
-#endif
     
-#ifndef NOEDIT
-    mapeditor::drawGhosts(c, V, ct);
-#endif
     }
     
     if(c->bardir != NODIR && c->bardir != NOBARRIERS && c->land != laHauntedWall &&
@@ -5234,10 +5128,6 @@ string buildHelpText() {
   h += XLAT("See more on the website: ") 
     + "http//roguetemple.com/z/hyper/\n\n";
   
-#ifdef TOUR
-  h += XLAT("Try the Tutorial to help with understanding the "
-    "geometry of HyperRogue (menu -> special modes).\n\n");
-#endif
   
   h += XLAT("Still confused? Read the FAQ on the HyperRogue website!\n\n");
   
@@ -6012,9 +5902,6 @@ void drawthemap() {
   modist = 1e20; mouseover = NULL; 
   modist2 = 1e20; mouseover2 = NULL; 
   mouseovers = XLAT("Press F1 or right click for help");
-#ifdef TOUR
-  if(tour::on) mouseovers = tour::tourhelp;
-#endif
   centdist = 1e20; centerover = NULL; 
 
   for(int i=0; i<multi::players; i++) {
@@ -6043,9 +5930,6 @@ void drawthemap() {
     }
   
 
-  #ifdef TOUR
-  if(tour::on) tour::presentation(2);
-  #endif
   
   profile_stop(1);
   profile_start(4);
@@ -6138,9 +6022,6 @@ void drawmovestar(double dx, double dy) {
   DEBB(DF_GRAPH, (debugfile,"draw movestar\n"));
   if(!playerfound) return;
   
-#ifndef NORUG
-  if(rug::rugged && multi::players == 1 && !multi::alwaysuse) return;
-#endif
 
   hyperpoint H = tC0(cwtV);
   ld R = sqrt(H[0] * H[0] + H[1] * H[1]);
@@ -6423,9 +6304,6 @@ string timeline() {
 void showGameover() {
 
   dialog::init(
-#ifdef TOUR
-    tour::on ? (canmove ? XLAT("Tutorial") : XLAT("GAME OVER")) :
-#endif
     cheater ? XLAT("It is a shame to cheat!") : 
     showoff ? XLAT("Showoff mode") :
     canmove && princess::challenge ? XLAT("%1 Challenge", moPrincess) :
@@ -6466,9 +6344,6 @@ void showGameover() {
     timerstart = time(NULL);
   
   if(princess::challenge) ;
-#ifdef TOUR
-  else if(tour::on) ;
-#endif
   else if(tkills() < 100)
     dialog::addInfo(XLAT("Defeat 100 enemies to access the Graveyard"));
   else if(kills[moVizier] == 0 && (items[itFernFlower] < 5 || items[itGold] < 5))
@@ -6517,9 +6392,6 @@ void showGameover() {
   
   bool intour = false;
   
-#ifdef TOUR
-  intour = tour::on;
-#endif
 
   if(intour) {
     if(canmove) {
@@ -7145,24 +7017,6 @@ void drawfullmap() {
     } */
 
   drawthemap();
-  #ifndef NORUG
-  if(!inHighQual) {
-    if(cmode == emNormal && !rug::rugged) {
-      if(multi::players > 1) {
-        transmatrix bcwtV = cwtV;
-        for(int i=0; i<multi::players; i++) if(multi::playerActive(i))
-          cwtV = multi::whereis[i], multi::cpid = i, drawmovestar(multi::mdx[i], multi::mdy[i]);
-        cwtV = bcwtV;
-        }
-      else if(multi::alwaysuse)
-        drawmovestar(multi::mdx[0], multi::mdy[0]);
-      else 
-        drawmovestar(0, 0);
-      }
-    if(rug::rugged && !rug::renderonce) queueline(C0, mouseh, 0xFF00FFFF, 5);
-    mapeditor::drawGrid();
-    }
-  #endif
   profile_start(2);
   drawqueue();
   profile_stop(2);
@@ -7196,21 +7050,12 @@ void drawscreen() {
   
   if(sidescreen) darken = 0;
 
-#ifndef NOEDIT
-  if(cmode == emMapEditor && !mapeditor::subscreen && !mapeditor::choosefile) darken = 0;
-  if(cmode == emDraw && mapeditor::choosefile) darken = 2;
-#endif
   if(hiliteclick && darken == 0 && mmmon) darken = 1;
   if(cmode == emProgress) darken = 0;
 
   if(conformal::includeHistory && cmode != emProgress) conformal::restore();
   
   if(darken >= 8) ;
-#ifndef NORUG
-  else if(rug::rugged) {
-    rug::actDraw();
-    }
-#endif
   else drawfullmap();
 
   if(conformal::includeHistory && cmode != emProgress) conformal::restoreBack();
@@ -7781,11 +7626,6 @@ void handleKeyQuit(int sym, int uni) {
   dialog::handleNavigation(sym, uni);
   // ignore the camera movement keys
 
-#ifndef NORUG
-  if(rug::rugged && (sym == SDLK_UP || sym == SDLK_DOWN || sym == SDLK_PAGEUP || sym == SDLK_PAGEDOWN ||
-    sym == SDLK_RIGHT || sym == SDLK_LEFT))
-    sym = 0;
-#endif
 
   if(sym == SDLK_RETURN || sym == SDLK_F10) quitmainloop = true;
   else if(uni == 'r' || sym == SDLK_F5) {
@@ -7929,9 +7769,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
       loadScores();
       }
 #endif
-#ifndef NORUG
-    else if(rug::rugged) ;
-#endif
     else if(sym == SDLK_UP || sym == SDLK_KP8) msgscroll++;
     else if(sym == SDLK_DOWN || sym == SDLK_KP2) msgscroll--;
     else if(sym == SDLK_PAGEUP || sym == SDLK_KP9) msgscroll+=5;
@@ -7991,9 +7828,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
 
 void handlekey(int sym, int uni, extra& ev) {
 
-#ifdef TOUR
-  if(tour::on && tour::handleKeyTour(sym, uni)) return;
-#endif
 
   if(((cmode == emNormal && canmove) || (cmode == emQuit && !canmove) || cmode == emDraw || cmode == emMapEditor) && DEFAULTCONTROL && !rug::rugged) {
 #ifndef PANDORA
@@ -8061,13 +7895,6 @@ void handlekey(int sym, int uni, extra& ev) {
   else if(cmode == emShmupConfig) shmup::handleConfig(sym, uni);
 #ifndef NOMODEL
   else if(cmode == emNetgen) netgen::handleKey(sym, uni);
-#endif
-#ifndef NORUG
-  else if(cmode == emRugConfig) rug::handleKey(sym, uni);
-#endif
-#ifndef NOEDIT
-  else if(cmode == emMapEditor) mapeditor::handleKey(sym, uni);
-  else if(cmode == emDraw) mapeditor::drawHandleKey(sym, uni);
 #endif
 #ifndef NOSAVE
   else if(cmode == emScores) handleScoreKeys(sym);
@@ -8293,11 +8120,6 @@ void mainloopiter() {
       mousex = ev.motion.x;
       mousey = ev.motion.y;
 
-#ifndef NORUG
-      if(rug::rugged)
-        mouseh = rug::gethyper(mousex, mousey);
-      else
-#endif
         mouseh = gethyper(mousex, mousey);
       
       if((rightclick || (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_MMASK)) && 
@@ -8340,15 +8162,6 @@ void cleargraph() {
 void cleargraphmemory() {
   DEBB(DF_INIT, (debugfile,"clear graph memory\n"));
   mouseover = centerover = lmouseover = NULL;  
-#ifndef NOEDIT
-  if(mapeditor::painttype == 4) 
-    mapeditor::painttype = 0, mapeditor::paintwhat = 0,
-    mapeditor::paintwhat_str = "clear monster";
-  mapeditor::copywhat = NULL;
-  mapeditor::undo.clear();
-  if(!cheater) mapeditor::displaycodes = 0;
-  if(!cheater) mapeditor::whichShape = 0;
-#endif
   for(int i=0; i<ANIMLAYERS; i++) animations[i].clear();
   gmatrix.clear(); gmatrix0.clear();
   }

@@ -83,10 +83,11 @@ const char *loadlevel = NULL;
 #include "graph.cpp"
 #include "sound.cpp"
 #include "achievement.cpp"
-#ifdef TOUR
-#include "tour.cpp"
-#endif
 #include <unistd.h>
+
+namespace tour {
+    bool on;
+}
 
 bool fixseed = false;
 

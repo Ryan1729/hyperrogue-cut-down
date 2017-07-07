@@ -1582,12 +1582,6 @@ eLand getNewLand(eLand old) {
   // return landtab[items[itStrongWind]++ % 10];
   // if(old != laPrairie) return laRiver;
   
-  #ifdef TOUR
-  if(tour::on) {
-    eLand l = tour::getNext(old);
-    if(l) return l;
-    }
-  #endif
   
 #ifdef LOCAL
   extern bool doAutoplay;
@@ -2689,9 +2683,6 @@ void setLandQuotient(cell *c) {
 
 bool quickfind(eLand l) {
   if(l == cheatdest) return true;
-#ifdef TOUR
-  if(tour::on && tour::quickfind(l)) return true;
-#endif
   return false;
   }
 
@@ -5111,10 +5102,6 @@ void setdist(cell *c, int d, cell *from) {
 
   if(d == 7) playSeenSound(c);
   
-#ifndef NOEDIT
-  if(d >= 7 && mapeditor::whichPattern)
-    mapeditor::applyModelcell(c);
-#endif
   }
 
 bool wchance(int a, int of) {
