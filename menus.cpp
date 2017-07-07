@@ -423,10 +423,6 @@ void handleVisual1(int sym, int uni) {
   
   if(xuni == 'g') cmode = emCustomizeChar;
 
-#ifdef LOCAL  
-  extern void process_local(int);
-  process_local(sym);
-#endif
   }
 
 void showJoystickConfig() {

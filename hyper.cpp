@@ -338,9 +338,6 @@ namespace arg {
     while(argc) {
       int r;
       r = readCommon(); if(r == 2) return; if(r == 0) { lshift(); continue; }
-#ifdef LOCAL
-      r = readLocal(); if(r == 2) return; if(r == 0) { lshift(); continue; }
-#endif
       printf("Unknown option: %s\n", args());
       exit(3);
       }

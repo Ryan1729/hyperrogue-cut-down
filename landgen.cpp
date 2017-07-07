@@ -1133,16 +1133,7 @@ void raiseBuggyGeneration(cell *c, const char *s) {
     }
   // return;
 
-#ifdef LOCAL
-  
-  describeCell(c);
-  for(int i=0; i<c->type; i++) describeCell(c->mov[i]);
-
-  buggyGeneration = true; buggycells.push_back(c);
-
-#else
   c->item = itBuggy;
-#endif
 
 #ifdef BACKTRACE
   void *array[1000];
@@ -1583,24 +1574,6 @@ eLand getNewLand(eLand old) {
   // if(old != laPrairie) return laRiver;
   
   
-#ifdef LOCAL
-  extern bool doAutoplay;
-  if(doAutoplay) 
-    return pick(laOcean, laLivefjord, laWarpSea, laWarpCoast);
-  extern bool doCross;
-  if(doCross) {
-    whichnow++;
-    eLand tabb[30] = {
-      laIce, laRedRock, laCaribbean, laWarpCoast, laWhirlwind, laPower,
-      laMirror, laPalace, laLivefjord, laAlchemist, laCocytus, 
-      laHell, laJungle, laCaves, laDesert, laRlyeh, laStorms,
-      laGraveyard, laMotion, laDryForest, laDragon, laZebra, laIvoryTower,
-      laTrollheim, laOvergrown, laBurial, laRose, laHive, laEmerald,
-      laEmerald
-      };
-    return tabb[whichnow%30];
-    }
-#endif
 
   if(cheatdest != old) if(!isCyclic(cheatdest) && !isTechnicalLand(cheatdest)) return cheatdest;
   

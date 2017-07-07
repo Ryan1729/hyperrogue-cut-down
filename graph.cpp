@@ -197,14 +197,8 @@ int textwidth(int siz, const string &str);
 
 int gradient(int c0, int c1, ld v0, ld v, ld v1);
 
-#ifdef LOCAL
-double fadeout = 1;
-#endif
 
 int darkened(int c) {
-#ifdef LOCAL
-  c = gradient(0, c, 0, fadeout, 1);
-#endif
   // c = ((c & 0xFFFF) << 8) | ((c & 0xFF0000) >> 16);
   // c = ((c & 0xFFFF) << 8) | ((c & 0xFF0000) >> 16);
   for(int i=0; i<darken; i++) c &= 0xFEFEFE, c >>= 1;
@@ -4846,10 +4840,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     netgen::buildVertexInfo(c, V);
 #endif
 
-#ifdef LOCAL
-    extern void localdraw (const transmatrix& V, cell *c);
-    localdraw(V, c);
-#endif
     }
   }
 
@@ -6892,9 +6882,6 @@ XLAT(
     }
 
   achievement_display();
-#ifdef LOCAL
-  process_local_stats();
-#endif
   }
 
 
@@ -7599,9 +7586,6 @@ void panning(hyperpoint hf, hyperpoint ht) {
   playermoved = false;
   }
 
-#ifdef LOCAL
-#include "local.cpp"
-#endif
 
 bool needConfirmation() {
   return canmove && (gold() >= 30 || tkills() >= 50) && !cheater && !quitsaves();
@@ -7821,9 +7805,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     }
 
 
-#ifdef LOCAL
-  process_local0(sym);
-#endif
   }
 
 void handlekey(int sym, int uni, extra& ev) {
@@ -7927,9 +7908,6 @@ void mainloopiter() {
   #endif
   #endif
 
-#ifdef LOCAL
-  process_local_extra();
-#endif
   
   optimizeview();
 

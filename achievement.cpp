@@ -92,9 +92,6 @@ bool wrongMode(char flags) {
 
 void achievement_log(const char* s, char flags) {
 
-#ifdef LOCAL
-  printf("achievement = %s [%d]\n", s, wrongMode(flags));
-#endif
   
   if(wrongMode(flags)) return;
   

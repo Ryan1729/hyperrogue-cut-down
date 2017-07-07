@@ -69,10 +69,6 @@ void handlemusic() {
   DEBB(DF_GRAPH, (debugfile,"handle music\n"));
   if(audio && musicvolume) {
     eLand id = getCurrentLandForMusic();
-#ifdef LOCAL
-    extern bool local_changemusic(eLand& id);
-    if(local_changemusic(id)) return;
-#endif
     if(outoffocus) id = eLand(0);
     if(musfname[id] == "LAST") id = cid;
     if(!loaded[id]) {

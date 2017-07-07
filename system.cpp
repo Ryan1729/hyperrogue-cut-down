@@ -1328,16 +1328,6 @@ bool applyCheat(char u, cell *c = NULL) {
     cblind = !cblind;
     return true;
     }
-#ifdef LOCAL
-  if(u == 'K'-64) {
-    printf("viewctr = %p.%d\n", viewctr.h, viewctr.spin);
-    display(View);
-    }
-  if(u == 'D'-64) {
-    cheater = 0; autocheat = 0;
-    return true;
-    }
-#endif
   return false;
   }
 
