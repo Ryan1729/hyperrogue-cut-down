@@ -8357,9 +8357,7 @@ void mainloopiter() {
       mousepressed = true;
       mousing = true;
       actonrelease = true;
-      if(ev.button.button==SDL_BUTTON_WHEELUP && ((cmode == emQuit) ^ !canmove)) {
-        }
-      else if(ev.button.button==SDL_BUTTON_WHEELDOWN) {
+      if(ev.button.button==SDL_BUTTON_WHEELDOWN) {
         if(cmode == (canmove ? emQuit : emNormal)) {
           sym = 1; msgscroll--; didsomething = true;
           }
