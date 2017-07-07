@@ -8485,7 +8485,6 @@ void showMissionScreen() {
 
 void resetGeometry() {
   precalc();
-  fp43.analyze(); 
   resetGL();
   }
 
