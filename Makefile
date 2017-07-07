@@ -11,8 +11,4 @@ hyper.o: hyper.cpp graph.cpp hyperpoint.cpp geometry.cpp cell.cpp heptagon.cpp g
 hyper: hyper.o savepng-loc.o
 	g++ savepng-loc.o hyper.o -o hyper -lSDL -lSDL_ttf -lSDL_mixer -lSDL_gfx ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} -lGL -lpng
 
-langen: langen.cpp language-cz.cpp language-pl.cpp language-tr.cpp language-ru.cpp
-	g++ langen.cpp -o langen
 
-language-data.cpp: langen
-	./langen > language-data.cpp
