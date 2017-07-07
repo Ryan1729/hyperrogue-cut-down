@@ -30,7 +30,6 @@ int detaillevel = 0;
 
 // #define PANDORA
 
-#ifndef MOBILE
 #include <SDL/SDL.h>
 
 #ifdef SDLAUDIO
@@ -42,17 +41,14 @@ int detaillevel = 0;
 #endif
 
 #include <SDL/SDL_ttf.h>
-#endif
 
 int colorbar;
 #define COLORBAR "###"
 
-#ifndef MOBILE
 SDL_Surface *s;
 TTF_Font *font[256];
 SDL_Joystick* sticks[8];
 int numsticks;
-#endif
 
 ld shiftmul = 1;
 
@@ -155,7 +151,6 @@ bool doHighlight() {
   return (hiliteclick && darken < 2) ? !mmhigh : mmhigh;
   }
 
-#ifndef MOBILE
 int& qpixel(SDL_Surface *surf, int x, int y) {
   if(x<0 || y<0 || x >= surf->w || y >= surf->h) return ZZ;
   char *p = (char*) surf->pixels;
@@ -175,11 +170,7 @@ int qpixel3(SDL_Surface *surf, int x, int y) {
 
 void loadfont(int siz) {
   if(!font[siz]) {
-#ifdef WEB
-    font[siz] = TTF_OpenFont("sans-serif", siz);
-#else
     font[siz] = TTF_OpenFont("DejaVuSans-Bold.ttf", siz);
-#endif
     // Destination set by ./configure (in the GitHub repository)
     #ifdef FONTDESTDIR
     if (font[siz] == NULL) {
@@ -198,10 +189,6 @@ int gl_width(int size, const char *s);
 int textwidth(int siz, const string &str) {
   if(size(str) == 0) return 0;
 
-#ifdef WEB
-  return gl_width(siz, str.c_str());
-
-#else
 
   loadfont(siz);
   
@@ -209,19 +196,10 @@ int textwidth(int siz, const string &str) {
   TTF_SizeUTF8(font[siz], str.c_str(), &w, &h);
   // printf("width = %d [%d]\n", w, size(str));
   return w;
-#endif
   }
-#endif
 
 int textwidth(int siz, const string &str);
 
-#ifdef IOS
-
-int textwidth(int siz, const string &str) {
-  return mainfont->getSize(str, siz / 36.0).width;
-  }
-
-#endif
 
 int gradient(int c0, int c1, ld v0, ld v, ld v1);
 
@@ -371,7 +349,6 @@ void setGLProjection() {
 
 void buildpolys();
 
-#ifndef MOBILE
 
 struct glfont_t {
   GLuint * textures;                                  // Holds The Texture Id's   
@@ -412,7 +389,6 @@ void init_glfont(int size) {
 //f.list_base = glGenLists(128);
   glGenTextures( 128+NUMEXTRA, f.textures );
 
-#ifndef WEB
   loadfont(size);
   if(!font[size]) return;
 
@@ -420,18 +396,11 @@ void init_glfont(int size) {
   
   SDL_Color white;
   white.r = white.g = white.b = 255;
-#endif
   
 //  glListBase(0);
  
   for(int ch=1;ch<128+NUMEXTRA;ch++) {
   
-#ifdef WEB
-    if(ch<32) continue;
-    int otwidth, otheight, tpix[3000], tpixindex = 0;    
-    loadCompressedChar(otwidth, otheight, tpix);
-
-#else
 
     SDL_Surface *txt;
     if(ch < 128) {
@@ -445,24 +414,15 @@ void init_glfont(int size) {
 
     int otwidth = txt->w;
     int otheight = txt->h;
-#endif
 
     int twidth = next_p2( otwidth );
     int theight = next_p2( otheight );
 
-#ifdef WEB
-    int expanded_data[twidth * theight];
-#else
     Uint16 expanded_data[twidth * theight];
-#endif
 
     for(int j=0; j <theight;j++) for(int i=0; i < twidth; i++) {
-#ifdef WEB
-      expanded_data[(i+j*twidth)] = (i>=otwidth || j>=otheight) ? 0 : tpix[tpixindex++];
-#else
       expanded_data[(i+j*twidth)] = 
           (i>=txt->w || j>=txt->h) ? 0 : ((qpixel(txt, i, j)>>24)&0xFF) * 0x101;
-#endif
       }
     
 /*    if(ch == '@') {
@@ -481,11 +441,7 @@ void init_glfont(int size) {
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
    
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, twidth, theight, 0,
-#ifdef WEB
-      GL_RGBA, GL_UNSIGNED_BYTE, 
-#else
       GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 
-#endif
       expanded_data );
    
 //  printf("c\n");
@@ -515,9 +471,7 @@ void init_glfont(int size) {
     glEndList(); */
     //glPopMatrix();
 
-#ifndef WEB
     SDL_FreeSurface(txt);    
-#endif
     }
 
 //printf("init size=%d ok\n", size);
@@ -542,15 +496,10 @@ int gl_width(int size, const char *s) {
   int gsiz = size;
   if(size > vid.fsize || size > 72) gsiz = 72;
 
-#ifdef WEB
-  gsiz = 36;
-#endif
 
   init_glfont(gsiz);
 
-#ifndef WEB
   if(!font[gsiz]) return 0;
-#endif
 
   glfont_t& f(*glfont[gsiz]);
 
@@ -579,15 +528,10 @@ bool gl_print(int x, int y, int shift, int size, const char *s, int color, int a
   if(size > vid.fsize || size > 72) gsiz = 72;
   // if(size >= 36) gsiz = 72;
 
-#ifdef WEB
-  gsiz = 36;
-#endif
   
   init_glfont(gsiz);
 
-#ifndef WEB
   if(!font[gsiz]) return false;
-#endif
 
   glfont_t& f(*glfont[gsiz]);
   
@@ -679,22 +623,18 @@ bool gl_print(int x, int y, int shift, int size, const char *s, int color, int a
   return clicked;
   // printf("gl_print ok\n");
   }
-#endif
 
 void resetGL() {
   DEBB(DF_INIT, (debugfile,"reset GL\n"));
-#ifndef MOBILE
   for(int i=0; i<128; i++) if(glfont[i]) {
     delete glfont[i];
     glfont[i] = NULL;
     }
-#endif
   buildpolys();
   }
 
 #endif
 
-#ifndef MOBILE
 bool displaystr(int x, int y, int shift, int size, const char *str, int color, int align) {
   if(strlen(str) == 0) return false;
 
@@ -703,9 +643,6 @@ bool displaystr(int x, int y, int shift, int size, const char *str, int color, i
     return false;
     }
   
-#ifdef WEB
-  return gl_print(x, y, shift, size, str, color, align);
-#endif
   
 #ifdef GL
   if(vid.usingGL) return gl_print(x, y, shift, size, str, color, align);
@@ -774,62 +711,6 @@ bool displaychr(int x, int y, int shift, int size, char chr, int col) {
   return displaystr(x, y, shift, size, buf, col, 8);
   }
 
-#else
-
-vector<int> graphdata;
-
-void gdpush(int t) {
-  graphdata.push_back(t);
-  }
-
-bool displaychr(int x, int y, int shift, int size, char chr, int col) {
-  gdpush(2); gdpush(x); gdpush(y); gdpush(8);
-  gdpush(col); gdpush(size); gdpush(0);
-  gdpush(1); gdpush(chr); 
-  return false;
-  }
-
-void gdpush_utf8(const string& s) {
-  int g = (int) graphdata.size(), q = 0;
-  gdpush((int) s.size()); for(int i=0; i<s.size(); i++) {
-#ifdef ANDROID
-    unsigned char uch = (unsigned char) s[i];
-    if(uch >= 192 && uch < 224) {
-      int u = ((s[i] - 192)&31) << 6;
-      i++;
-      u += (s[i] - 128) & 63;
-      gdpush(u); q++;
-      }
-    else
-#endif
-      {
-      gdpush(s[i]); q++;
-      }
-    }
-  graphdata[g] = q;
-  }
-
-bool displayfr(int x, int y, int b, int size, const string &s, int color, int align) {
-  gdpush(2); gdpush(x); gdpush(y); gdpush(align);
-  gdpush(color); gdpush(size); gdpush(b);
-  gdpush_utf8(s);
-  int mx = mousex - x;
-  int my = mousey - y;
-  int len = textwidth(size, s);
-  return 
-    mx >= -len*align/32   && mx <= +len*(16-align)/32 && 
-    my >= -size*3/4 && my <= +size*3/4;
-  }
-
-bool displaystr(int x, int y, int shift, int size, const string &s, int color, int align) {
-  return displayfr(x,y,0,size,s,color,align);
-  }
-
-bool displaystr(int x, int y, int shift, int size, char const *s, int color, int align) {
-  return displayfr(x,y,0,size,s,color,align);
-  }
-
-#endif
 
 bool displaynum(int x, int y, int shift, int size, int col, int val, string title) {
   char buf[64];
@@ -1316,9 +1197,6 @@ transmatrix ddspin(cell *c, int d, int bonus = 0) {
   return getspinmatrix(hdir);
   }
 
-#ifdef WEB
-Uint8 *SDL_GetKeyState(void *v) { static Uint8 tab[1024]; return tab; }
-#endif
 
 #include "shmup.cpp"
 #include "conformal.cpp"
@@ -1401,9 +1279,6 @@ void drawStunStars(const transmatrix& V, int t) {
   }
 
 bool drawUserShape(transmatrix V, int group, int id, int color) {
-#ifdef MOBILE
-  return false;
-#else
   usershape *us = usershapes[group][id];
   if(!us) return false;
 
@@ -1446,7 +1321,6 @@ bool drawUserShape(transmatrix V, int group, int id, int color) {
 #endif
 
   return true;
-#endif
   }
 
 string csnameid(int id) {
@@ -2801,9 +2675,6 @@ void drawCircle(int x, int y, int size, int color) {
     }
   #endif
 
-#ifdef MOBILE
-  gdpush(4); gdpush(color); gdpush(x); gdpush(y); gdpush(size);
-#else
 #ifdef GFX
   (vid.usingAA?aacircleColor:circleColor) (s, x, y, size, color);
 #else
@@ -2811,7 +2682,6 @@ void drawCircle(int x, int y, int size, int color) {
   if(pts > 1500) pts = 1500;
   for(int r=0; r<pts; r++)
     qpixel(s, x + int(size * sin(r)), y + int(size * cos(r))) = color;
-#endif
 #endif
   }
 
@@ -5198,11 +5068,7 @@ void queuecircleat(cell *c, double rad, int col) {
 #define Gm(x) gmatrix[x]
 #define Gm0(x) tC0(gmatrix[x])
 
-#ifdef MOBILE
-#define MOBON (clicked)
-#else
 #define MOBON true
-#endif
 
 void drawMarkers() {
 
@@ -5265,18 +5131,6 @@ void drawMarkers() {
 
     // process mouse
 
-#ifdef MOBILE
-  extern bool useRangedOrb;
-  if(canmove && !shmup::on && andmode == 0 && !useRangedOrb && vid.mobilecompasssize > 0) {
-    using namespace shmupballs;
-    calc();
-    queuecircle(xmove, yb, rad, 0xFF0000FF);
-    queuecircle(xmove, yb, rad*SKIPFAC, 
-      legalmoves[7] ? 0xFF0000FF : 0xFF000080
-      );
-    forCellAll(c2, cwt.c) IG(c2) drawMobileArrow(c2, Gm(c2));
-    }
-#endif
 
     if((vid.axes == 4 || (vid.axes == 1 && !mousing)) && !shmup::on) {
       if(multi::players == 1) {
@@ -5380,12 +5234,6 @@ string buildHelpText() {
   DEBB(DF_GRAPH, (debugfile,"buildHelpText\n"));
   string h;
   h += XLAT("Welcome to HyperRogue");
-#ifdef ANDROID  
-  h += XLAT(" for Android");
-#endif
-#ifdef IOS
-  h += XLAT(" for iOS");
-#endif
   h += XLAT("! (version %1)\n\n", VER);
   
   h += XLAT(
@@ -5412,14 +5260,6 @@ string buildHelpText() {
     "get the details of all the Lands.\n\n");
   h += "\n\n";
     
-#ifdef MOBILE
-  h += XLAT(
-    "Usually, you move by touching somewhere on the map; you can also touch one "
-    "of the four buttons on the map corners to change this (to scroll the map "
-    "or get information about map objects). You can also touch the "
-    "numbers displayed to get their meanings.\n"
-    );
-#else
   h += XLAT(
     "Move with mouse, num pad, qweadzxc, or hjklyubn. Wait by pressing 's' or '.'. Spin the world with arrows, PageUp/Down, and Home/Space. "
     "To save the game you need an Orb of Safety. Press 'v' for the main menu (configuration, special modes, etc.), ESC for the quest status.\n\n"
@@ -5428,7 +5268,6 @@ string buildHelpText() {
     "You can right click any element to get more information about it.\n\n"
     );
   h += XLAT("(You can also use right Shift)\n\n");
-#endif
   h += XLAT("See more on the website: ") 
     + "http//roguetemple.com/z/hyper/\n\n";
   
@@ -5461,11 +5300,9 @@ string buildCredits() {
 #ifdef EXTRALICENSE
   h += EXTRALICENSE;
 #endif
-#ifndef MOBILE
   h += XLAT(
     "\n\nSee sounds/credits.txt for credits for sound effects"
     );
-  #endif
   if(musiclicense != "") h += musiclicense;
   return h;
   }
@@ -5474,9 +5311,7 @@ string pushtext(stringpar p) {
   string s = XLAT(
     "\n\nNote: when pushing %the1 off a heptagonal cell, you can control the pushing direction "
     "by clicking left or right half of the heptagon.", p);
-#ifndef MOBILE
   s += XLAT(" With the keyboard, you can rotate the view for a similar effect (Page Up/Down).");
-#endif
   return s;
   }
 
@@ -5519,13 +5354,8 @@ string generateHelpForItem(eItem it) {
        " You need to go deep to collect lots of them.");
      }
      
-#ifdef MOBILE
-   if(it == itOrbSafety)
-     help += XLAT("This might be very useful for devices with limited memory.");
-#else
    if(it == itOrbSafety)
      help += XLAT("Thus, it is potentially useful for extremely long games, which would eat all the memory on your system otherwise.\n");
-#endif
 
    if(isRangedOrb(it)) {
      help += XLAT("\nThis is a ranged Orb. ");
@@ -5544,13 +5374,8 @@ string generateHelpForItem(eItem it) {
      help += XLAT("\nYou can never target cells which are adjacent to the player character, or ones out of the sight range.");
      }
 
-#ifdef MOBILE
-   if(it == itGreenStone)
-     help += XLAT("You can touch the Dead Orb in your inventory to drop it.");
-#else
    if(it == itGreenStone)
      help += XLAT("You can press 'g' or click them in the list to drop a Dead Orb.");
-#endif
    if(it == itOrbLightning || it == itOrbFlash)
      help += XLAT("\n\nThis Orb is triggered on your first attack or illegal move.");
    if(it == itOrbShield)
@@ -5606,11 +5431,7 @@ void addMinefieldExplanation(string& s) {
     );
 
   s += "\n\n";
-#ifdef MOBILE
-  s += XLAT("Known mines may be marked by pressing 'm'. Your allies won't step on marked mines.");
-#else
   s += XLAT("Known mines may be marked by touching while in drag mode. Your allies won't step on marked mines.");
-#endif
   }
 
 string generateHelpForWall(eWall w) {
@@ -6064,10 +5885,8 @@ void describeMouseover() {
       out = XLAT("The axes help with keyboard movement");
     else if(getcstat == 'g')
       out = XLAT("Affects looks and grammar");
-#ifndef MOBILE
     else if(getcstat == 's')
       out = XLAT("Config file: %1", conffile);
-#endif
     else out = "";
     }
   else if(cmode == emVisual2) {
@@ -6092,9 +5911,7 @@ void describeMouseover() {
   int col = linf[cwt.c->land].color;
   if(cwt.c->land == laRedRock) col = 0xC00000;
 
-#ifndef MOBILE
   displayfr(vid.xres/2, vid.fsize,   2, vid.fsize, out, col, 8);
-#endif
 
   if(mousey < vid.fsize * 3/2) getcstat = SDLK_F1;
 
@@ -6278,9 +6095,6 @@ void drawthemap() {
     multi::ccdist[i] = 1e20; multi::ccat[i] = NULL;
     }
 
-  #ifdef MOBILE
-  mouseovers = XLAT("No info about this...");
-  #endif
   if(outofmap(mouseh)) 
     modist = -5;
   playerfound = false;
@@ -6348,7 +6162,6 @@ void drawthemap() {
       }
     }
 
-  #ifndef MOBILE
   Uint8 *keystate = SDL_GetKeyState(NULL);
   lmouseover = mouseover;
   bool useRangedOrb = (!(vid.shifttarget & 1) && haveRangedOrb() && lmouseover && lmouseover->cpdist > 1) || (keystate[SDLK_RSHIFT] | keystate[SDLK_LSHIFT]);
@@ -6367,7 +6180,6 @@ void drawthemap() {
     cwt = cw; flipplayer = f;
     lmouseover = mousedest.d >= 0 ? cwt.c->mov[(cwt.spin + mousedest.d) % cwt.c->type] : cwt.c;
     }
-  #endif
   profile_stop(0);
   }
 
@@ -6673,7 +6485,6 @@ void displayColorButton(int x, int y, const string& name, int key, int align, in
     }
   }
 
-#ifndef MOBILE
 void quitOrAgain() {
   int y = vid.yres * (618) / 1000;
   displayButton(vid.xres/2, y + vid.fsize*1/2, 
@@ -6686,7 +6497,6 @@ void quitOrAgain() {
   displayButton(vid.xres/2, y + vid.fsize*10/2, XLAT("or 'v' to see the main menu"), 'v', 8, 2);
   displayButton(vid.xres/2, y + vid.fsize*13/2, XLAT("or 'o' to see the world overview"), 'o', 8, 2);
   }
-#endif
 
 int calcfps() {
   #define CFPS 30
@@ -6840,9 +6650,7 @@ void showGameover() {
     dialog::addItem(canmove ? "continue" : "see how it ended", SDLK_ESCAPE);
     dialog::addItem("main menu", 'v');
     dialog::addItem("restart", SDLK_F5);
-    #ifndef MOBILE
     dialog::addItem(quitsaves() ? "save" : "quit", SDLK_F10);
-    #endif
     #ifdef ANDROIDSHARE
     dialog::addItem("SHARE", 's'-96);
     #endif
@@ -6854,26 +6662,6 @@ void showGameover() {
     displayfr(vid.xres/2, vid.yres-vid.fsize*(mnum+1), 2, vid.fsize/2,  XLAT("last messages:"), 0xC0C0C0, 8);  
   }
 
-#ifdef MOBILE
-void displayabutton(int px, int py, string s, int col) {
-  // TMP
-  int siz = vid.yres > vid.xres ? vid.fsize*2 : vid.fsize * 3/2;
-  int vrx = min(vid.radius, vid.xres/2 - 40);
-  int vry = min(vid.radius, min(vid.ycenter, vid.yres - vid.ycenter) - 20);
-  int x = vid.xcenter + px * vrx;
-  int y = vid.ycenter + py * (vry - siz/2);
-  int vrr = int(hypot(vrx, vry) * sqrt(2.));
-  if(gtouched && !mouseover
-    && abs(mousex - vid.xcenter) < vrr
-    && abs(mousey - vid.ycenter) < vrr
-    && hypot(mousex-vid.xcenter, mousey-vid.ycenter) > vrr
-    && px == (mousex > vid.xcenter ? 1 : -1)
-    && py == (mousey > vid.ycenter ? 1 : -1)
-    ) col = 0xFF0000;
-  if(displayfr(x, y, 0, siz, s, col, 8+8*px))
-    buttonclicked = true;
-  }
-#endif
 
 #ifndef NOSAVE
 vector<score> scores;
@@ -6956,10 +6744,6 @@ void loadScores() {
   else if(hardcore) scoremode = 2;
   scorefrom = 0;
   stable_sort(scores.begin(), scores.end(), scorecompare);
-  #ifdef MOBILE
-  extern int andmode;
-  andmode = 2;
-  #endif
   }
 
 vector<pair<string, int> > pickscore_options;
@@ -7336,15 +7120,9 @@ void drawStats() {
       "If you find that animations are not smooth enough, you can try "
       "to change the options "
       ) +
-#ifdef IOS
-XLAT(
-      "(in the MENU). You can reduce the sight range, this should make "
-      "the animations smoother.");
-#else
 XLAT(
       "(press v) and change the wall/monster mode to ASCII, or change "
       "the resolution.");
-#endif
     }
 
   achievement_display();
@@ -7353,7 +7131,6 @@ XLAT(
 #endif
   }
 
-#ifndef MOBILE
 
 #ifndef NOPNG
 void IMAGESAVE(SDL_Surface *s, const char *fname) {
@@ -7408,7 +7185,6 @@ void saveHighQualityShot(const char *fname) {
   
   SDL_FreeSurface(s);
   }
-#endif
 
 void addball(ld a, ld b, ld c) {
   hyperpoint h;
@@ -7518,14 +7294,12 @@ void drawscreen() {
 #endif
   if(cmode != emHelp) help = "@";
   
-  #ifndef MOBILE
   // SDL_LockSurface(s);
   // unsigned char *b = (unsigned char*) s->pixels;
   // int n = vid.xres * vid.yres * 4;
   // while(n) *b >>= 1, b++, n--;
   // memset(s->pixels, 0, vid.xres * vid.yres * 4);
   if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
-  #endif
   
   if(!canmove) darken = 1;
   if(cmode != emNormal && cmode != emDraw && cmode != emCustomizeChar) darken = 2;
@@ -7557,28 +7331,6 @@ void drawscreen() {
   
   if(cmode == emNormal || cmode == emQuit) drawStats();
 
-  #ifdef MOBILE
-  
-  buttonclicked = false;
-  
-  if(cmode == (canmove ? emNormal : emQuit)) {
-    if(andmode == 0 && shmup::on) {
-      using namespace shmupballs;
-      calc();
-      drawCircle(xmove, yb, rad, 0xFFFFFFFF);
-      drawCircle(xmove, yb, rad/2, 0xFFFFFFFF);
-      drawCircle(xfire, yb, rad, 0xFF0000FF);
-      drawCircle(xfire, yb, rad/2, 0xFF0000FF);
-      }
-    else {
-      if(andmode != 0) displayabutton(-1, +1, XLAT("MOVE"),  andmode == 0 ? BTON : BTOFF);
-      displayabutton(+1, +1, XLAT(andmode == 1 ? "BACK" : "DRAG"),  andmode == 1 ? BTON : BTOFF);
-      }
-    displayabutton(-1, -1, XLAT("INFO"),  andmode == 12 ? BTON : BTOFF);
-    displayabutton(+1, -1, XLAT("MENU"), andmode == 3 ? BTON : BTOFF);
-    }
-  
-  #endif
  
   // displaynum(vx,100, 0, 24, 0xc0c0c0, celldist(cwt.c), ":");
 
@@ -7636,20 +7388,17 @@ void drawscreen() {
       }
     }
 
-  #ifndef MOBILE
   if(cmode == emNormal || cmode == emVisual1 || cmode == emVisual2 || cmode == emChangeMode ) {
     if(tour::on) 
       displayButton(vid.xres-8, vid.yres-vid.fsize, XLAT("(ESC) tour menu"), SDLK_ESCAPE, 16);
     else
       displayButton(vid.xres-8, vid.yres-vid.fsize, XLAT("(v) menu"), 'v', 16);
     }
-  #endif  
 
   if(cmode == emQuit) {
     if(canmove) showGameover();
     }
 
-  #ifndef MOBILE
   // SDL_UnlockSurface(s);
 
   DEBT("swapbuffers");
@@ -7660,10 +7409,8 @@ void drawscreen() {
   
 //printf("\ec");
 
-  #endif
   }
 
-#ifndef MOBILE
 bool setfsize = true;
 
 void setvideomode() {
@@ -7711,7 +7458,6 @@ void setvideomode() {
     }
 #endif
   }
-#endif
 
 void restartGraph() {
   DEBB(DF_INIT, (debugfile,"restartGraph\n"));
@@ -7865,11 +7611,7 @@ void saveConfig() {
   fprintf(f, "compass size\n");
   
   fclose(f);
-#ifndef MOBILE
   addMessage(s0 + "Configuration saved to: " + conffile);
-#else
-  addMessage(s0 + "Configuration saved");
-#endif
   }
 
 void readf(FILE *f, ld& x) {
@@ -7983,7 +7725,6 @@ void loadConfig() {
   }
 #endif
 
-#ifndef MOBILE
 void initJoysticks() {
   DEBB(DF_INIT, (debugfile,"init joysticks\n"));
   numsticks = SDL_NumJoysticks();
@@ -8006,7 +7747,6 @@ void closeJoysticks() {
     }
   numsticks = 0;
   }
-#endif
 
 void initgraph() {
 
@@ -8026,17 +7766,12 @@ void initgraph() {
   vid.camera_angle = 0;
   vid.ballproj = 1;
 
-#ifdef ANDROID
-  vid.monmode = 2;
-  vid.wallmode = 3;
-#else
 #ifdef PANDORA
   vid.monmode = 2;
   vid.wallmode = 3;
 #else
   vid.monmode = 4;
   vid.wallmode = 5;
-#endif
 #endif
 
   vid.particles = 1;
@@ -8067,9 +7802,6 @@ void initgraph() {
   
   vid.drawmousecircle = false;
   revcontrol = false;
-#ifdef MOBILE
-  vid.drawmousecircle = true;
-#endif
 #ifdef PANDORA
   vid.drawmousecircle = true;
 #endif
@@ -8082,24 +7814,17 @@ void initgraph() {
 
   buildpolys();
 
-  #ifndef MOBILE  
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
   {
     printf("Failed to initialize video.\n");
     exit(2);
   }
 
-#ifdef WEB
-  vid.xscr = vid.xres = 1200;
-  vid.yscr = vid.yres = 900;
-#else
   const SDL_VideoInfo *inf = SDL_GetVideoInfo();
   vid.xscr = vid.xres = inf->current_w;
   vid.yscr = vid.yres = inf->current_h;
-#endif
   
   SDL_WM_SetCaption("HyperRogue " VER, "HyperRogue " VER);
-  #endif
   
   preparesort();
 #ifndef NOCONFIG
@@ -8110,7 +7835,6 @@ void initgraph() {
   arg::read(2);
 #endif
 
-  #ifndef MOBILE  
   setvideomode();
   if(!s) {
     printf("Failed to initialize graphics.\n");
@@ -8131,7 +7855,6 @@ void initgraph() {
   initAudio();
   #endif
     
-  #endif
   }
 
 int frames;
@@ -8204,11 +7927,7 @@ void handleKeyQuit(int sym, int uni) {
     }
   }
 
-#ifdef MOBILE
-#define extra int
-#else
 #define extra SDL_Event
-#endif
 
 void handleKeyNormal(int sym, int uni, extra& ev) {
 
@@ -8350,7 +8069,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     cmode = emVisual1;
     }
 
-#ifndef MOBILE
 #ifdef PANDORA
   if(ev.type == SDL_MOUSEBUTTONUP && sym == 0 && !rightclick) 
 #else
@@ -8372,7 +8090,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
       }
     else mousemovement();
     }
-#endif
 
   if(sym == SDLK_F1) {
     lastmode = cmode;
@@ -8438,7 +8155,6 @@ void handlekey(int sym, int uni, extra& ev) {
       if(isGravityLand(cwt.c->land)) playermoved = false;
     }
   
-#ifndef MOBILE
   if(sym == SDLK_F7 && !vid.usingGL) {
 
     time_t timer;
@@ -8448,7 +8164,6 @@ void handlekey(int sym, int uni, extra& ev) {
     IMAGESAVE(s, buf);
     addMessage(XLAT("Screenshot saved to %1", buf));
     }
-#endif
 
   #ifdef DEMO
   if(cmode == emOverview || cmode == emMenu) handleDemoKey(sym, uni); else
@@ -8474,9 +8189,7 @@ void handlekey(int sym, int uni, extra& ev) {
   else if(cmode == emDraw) mapeditor::drawHandleKey(sym, uni);
 #endif
 #ifndef NOSAVE
-#ifndef MOBILE
   else if(cmode == emScores) handleScoreKeys(sym);
-#endif
   else if(cmode == emPickScores) handlePickScoreKeys(uni);
 #endif
   else if(cmode == emConformal) conformal::handleKey(sym, uni);
@@ -8484,11 +8197,6 @@ void handlekey(int sym, int uni, extra& ev) {
   else if(cmode == emTactic) tactic::handleKey(sym, uni);
   else if(cmode == emOverview) handleOverview(sym, uni);
   else if(cmode == emPickEuclidean) handleEuclidean(sym, uni);
-#ifdef MOBILE
-#ifdef HAVE_ACHIEVEMENTS
-  else if(cmode == emLeader) leader::handleKey(sym, uni);
-#endif
-#endif
   else if(cmode == emColor) dialog::handleColor(sym, uni);
   else if(cmode == emNumber) dialog::handleNumber(sym, uni);      
   else if(cmode == emHelp) handleHelp(sym, uni);    
@@ -8499,7 +8207,6 @@ void handlekey(int sym, int uni, extra& ev) {
 #endif
   }
 
-#ifndef MOBILE
 
 // Warning: a very long function! todo: refactor
 
@@ -8545,12 +8252,6 @@ void mainloopiter() {
     if(cwt.mirrored) playerV = playerV * Mirror;
     }
 
-#ifdef WEB
-  if(playermoved && vid.sspeed > -4.99 && !outoffocus) {
-    centerpc((ticks - lastt) / 1000.0 * exp(vid.sspeed));
-    }
-  if(!outoffocus) drawscreen();
-#else
   if(timetowait > 0)
     SDL_Delay(timetowait);
   else {
@@ -8567,7 +8268,6 @@ void mainloopiter() {
       }
     lastt = ticks;
     }      
-#endif
 
   Uint8 *keystate = SDL_GetKeyState(NULL);
   rightclick = keystate[SDLK_RCTRL];
@@ -8815,16 +8515,9 @@ void mainloopiter() {
 void mainloop() {
   lastt = 0;
   cmode = emNormal;
-#ifdef WEB
-  initweb();
-  emscripten_set_main_loop(mainloopiter, 0, true);
-#else
   while(!quitmainloop) mainloopiter();
-#endif
   }
-#endif
 
-#ifndef MOBILE
 void cleargraph() {
   DEBB(DF_INIT, (debugfile,"clear graph\n"));
   for(int i=0; i<256; i++) if(font[i]) TTF_CloseFont(font[i]);
@@ -8834,7 +8527,6 @@ void cleargraph() {
 #endif
   SDL_Quit();
   }
-#endif
 
 void cleargraphmemory() {
   DEBB(DF_INIT, (debugfile,"clear graph memory\n"));

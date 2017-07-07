@@ -1207,14 +1207,9 @@ void readcolor(const char *cfname) {
 void init() {
   if(on) return;
   on = autocheat = true; 
-#ifndef WEB
   mapeditor::drawplayer = false;
   firstland = euclidland = laCanvas;
   if(!shmup::on) restartGame('s');
-#else
-  firstland = euclidland = laCanvas;
-  restartGame();
-#endif
   items[itOrbLife] = 0;
   timerghost = false;
 

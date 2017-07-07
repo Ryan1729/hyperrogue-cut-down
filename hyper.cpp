@@ -21,13 +21,9 @@
 #define USE_SDL
 #define USE_COMMANDLINE
 
-#ifdef STEAM
-#define NOLICENSE
-#endif
 
 #include "init.cpp"
 
-#ifdef LINUX
 #include <sys/resource.h>
 
 void moreStack() {
@@ -46,7 +42,6 @@ void moreStack() {
       }
     }
   }
-#endif
 
 eLand readland(const char *s) {
   string ss = s;
@@ -338,13 +333,9 @@ else if(args()[0] == '-' && args()[1] == x && args()[2] == '0') { PHASE(2); para
   }
 
 int main(int argc, char **argv) {
-#ifndef WEB
-  #ifdef LINUX
     moreStack();
-  #endif
   arg::init(argc, argv);
   initializeCLI();
-#endif
   initAll();
   arg::read(3);
   mainloop();
@@ -353,7 +344,6 @@ int main(int argc, char **argv) {
   return 0;
   }
 
-#ifdef USE_COMMANDLINE
 namespace arg {
   int argc; char **argv;
   
@@ -373,4 +363,3 @@ namespace arg {
       }
     }
   }
-#endif

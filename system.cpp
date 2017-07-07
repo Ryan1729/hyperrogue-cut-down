@@ -212,13 +212,7 @@ void initgame() {
 #endif
     else {
       addMessage(XLAT("Welcome to HyperRogue!"));
-#ifndef MOBILE
-#ifdef IOS
-      addMessage(XLAT("Press F1 or right-shift-click things for help."));
-#else
       addMessage(XLAT("Press F1 or right-click things for help."));
-#endif
-#endif
       }
     }
   else {
@@ -737,11 +731,9 @@ void saveStats(bool emergency = false) {
   
   fprintf(f, "\n\n\n");
   
-#ifndef MOBILE
   DEBB(DF_INIT, (debugfile, "Game statistics saved to %s\n", scorefile));
   if(!tactic::trailer)
     addMessage(XLAT("Game statistics saved to %1", scorefile));
-#endif
   fclose(f);
   }
 

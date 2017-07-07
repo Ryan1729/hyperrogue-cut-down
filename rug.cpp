@@ -8,7 +8,6 @@
 #define TEXTURESIZE (texturesize)
 #define HTEXTURESIZE (texturesize/2)
 
-#ifdef LINUX
 extern "C" {
 GLAPI void APIENTRY glGenFramebuffers (GLsizei n, GLuint *framebuffers);
 GLAPI void APIENTRY glBindFramebuffer (GLenum target, GLuint framebuffer);
@@ -22,7 +21,6 @@ GLAPI void APIENTRY glFramebufferRenderbuffer (GLenum target, GLenum attachment,
 GLAPI void APIENTRY glDeleteRenderbuffers (GLsizei n, const GLuint *renderbuffers);
 GLAPI void APIENTRY glDeleteFramebuffers (GLsizei n, const GLuint *framebuffers);
 }
-#endif
 
 #ifdef MAC
 #define glFramebufferTexture glFramebufferTextureEXT 

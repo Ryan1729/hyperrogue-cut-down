@@ -120,20 +120,11 @@ void achievement_log(const char* s, char flags) {
 #endif
   }
 
-#ifdef STEAM
-void improveItemScores();
-#include "hypersteam.cpp"
-#else
-#ifndef ANDROID
-#ifndef IOS
 void achievement_init() {}
 void achievement_close() {}
 void achievement_gain(const char* s, char flags) {
   achievement_log(s, flags);
   }
-#endif
-#endif
-#endif
 
 void achievement_collection(eItem it, int prevgold, int newgold) {
   if(cheater) return;
@@ -570,26 +561,20 @@ void achievement_final(bool really_final) {
     }
 
   if(total_improved >= 2) {
-#ifndef ANDROID  
     addMessage(XLAT("Your total treasure has been recorded in the " LEADERFULL "."));
     addMessage(XLAT("Congratulations!"));
-#endif
     }
   else if(total_improved && specific_improved >= 2)
     addMessage(XLAT("You have improved your total high score and %1 specific high scores!", its(specific_improved)));
   else if(total_improved && specific_improved)
     addMessage(XLAT("You have improved your total and '%1' high score!", iinf[specific_what].name));
   else if(total_improved) {
-#ifndef ANDROID  
     addMessage(XLAT("You have improved your total high score on " LEADER ". Congratulations!"));
-#endif
     }
   else if(specific_improved >= 2)
     addMessage(XLAT("You have improved %1 of your specific high scores!", its(specific_improved)));
   else if(specific_improved) {
-#ifndef ANDROID  
     addMessage(XLAT("You have improved your '%1' high score on " LEADER "!", iinf[specific_what].name));
-#endif
     }
 #endif
   }
@@ -631,9 +616,7 @@ void achievement_victory(bool hyper) {
   if(improved) {
     if(improved >= 4) {
       if(!hyper) addMessage(XLAT("This is your first victory!"));
-#ifndef ANDROID
       addMessage(XLAT("This has been recorded in the " LEADERFULL "."));
-#endif
       addMessage(XLAT("The faster you get here, the better you are!"));
       }
     else if(improved >= 3) {
@@ -672,14 +655,10 @@ void achievement_display() {
     col /= 10; col *= 0x10101;
     displayfr(vid.xres/2, vid.yres/4, 2, vid.fsize * 2, achievementMessage[0], col & 0xFFFF00, 8);
     int w = 2 * vid.fsize;
-#ifndef MOBILE
     while(w>3 && textwidth(w, achievementMessage[1]) > vid.xres) w--;
-#endif
     displayfr(vid.xres/2, vid.yres/4 + vid.fsize*2, 2, w, achievementMessage[1], col, 8);
     w = vid.fsize;
-#ifndef MOBILE
     while(w>3 && textwidth(w, achievementMessage[2]) > vid.xres) w--;
-#endif
     displayfr(vid.xres/2, vid.yres/4 + vid.fsize*4, 2, w, achievementMessage[2], col, 8);
     }
   #endif

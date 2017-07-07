@@ -4,11 +4,7 @@
 
 // implementation of the shoot'em up mode
 
-#ifdef MOBILE
-#define SHMUPTITLE "shoot'em up mode"
-#else
 #define SHMUPTITLE "shoot'em up and multiplayer"
-#endif
 
 #include <map>
 
@@ -175,7 +171,6 @@ char* axeconfigs[24]; int numaxeconfigs;
 int* dzconfigs[24];
 
 string listkeys(int id) {
-#ifndef MOBILE
   string lk = "";
   for(int i=0; i<512; i++)
     if(vid.scfg.keyaction[i] == id)
@@ -190,10 +185,6 @@ string listkeys(int id) {
         lk = lk + " " + cts('A'+i)+"-"+"URDL"[d];
         }
   return lk;
-#endif
-#ifdef MOBILE
-  return "";
-#endif
   }
 
 #define SCJOY 16
@@ -218,7 +209,6 @@ bool shmupcfg;
 bool configdead;
 
 void showShmupConfig() {
-#ifndef MOBILE
 
   int sc = vid.scfg.subconfig;
 
@@ -364,11 +354,9 @@ void showShmupConfig() {
     
     dialog::display();
     }
-#endif
   }
 
 void handleConfig(int sym, int uni) {
-#ifndef MOBILE
   if(!vid.scfg.setwhat) dialog::handleNavigation(sym, uni);
   int sc = vid.scfg.subconfig;
   if(sc == 0) {
@@ -484,7 +472,6 @@ help += XLAT("This menu can be also used to configure keys.\n\n");
         vid.scfg.subconfig = 0;
       }
     }
-#endif
   }
 
 #define NUMACT 128
@@ -504,7 +491,6 @@ void pressaction(int id) {
   }
 
 void handleInput(int delta) {
-#ifndef MOBILE
   double d = delta / 500.;
 
   Uint8 *keystate = SDL_GetKeyState(NULL);
@@ -556,7 +542,6 @@ void handleInput(int delta) {
     View = xpush(-panx * d) * ypush(-pany * d) * spin(panspin * d) * View;
     playermoved = false;
     }
-#endif
   }
 
 int tableid[7] = {1, 2, 4, 5, 6, 7, 8};
@@ -571,12 +556,10 @@ void initConfig() {
   t['a'] = 16 + 2;
   t['d'] = 16 + 3;
 
-#ifndef MOBILE
   t[SDLK_KP8] = 16 + 4;
   t[SDLK_KP6] = 16 + 5;
   t[SDLK_KP2] = 16 + 6;
   t[SDLK_KP4] = 16 + 7;
-#endif
 
   t['f'] = 16 + pcFire;
   t['g'] = 16 + pcFace;
@@ -594,7 +577,6 @@ void initConfig() {
   t['p'] = 32 + 10;
   t['['] = 32 + pcCenter;
 
-#ifndef MOBILE
   t[SDLK_UP] = 48 ;
   t[SDLK_RIGHT] = 48 + 1;
   t[SDLK_DOWN] = 48 + 2;
@@ -602,7 +584,6 @@ void initConfig() {
   t[SDLK_PAGEUP] = 48 + 4;
   t[SDLK_PAGEDOWN] = 48 + 5;
   t[SDLK_HOME] = 48 + 6;
-#endif
 
   vid.scfg.joyaction[0][0] = 16 + pcFire;
   vid.scfg.joyaction[0][1] = 16 + pcOrbPower;
@@ -1410,7 +1391,6 @@ void movePlayer(monster *m, int delta) {
   int jb = 4*tableid[cpid];
   for(int i=0; i<4; i++) if(axespressed[jb+i]) playermoved = true;
   
-#ifndef MOBILE
   mgo = actionspressed[b+pcForward] - actionspressed[b+pcBackward] + axespressed[jb+2]/30000.;
   mturn = actionspressed[b+pcTurnLeft] - actionspressed[b+pcTurnRight] + axespressed[jb+3]/30000.;
   mdx = actionspressed[b+pcMoveRight] - actionspressed[b+pcMoveLeft] + axespressed[jb]/30000.;
@@ -1419,31 +1399,13 @@ void movePlayer(monster *m, int delta) {
   shotkey = actionspressed[b+pcFire] || actionspressed[b+pcFaceFire];
   facemouse = actionspressed[b+pcFace] || actionspressed[b+pcFaceFire];
   dropgreen = actionspressed[b+pcDrop];
-#endif
   
-#ifdef MOBILE
-  mdx = mdy = mgo = mturn = 0;
-  facemouse = shotkey = false;
-  dropgreen = getcstat == 'g';
-  using namespace shmupballs;
-
-  if(clicked && hypot(mousex - xfire, mousey - yb) < rad) {
-    shotkey = true;
-    mdx = (mousex - xfire) / (rad/2.);
-    mdy = (mousey - yb) / (rad/2.);
-    }
-  if(clicked && hypot(mousex - xmove, mousey - yb) < rad) {
-    mdx = (mousex - xmove) / (rad/2.);
-    mdy = (mousey - yb) / (rad/2.);
-    }
-  #endif
   
   if(actionspressed[b+pcOrbPower] && !lactionpressed[b+pcOrbPower] && mouseover) {
     cwt.c = m->base;
     targetRangedOrb(mouseover, roKeyboard);
     }
 
-#ifndef MOBILE    
   if(haveRangedOrb()) {
     cwt.c = m->base;
     if(actionspressed[b+pcOrbKey] && !lactionpressed[b+pcOrbKey])
@@ -1452,7 +1414,6 @@ void movePlayer(monster *m, int delta) {
       keyresult[cpid] = targetRangedOrbKey(roCheck);
     }
   else
-#endif
     keyresult[cpid] = itNone;
     
   if(actionspressed[b+pcCenter]) {
@@ -1479,7 +1440,6 @@ void movePlayer(monster *m, int delta) {
     mgo += mdd;
     }
 
-#ifndef MOBILE
   Uint8 *keystate = SDL_GetKeyState(NULL);
   bool forcetarget = (keystate[SDLK_RSHIFT] | keystate[SDLK_LSHIFT]);
   if(((mousepressed && !forcetarget) || facemouse) && delta > 0 && !outofmap(mouseh)) {
@@ -1489,7 +1449,6 @@ void movePlayer(monster *m, int delta) {
     // nat = nat * spin(alpha);
     // mturn += alpha * 150. / delta;
     }
-#endif
 
   bool blown = m->blowoff > curtime;
     

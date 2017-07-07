@@ -2,9 +2,7 @@
 // Copyright (C) 2011-2016 Zeno Rogue, see 'hyper.cpp' for details
 
 #ifdef GFX
-#ifndef MOBILE
 #include <SDL/SDL_gfxPrimitives.h>
-#endif
 #endif
 
 #ifdef WINDOWS
@@ -12,7 +10,6 @@
 #else
 
 #define GL_GLEXT_PROTOTYPES 1
-#ifndef MOBILE
 #ifdef GL
 #ifdef MAC
 #include <OpenGL/gl.h>
@@ -28,17 +25,7 @@
 #include <GL/glext.h>
 #endif
 #endif
-#endif
 
-#ifdef ANDROID
-#ifndef FAKE
-#ifdef GL
-#include <GLES/gl.h>
-#include <GLES/glext.h>
-#include <GLES2/gl2.h>
-#endif
-#endif
-#endif
 #endif
 
 #define QHPC 32000
@@ -156,9 +143,7 @@ void shift(hpcshape& sh, double dx, double dy, double dz) {
     hpc[i] = m * hpc[i];
   }
 
-#ifndef MOBILE
 SDL_Surface *aux;
-#endif
 
 vector<polytodraw*> ptds2;
 
@@ -279,7 +264,6 @@ void addpoly(const transmatrix& V, GLfloat *tab, int cnt) {
   }
 
 #ifdef GFX
-#ifndef MOBILE
 void aapolylineColor(SDL_Surface *s, int*x, int *y, int polyi, int col) {
   for(int i=1; i<polyi; i++)
     aalineColor(s, x[i-1], y[i-1], x[i], y[i], col);
@@ -296,7 +280,6 @@ void filledPolygonColorI(SDL_Surface *s, int* polyx, int *polyy, int polyi, int 
   filledPolygonColor(s, spolyx, spolyy, polyi, col);
   }
 
-#endif
 #endif
 
 void glcolor2(int color) {
@@ -406,28 +389,10 @@ void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outl
   polyi = 0;
   addpoly(V, tab, cnt);
 
-#ifdef MOBILE
-
-#ifdef ANDROID
-#define ANDROIDGD
-#endif
-
-#ifdef FAKEMOBILE
-#define ANDROIDGD
-#endif
-
-#ifdef ANDROIDGD
-  gdpush(1); gdpush(col); gdpush(outline); gdpush(polyi);
-  for(int i=0; i<polyi; i++) gdpush(polyx[i]), gdpush(polyy[i]);
-#endif
-
-#else
 
 #ifdef GFX
   filledPolygonColorI(s, polyx, polyy, polyi, col);
-#ifndef MOBILE
   if(svg::in) svg::polygon(polyx, polyy, polyi, col, outline);
-#endif
   if(vid.goteyes) filledPolygonColorI(aux, polyxr, polyy, polyi, col);
   
   (vid.usingAA?aapolylineColor:polylineColor)(s, polyx, polyy, polyi, outline);
@@ -443,7 +408,6 @@ void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outl
       for(int t=0; t<polyi; t++) polyx[t] -= x, polyy[t] -= y;
       }
     }
-#endif
 #endif
   }
 
@@ -514,7 +478,6 @@ void drawqueue() {
 #endif
   profile_stop(3);
 
-#ifndef MOBILE
   if(vid.goteyes && !vid.usingGL) {
 
     if(aux && (aux->w != s->w || aux->h != s->h))
@@ -529,7 +492,6 @@ void drawqueue() {
     // SDL_UnlockSurface(aux);
     SDL_BlitSurface(s, NULL, aux, NULL);
     }
-#endif
   
   for(int i=0; i<siz; i++) {
 
@@ -560,7 +522,6 @@ void drawqueue() {
       }
     else if(ptd.kind == pkString) {
       qchr& q(ptd.u.chr);
-#ifndef MOBILE
       if(svg::in) 
         svg::text(q.x, q.y, q.size, q.str, q.frame, ptd.col, q.align);
       else {
@@ -572,21 +533,15 @@ void drawqueue() {
           }
         displaystr(q.x, q.y, q.shift, q.size, q.str, ptd.col, q.align);
         }
-#else
-      displayfr(q.x, q.y, q.frame, q.size, q.str, ptd.col, q.align);
-#endif
       }
     else if(ptd.kind == pkCircle) {
-#ifndef MOBILE
       if(svg::in) 
         svg::circle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
       else
-#endif
       drawCircle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
       }
     }
 
-#ifndef MOBILE  
   if(vid.goteyes && !vid.usingGL) {
     int qty = s->w * s->h;
     int *a = (int*) s->pixels;
@@ -601,7 +556,6 @@ void drawqueue() {
 
   if(vid.goteyes && vid.usingGL) selectEyeGL(0), selectEyeMask(0);
 
-#endif
 #endif
 
   setcameraangle(false);
@@ -1774,13 +1728,7 @@ void queuecircle(int x, int y, int size, int color, int prio = PPR_CIRCLE) {
   ptd.prio = prio << PSHIFT;
   }
 
-#ifdef MOBILE
-namespace svg {
-  bool in = false;
-  }
-#endif
 
-#ifndef MOBILE
 // svg renderer
 namespace svg {
   FILE *f;
@@ -1949,7 +1897,6 @@ namespace svg {
     addMessage(XLAT("Saved the SVG shot to %1 (sightrange %2)", fname, its(sightrange)));
     }
   }
-#endif
 
 void getcoord0(const hyperpoint& h, int& xc, int &yc, int &sc) {
   hyperpoint hscr;

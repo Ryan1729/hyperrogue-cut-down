@@ -1,7 +1,7 @@
 #define ISANDROID 0
 #define ISMOBILE 1
 #define ISIOS 0
-#define MOBILE
+// error : inserted by coan: "#define MOBILE" contradicts -U or --implicit at /home/ryan/hyperrogue-cut-down/fake-mobile.cpp(4)
 #define MOBPAR_FORMAL int
 #define MOBPAR_ACTUAL 0
 #define FAKEMOBILE

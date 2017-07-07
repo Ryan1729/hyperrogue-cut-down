@@ -5897,10 +5897,6 @@ bool collectItem(cell *c2, bool telekinesis) {
       chaosAchieved = true;
       }
 
-#ifdef MOBILE
-    if(pg < lastsafety + 45 && g2 >= lastsafety + 45)
-      addMessage(XLAT("The Orb of Safety from the Land of Eternal Motion might save you."));
-#endif
     
     if(pg < 15 && g2 >= 15) 
       addMessage(XLAT("Collect treasure to access more different lands..."));

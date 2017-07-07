@@ -198,13 +198,9 @@ void showMainMenu() {
   dialog::addItem(XLAT("special game modes"), 'm');
   
   string q;
-  #ifdef MOBILE
-  dialog::addItem(XLAT("visit the website"), 'q');
-  #else
   q = quitsaves() ? "save" : "quit"; 
   q = q + " the game";
   dialog::addItem(XLAT(q), 'q'); dialog::lastItem().keycaption += " / F10";
-  #endif
 
   if(canmove)                                     
     q = "review your quest";
@@ -219,11 +215,6 @@ void showMainMenu() {
   dialog::addItem(XLAT("rogueviz menu"), 'g'); 
 #endif
   
-#ifdef MOBILE
-#ifdef HAVE_ACHIEVEMENTS
-  dialog::addItem(XLAT("leaderboards/achievements"), '3'); 
-#endif
-#endif
 
 #ifdef ANDROIDSHARE
   dialog::addItem("SHARE", 's'-96);
@@ -280,14 +271,6 @@ void handleMenuKey(int sym, int uni) {
     cmode = emQuit;
     achievement_final(false);
     }
-#ifdef MOBILE
-#ifdef HAVE_ACHIEVEMENTS
-  else if(sym == '3') {
-    achievement_final(false);
-    cmode = emLeader;
-    }
-#endif
-#endif
 #ifdef ROGUEVIZ
   else if(uni == 'g') cmode = emRogueviz;
 #endif
@@ -300,12 +283,8 @@ void handleMenuKey(int sym, int uni) {
 void showVisual1() {
   dialog::init(XLAT("basic configuration"));
       
-#ifndef MOBILE
   dialog::addSelItem(XLAT("video resolution"), its(vid.xres) + "x"+its(vid.yres), 0);
-#endif
-#ifndef IOS
   dialog::addBoolItem(XLAT("fullscreen mode"), (vid.full), 'f');
-#endif
   dialog::addSelItem(XLAT("scrolling speed"), fts(vid.sspeed), 'a');
   dialog::addSelItem(XLAT("movement animation speed"), fts(vid.mspeed), 'r');
   dialog::addSelItem(XLAT("projection"), fts(vid.alpha), 'p');
@@ -410,11 +389,6 @@ void handleVisual1(int sym, int uni) {
   
   if(xuni == 'f') {
     vid.full = !vid.full;
-#ifdef ANDROID
-    addMessage(XLAT("Reenter HyperRogue to apply this setting"));
-    settingsChanged = true;
-#endif
-#ifndef MOBILE
     if(true) {
       vid.xres = vid.full ? vid.xscr : 9999;
       vid.yres = vid.full ? vid.yscr : 9999;
@@ -422,7 +396,6 @@ void handleVisual1(int sym, int uni) {
       setfsize = true;
       }
     setvideomode();
-#endif
     }
   
   if(xuni == 'v') cmode = emNormal;
@@ -451,9 +424,6 @@ void handleVisual1(int sym, int uni) {
     vid.language += (shiftmul>0?1:-1);
     vid.language %= NUMLAN;
     if(vid.language < 0) vid.language += NUMLAN;
-#ifdef ANDROID
-    settingsChanged = true;
-#endif
     }
 #endif
   
@@ -691,31 +661,16 @@ void showVisual2() {
   dialog::addSelItem(XLAT("framerate limit"), its(vid.framelimit), 'f');
   #endif
 
-#ifndef MOBILE
   dialog::addSelItem(XLAT("configure input"), "", 'p');
-#endif
 
-#ifdef MOBILE
-  dialog::addSelItem(XLAT("font scale"), its(fontscale), 'b');
-#endif
 
   dialog::addSelItem(XLAT("sight range"), its(sightrange), 'a');
   dialog::addBoolItem(XLAT("reverse pointer control"), (revcontrol), 'r');
   dialog::addBoolItem(XLAT("draw circle around the target"), (vid.drawmousecircle), 'd');
   
   dialog::addSelItem(XLAT("message flash time"), its(vid.flashtime), 't');
-#ifdef MOBILE
-  dialog::addBoolItem(XLAT("targetting ranged Orbs long-click only"), (vid.shifttarget&2), 'i');
-#else
   dialog::addBoolItem(XLAT("targetting ranged Orbs Shift+click only"), (vid.shifttarget&1), 'i');
-#endif
-#ifdef STEAM
-  dialog::addBoolItem(XLAT("send scores to Steam leaderboards"), (vid.steamscore&1), 'l');
-#endif
   dialog::addSelItem(XLAT("3D configuration"), "", '3');
-#ifdef MOBILE
-  dialog::addSelItem(XLAT("compass size"), its(vid.mobilecompasssize), 'c');
-#endif
 
   dialog::addBreak(50);
   dialog::addItem(XLAT("exit configuration"), 'v');
@@ -750,33 +705,23 @@ void handleVisual2(int sym, int uni) {
     vid.usingGL = !vid.usingGL;
     if(vid.usingGL) addMessage(XLAT("openGL mode enabled"));
     if(!vid.usingGL) addMessage(XLAT("openGL mode disabled"));
-#ifndef ANDROID
     if(!vid.usingGL) addMessage(XLAT("shift+O to switch anti-aliasing"));
-#endif
-#ifdef ANDROID
-    settingsChanged = true;
-#else
 #ifndef FAKEMOBILE
     setvideomode();
 #endif
-#endif
     }
 
-#ifndef MOBILE
   if(xuni == 'o' && shiftmul < 0 && !vid.usingGL) {
     vid.usingAA = !vid.usingAA;
     if(vid.usingAA) addMessage(XLAT("anti-aliasing enabled"));
     if(!vid.usingAA) addMessage(XLAT("anti-aliasing disabled"));
     }
 #endif
-#endif
 
-#ifndef MOBILE
   if(xuni == 'p') {
     cmode = emShmupConfig; 
     multi::shmupcfg = shmup::on;
     }
-#endif
   
   if(xuni == 'f') 
     dialog::editNumber(vid.framelimit, 5, 300, 10, 300, XLAT("framerate limit"), "");
@@ -792,10 +737,6 @@ void handleVisual2(int sym, int uni) {
   if(xuni == 'r') revcontrol = !revcontrol;
   if(xuni == 'd') vid.drawmousecircle = !vid.drawmousecircle;
 
-#ifdef MOBILE
-  if(xuni =='b') 
-    dialog::editNumber(fontscale, 0, 400, 10, 100, XLAT("font scale"), "");
-#endif
 
   if(xuni == 'e') {
     dialog::editNumber(vid.eye, -10, 10, 0.01, 0, XLAT("distance between eyes"),
@@ -804,9 +745,6 @@ void handleVisual2(int sym, int uni) {
     dialog::sidedialog = true;
     }
 
-#ifdef STEAM
-  if(xuni == 'l') vid.steamscore = vid.steamscore^1;
-#endif
   if(xuni == 't') 
     dialog::editNumber(vid.flashtime, 0, 64, 1, 8, XLAT("message flash time"),
       XLAT("How long should the messages stay on the screen."));
@@ -876,9 +814,7 @@ void handleChangeMode(int sym, int uni) {
     else if(!cheater) {
       cheater++;
       addMessage(XLAT("You activate your demonic powers!"));
-#ifndef MOBILE
       addMessage(XLAT("Shift+F, Shift+O, Shift+T, Shift+L, Shift+U, etc."));
-#endif
       cmode = emNormal;
       }
     else {
@@ -964,13 +900,8 @@ void handleChangeMode(int sym, int uni) {
     }
 #endif
   else if(xuni == 's') {
-#ifdef MOBILE
-    restartGame('s');
-    cmode = emNormal;
-#else
     multi::shmupcfg = shmup::on;
     cmode = emShmupConfig;
-#endif
     }
 #ifndef NOMODEL
   else if(xuni == 'n')
@@ -1207,9 +1138,6 @@ void handleEuclidean(int sym, int uni) {
   else if(uni || sym == SDLK_F10) cmode = emNormal;
   }
 
-#ifdef MOBILE
-namespace leader { void showMenu(); void handleKey(int sym, int uni); }
-#endif
 
 #ifndef NOSAVE
 void showScores() {
@@ -1277,12 +1205,6 @@ void showScores() {
     y += vid.fsize*5/4; id++;
     }
 
-#ifdef MOBILE
-  buttonclicked = false;
-  displayabutton(-1, +1, XLAT("SORT"), BTON);
-  displayabutton( 0, +1, XLAT("PICK"), BTON);
-  displayabutton(+1, +1, XLAT("PLAY"), BTON);
-#endif
   }
 
 void sortScores() {
@@ -1300,7 +1222,6 @@ void shiftScoreDisplay(int delta) {
   }
 
 void handleScoreKeys(int sym) {
-#ifndef MOBILE
   if(sym == SDLK_LEFT || sym == SDLK_KP4 || sym == 'h' || sym == 'a')
     shiftScoreDisplay(-1);
   else if(sym == SDLK_RIGHT || sym == SDLK_KP6 || sym == 'l' || sym == 'd')
@@ -1317,41 +1238,6 @@ void handleScoreKeys(int sym) {
   else if(sym == 's') sortScores(); 
   else if(sym == 'm') { scoremode++; scoremode %= 3; }
   else if(sym != 0) cmode = emNormal;
-#else
-  static int scoredragx, scoredragy;
-  extern bool clicked, lclicked;
-  extern int andmode;
-  
-  if(andmode) { 
-    if(!clicked && !lclicked) {
-      andmode = 0;
-      scoredragx = mousex;
-      scoredragy = mousey;
-      }
-    }
-
-  else {
-  
-    if(clicked && !lclicked)
-      scoredragx = mousex, scoredragy = mousey;
-  
-    else if(lclicked && !clicked) {
-      if(mousey > vid.ycenter - 2 * vid.fsize) {
-        if(mousex < vid.xcenter*2/3) sortScores();
-        else if(mousex < vid.xcenter*4/3)
-          cmode = emPickScores;
-        else andmode = 0, cmode = emNormal;
-        }
-      }
-    
-    else if(clicked && lclicked) {
-  //  if(mousex > scoredragx + 80) scoredragx += 80, shiftScoreDisplay(1); 
-  //  if(mousex < scoredragx - 80) scoredragx -= 80, shiftScoreDisplay(-1); 
-      while(mousey > scoredragy + vid.fsize) scoredragy += vid.fsize, scorefrom--;
-      while(mousey < scoredragy - vid.fsize) scoredragy -= vid.fsize, scorefrom++;
-      }
-    }
-#endif
   }
         
 bool monsterpage = false;
@@ -1583,11 +1469,6 @@ void displayMenus() {
 #endif
   if(cmode == emHelp) showHelp();
   if(cmode == em3D) show3D();
-#ifdef MOBILE
-#ifdef HAVE_ACHIEVEMENTS
-  if(cmode == emLeader) leader::showMenu();
-#endif
-#endif
 #ifdef ROGUEVIZ
   if(cmode == emRogueviz) rogueviz::showMenu();
 #endif

@@ -5870,14 +5870,10 @@ namespace halloween {
       }
     int id = hrand(100);
     if(items[itTreat] == 1) {
-#ifndef MOBILE
       addMessage(XLAT("Hint: use arrow keys to scroll."));
-#endif
       }
     else if(items[itTreat] == 2) {
-#ifndef MOBILE
       addMessage(XLAT("Hint: press 1 2 3 4 to change the projection."));
-#endif
       }
     else if(items[itTreat] == 3) {
       items[itOrbShell] += 20;

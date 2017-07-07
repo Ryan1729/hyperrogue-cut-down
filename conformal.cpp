@@ -95,7 +95,6 @@ namespace polygonal {
 
   }
 
-#ifndef MOBILE
 namespace spiral {
 
   typedef long double ld;
@@ -221,7 +220,6 @@ namespace spiral {
     }
 
   }
-#endif
 
 bool isbad(ld z) { return !isfinite(z) || fabs(z) > 1e6; }
 
@@ -230,7 +228,6 @@ namespace conformal {
   int lastprogress;
 
   void progress(string str) {
-#ifndef MOBILE
     int tick = SDL_GetTicks();
     if(tick > lastprogress + 250) {
       lastprogress = tick;
@@ -238,7 +235,6 @@ namespace conformal {
       addMessage(str);
       drawscreen();
       }
-#endif
     }
   
   bool on;
@@ -384,7 +380,6 @@ namespace conformal {
   void restore();
   void restoreBack();
 
-#ifndef MOBILE
   void createImage(bool dospiral) {
     int segid = 1;
     inHighQual = true;
@@ -501,7 +496,6 @@ namespace conformal {
 
     inHighQual = false;
     }
-#endif
 
   const char* directions[MODELCOUNT][4] = {
      { "right", "up", "left", "down" },
@@ -548,7 +542,6 @@ namespace conformal {
     dialog::addBoolItem(XLAT("prepare the line animation"), (on), 'e');
     if(on) dialog::addSelItem(XLAT("animation speed"), fts(lvspeed), 'a');
     
-#ifndef MOBILE
     dialog::addBoolItem(XLAT("render bands automatically"), (autoband), 'o');
     if(autoband)
       dialog::addBoolItem(XLAT("include history when auto-rendering"), (autobandhistory), 'j');
@@ -561,7 +554,6 @@ namespace conformal {
       if(renderable)
         dialog::addItem(XLAT("render now (length: %1)", its(measureLength())), 'f');
       }
-#endif
       
     dialog::addItem(XLAT("exit this menu"), 'q');
     dialog::display();
@@ -645,9 +637,7 @@ namespace conformal {
     else if(sym == 's') 
       dialog::editNumber(bandsegment, 500, 32000, 500, 16000, XLAT("band segment"), "");
     else if(sym == 'g') { dospiral = !dospiral; }
-#ifndef MOBILE
     else if(uni == 'f' && pmodel == mdBand && on) createImage(dospiral);
-#endif
     else if(sym == 'q' || sym == SDLK_ESCAPE || sym == '0') { cmode = emNormal; }
     else if(sym == 'i') { 
       if(canmove && !cheater) {
@@ -699,7 +689,6 @@ namespace conformal {
     }
   
   void renderAutoband() {
-#ifndef MOBILE
     if(celldist(cwt.c) <= 7) return;
     if(!autoband) return;
     eModel spm = pmodel;
@@ -711,6 +700,5 @@ namespace conformal {
     clear();
     pmodel = spm;
     includeHistory = ih;
-#endif
   }
   }

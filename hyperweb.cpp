@@ -1,6 +1,6 @@
-#define WEB
+// error : inserted by coan: "#define WEB" contradicts -U or --implicit at /home/ryan/hyperrogue-cut-down/hyperweb.cpp(1)
 #define MOBWEB
-#define MINI
+// error : inserted by coan: "#define MINI" contradicts -U or --implicit at /home/ryan/hyperrogue-cut-down/hyperweb.cpp(3)
 #define NOAUDIO
 #define NOGFX
 #define NOPNG

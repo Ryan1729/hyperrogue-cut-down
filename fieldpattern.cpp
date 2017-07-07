@@ -49,47 +49,17 @@ struct fpattern {
   // by experimentation, such cs and ch always exist
   // many computations are much simpler under that assumption
   
-  #ifndef EASY
-  static int neasy;
-  
-  int m(int x) { x %= Prime; if(x<0) x+= Prime; return x; }
-  #endif
   
   int sub(int a, int b) { 
-    #ifdef EASY
     return (a + b * (Prime-1)) % Prime;
-    #else
-    return m(a%Prime-b%Prime) + Prime * m(a/Prime-b/Prime);
-    #endif
     }
   
   int add(int a, int b) { 
-    #ifdef EASY
     return (a+b)%Prime;
-    #else
-    return m(a%Prime+b%Prime) + Prime * m(a/Prime+b/Prime);
-    #endif
     }
   
   int mul(int tx, int ty) {
-    #ifdef EASY
     return (tx*ty*((tx<0&&ty<0)?wsquare:1)) % Prime;
-    #else
-    if(tx >= Prime && tx % Prime) neasy++; 
-    if(ty >= Prime && ty % Prime) neasy++; 
-    int x[2], y[2], z[3];
-    for(int i=0; i<3; i++) z[i] = 0;
-    for(int i=0; i<2; i++) 
-      x[i] = tx%Prime, tx /= Prime;
-    for(int i=0; i<2; i++) 
-      y[i] = ty%Prime, ty /= Prime;
-    for(int i=0; i<2; i++)
-    for(int j=0; j<2; j++)
-      z[i+j] = (z[i+j] + x[i] * y[j]) % Prime;
-    z[0] += z[2] * wsquare;
-    
-    return m(z[0]) + Prime * m(z[1]);
-    #endif
     }
   
   int sqr(int x) { return mul(x,x); }
@@ -97,14 +67,8 @@ struct fpattern {
   matrix mmul(const matrix& A, const matrix& B) {
     matrix res;
     for(int i=0; i<3; i++) for(int k=0; k<3; k++) {
-  #ifdef EASY
       res[i][k] = 
         (mul(A[i][0], B[0][k]) + mul(A[i][1], B[1][k]) + mul(A[i][2], B[2][k])) % Prime;
-  #else
-      int t=0;                
-      for(int j=0; j<3; j++) t = add(t, mul(A[i][j], B[j][k]));
-      res[i][k] = t;
-  #endif
       }
     return res;
     }
@@ -214,16 +178,10 @@ struct fpattern {
           }
         } else wsquare = 0;
   
-  #ifdef EASY        
       int sqrts[Prime];
       for(int k=0; k<Prime; k++) sqrts[k] = 0;
       for(int k=1-Prime; k<Prime; k++) sqrts[sqr(k)] = k;
       int fmax = Prime;
-  #else
-      int sqrts[Field];
-      for(int k=0; k<Field; k++) sqrts[sqr(k)] = k;
-      int fmax = Field;
-  #endif
   
       if(Prime == 13 && wsquare) {
         for(int i=0; i<Prime; i++) printf("%3d", sqrts[i]);
@@ -659,13 +617,7 @@ void info() {
       cases++;
       if(!fp.easy(fp.cs) || !fp.easy(fp.sn) || !fp.easy(fp.ch) || !fp.easy(fp.sn))
         hard++;
-      #ifndef EASY
-      neasy = 0; 
-      #endif
       fp.build();
-      #ifndef EASY
-      printf("Not easy: %d\n", neasy);
-      #endif
       int N = size(fp.matrices);
       int left = N / fp.Prime;
       printf("Prime decomposition: %d = %d", N, fp.Prime);
