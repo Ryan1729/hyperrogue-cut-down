@@ -7,20 +7,6 @@
 #define GEN_N 2
 #define GEN_O 3
 
-
-
-
-#ifdef MOBWEB
-#define NORUG
-#define NOEDIT
-#define NOMODEL
-#endif
-
-
-
-
-// desktop
-
 #include <stdio.h>
 
 #ifdef USE_SDL

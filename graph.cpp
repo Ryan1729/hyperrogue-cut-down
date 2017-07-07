@@ -8307,13 +8307,6 @@ void mainloopiter() {
     int sym = 0;
     int uni = 0;
     shiftmul = 1;
-    
-/*    if(ev.type == SDL_JOYDEVICEADDED || ev.type == SDL_JOYDEVICEREMOVED) {
-      joyx = joyy = 0;
-      panjoyx = panjoyy = 0;
-      closeJoysticks();
-      initJoysticks();
-      }*/
 
     if(ev.type == SDL_ACTIVEEVENT) {
       if(ev.active.state & SDL_APPINPUTFOCUS) {
@@ -8340,55 +8333,6 @@ void mainloopiter() {
     
     if(ev.type == SDL_VIDEOEXPOSE) {
       drawscreen();
-      }
-    
-    if(ev.type == SDL_JOYAXISMOTION) {
-      if(ev.jaxis.which == 0) {
-        if(ev.jaxis.axis == 0)
-          joyx = ev.jaxis.value;
-        else if(ev.jaxis.axis == 1)
-          joyy = ev.jaxis.value;
-        else if(ev.jaxis.axis == 3)
-          panjoyx = ev.jaxis.value;
-        else if(ev.jaxis.axis == 4)
-          panjoyy = ev.jaxis.value;
-        checkjoy();
-        // printf("panjoy = %d,%d\n", panjoyx, panjoyy);
-        }
-      else {
-        if(ev.jaxis.axis == 0)
-          panjoyx = ev.jaxis.value;
-        else 
-          panjoyy = ev.jaxis.value;
-        }
-      }
-
-    if(ev.type == SDL_JOYBUTTONDOWN && cmode == emShmupConfig && vid.scfg.setwhat) {
-      int joyid = ev.jbutton.which;
-      int button = ev.jbutton.button;
-      if(joyid < 8 && button < 32)
-         vid.scfg.joyaction[joyid][button] = vid.scfg.setwhat;
-      vid.scfg.setwhat = 0;
-      }
-
-    else if(ev.type == SDL_JOYHATMOTION && cmode == emShmupConfig && vid.scfg.setwhat) {
-      int joyid = ev.jhat.which;
-      int hat = ev.jhat.hat;
-      int dir = 4;
-      if(ev.jhat.value == SDL_HAT_UP) dir = 0;
-      if(ev.jhat.value == SDL_HAT_RIGHT) dir = 1;
-      if(ev.jhat.value == SDL_HAT_DOWN) dir = 2;
-      if(ev.jhat.value == SDL_HAT_LEFT) dir = 3;
-      if(joyid < 8 && hat < 4 && dir < 4) {
-        vid.scfg.hataction[joyid][hat][dir] = vid.scfg.setwhat;
-        vid.scfg.setwhat = 0;
-        }
-      }
-
-    else if(ev.type == SDL_JOYBUTTONDOWN && DEFAULTCONTROL) {
-      flashMessages();
-      movepcto(joydir);
-      checkjoy();
       }
 
     if(ev.type == SDL_KEYDOWN) {
@@ -8488,14 +8432,6 @@ void mainloopiter() {
          mouseh[2] < 50 && mouseoh[2] < 50) {
         panning(mouseoh, mouseh);
         }
-
-#ifdef SIMULATE_JOYSTICK
-      // pretend that both joysticks are present
-      stick = panstick = (SDL_Joystick*) (&vid);
-      panjoyx = 20 * (mousex - vid.xcenter);
-      panjoyy = 20 * (mousey - vid.ycenter);
-      checkjoy();
-#endif
 
       if(mousepressed && inslider) {
         sym = getcstat, uni = getcstat, shiftmul = getcshift;
