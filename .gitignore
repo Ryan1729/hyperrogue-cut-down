@@ -2,6 +2,7 @@ target/
 **/*.rs.bk
 
 **/*.o
+*.o
 hyper
 langgen
 DejaVuSans-Bold.ttf
