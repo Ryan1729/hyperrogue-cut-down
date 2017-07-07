@@ -1435,7 +1435,6 @@ void displayMenus() {
   if(cmode == emYendor) yendor::showMenu();
   if(cmode == emChangeMode) showChangeMode();
   if(cmode == emCustomizeChar) showCustomizeChar();
-  if(cmode == emShmupConfig) shmup::showShmupConfig();
   if(cmode == emConformal) conformal::show();
   if(cmode == emTactic) tactic::showMenu();
   if(cmode == emPickEuclidean) showEuclideanMenu();
