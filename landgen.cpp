@@ -3253,8 +3253,7 @@ void setdist(cell *c, int d, cell *from) {
 
   if(signed(c->mpdist) <= d) return;
   if(c->mpdist > d+1 && d != BARLEV) setdist(c, d+1, from);
-  c->mpdist = d;
-  // printf("setdist %p %d [%p]\n", c, d, from);
+  c->mpdist = d;  
 
   if(d <= 3) lastexplore = shmup::on ? shmup::curtime : turncount;
 
@@ -3593,31 +3592,6 @@ void setdist(cell *c, int d, cell *from) {
               c3->wall = waBarrowWall, c3->item = itNone;
             }
           }
-
-        /* if(hrand(25000) < PT(25 + 2 * kills[moDraugr], 40) && notDippingFor(itBarrow)) {
-          c->item = itBarrow;
-          c->wall = waBarrowCenter;
-          forCellCM(c2, c) c2->wall = waBarrowCenter, c2->item = itBarrow;
-          forCellCM(c2, c) forCellCM(c3, c2) if(!isNeighbor(c3, c) && c3 != c)
-            c3->wall = waBarrowWall, c3->item = itNone;
-          int i = hrand(c->type);
-          cell *c2, *c3;
-          while(true) { 
-            c2 = createMov(c, i);
-            c3 = createMov(c2, hrand(c2->type));
-            if(c3 != c && !isNeighbor(c3, c)) break;
-            }
-          c3->wall = waBarrowCenter;
-          forCellCM(c4, c3) {
-            if(c4 == c2 || isNeighbor(c4, c2)) continue;
-            bool adj = false;
-            forCellEx(c5, c2) if(c5 != c3 && isNeighbor(c5, c4)) adj = true;
-            if(adj)
-              c4->wall = waBarrowCenter;
-            else
-              c4->wall = waBarrowWall, c4->item = itNone;
-            }
-          } */
         }
 
       if(c->land == laTrollheim) {
@@ -3752,11 +3726,6 @@ void setdist(cell *c, int d, cell *from) {
         if(randomPatternsMode)
           c->wall = RANDPAT ? waNone : waSaloon;
         else if(cdist50(c) <= 2) c->wall = waSaloon;
-        
-        /*if(i == 3 && polarb50(c) == 1) {
-          for(int j=0; j<c->type; j++) if(c->mov[j] && polarb50(c->mov[j]) == 0)
-            c->wall = waFloorA;
-          } */
         }
 
       if(c->land == laWhirlwind) {
@@ -3770,13 +3739,6 @@ void setdist(cell *c, int d, cell *from) {
           {}
         else
           whirlwind::switchTreasure(c);
-
-        /* bool edge = false;
-        for(int i=0; i<c->type; i++) 
-         if(zebra3(c->mov[i]) != z)
-           edge = true; */
-        // if(edge && hrand(100) < 5)
-        //    c->wall = waSaloon;
         }
       
       if(c->land == laStorms) {
@@ -4106,14 +4068,6 @@ void setdist(cell *c, int d, cell *from) {
           c->monst = moNone;
           c->landparam = hrand(0xFFFFFF + 1);
           }
-        /* for(int i=0; i<c->type; i++) {
-          if(hrand(6) < 5) {
-            createMov(c,i);
-            cell *c2 = c->mov[i];
-            c2->wall = waWaxWall;
-            c2->monst = moNone;
-            }
-          } */
         }
 
       if(c->land == laDesert) {
@@ -4193,11 +4147,6 @@ void setdist(cell *c, int d, cell *from) {
       }
 
     if(d == 8 && c->land == laBull && !c->monst && !c->item && celldist(c) >= 3) {
-      /* int cd = getCdata(c, 3);
-      cd &= 15;
-      int ce = getCdata(c, 2);
-      ce &= 15;
-      if(cd >= 8 && ce >= 8) */
       if(hrand(100) < 25)
         c->wall = safety ? pick(waBigTree, waSmallTree) : pick(waStone, waBigTree, waSmallTree);
       }
@@ -5173,8 +5122,6 @@ bool wchance(int a, int of) {
   a += yendor::hardness() + items[itHolyGrail] + 1;
   if(isCrossroads(cwt.c->land)) 
     a+= items[itHyperstone] * 10;
-
-//if(cwt.c->land == laWhirlwind && !nowhirl) a += items[itWindstone] * 3;
 
   for(int i=0; i<ittypes; i++) if(itemclass(eItem(i)) == IC_TREASURE)
     a = max(a, (items[i]-10) / 10);

@@ -8049,9 +8049,6 @@ void handlekey(int sym, int uni, extra& ev) {
     addMessage(XLAT("Screenshot saved to %1", buf));
     }
 
-  #ifdef DEMO
-  if(cmode == emOverview || cmode == emMenu) handleDemoKey(sym, uni); else
-  #endif
 
   if(cmode == emNormal) handleKeyNormal(sym, uni, ev);
   else if(cmode == emMenu) handleMenuKey(sym, uni);
