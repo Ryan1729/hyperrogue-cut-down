@@ -242,8 +242,8 @@ else if(args()[0] == '-' && args()[1] == x && args()[2] == '0') { PHASE(2); para
     PHASE(3); shift(); 
     printf("Generating %d cells...\n", argi());
     celllister cl(cwt.c, 50, argi(), NULL);
-    printf("Cells generated: %d\n", size(cl.lst));
-    for(int i=0; i<size(cl.lst); i++)
+    printf("Cells generated: %d\n", int(cl.lst.size()));
+    for(int i=0; i<int(cl.lst.size()); i++)
       setdist(cl.lst[i], 7, NULL);
     }
   else if(argis("-sr")) {    

@@ -1120,7 +1120,7 @@ void showScores() {
   int omit = scorefrom;
   int rank = 0;
   while(y < (ISMOBILE ? vid.yres - 5*vid.fsize : vid.yres - 2 * vid.fsize)) { 
-    if(id >= size(scores)) break;
+    if(id >= int(scores.size())) break;
         
     score& S(scores[id]);
     
@@ -1200,7 +1200,7 @@ void handlePickScoreKeys(int uni) {
   andmode = 2;
   if(uni == 'm') monsterpage = !monsterpage; else
   if(uni >= '1' && uni <= '9') uni = uni + 1000 - '1';
-  else if(uni >= 1000 && uni < 1000 + size(pickscore_options)) { 
+  else if(uni >= 1000 && uni < 1000 + int(pickscore_options.size())) { 
     cmode = emScores; 
     scoredisplay = pickscore_options[uni - 1000].second;
     }

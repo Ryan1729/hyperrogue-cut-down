@@ -75,12 +75,12 @@ struct celllister {
   vector<int> dists;
   
   bool listed(cell *c) {
-    return c->aitmp >= 0 && c->aitmp < size(lst) && lst[c->aitmp] == c;
+    return c->aitmp >= 0 && c->aitmp < int(lst.size()) && lst[c->aitmp] == c;
     }
   
   void add(cell *c, int d) {
     if(listed(c)) return;
-    c->aitmp = size(lst);
+    c->aitmp = int(lst.size());
     tmps.push_back(c->aitmp);
     lst.push_back(c);
     dists.push_back(d);
@@ -89,7 +89,7 @@ struct celllister {
   int getdist(cell *c) { return dists[c->aitmp]; }
   
   ~celllister() {
-    for(int i=0; i<size(lst); i++) lst[i]->aitmp = tmps[i];
+    for(int i=0; i<int(lst.size()); i++) lst[i]->aitmp = tmps[i];
     }
   
   celllister(cell *orig, int maxdist, int maxcount, cell *breakon) {
@@ -98,15 +98,15 @@ struct celllister {
     dists.clear();
     add(orig, 0);
     cell *last = orig;
-    for(int i=0; i<size(lst); i++) {
+    for(int i=0; i<int(lst.size()); i++) {
       cell *c = lst[i];
       if(maxdist) forCellCM(c2, c) {
         add(c2, dists[i]+1);
         if(c2 == breakon) return;
         }
       if(c == last) {
-        if(size(lst) >= maxcount || dists[i]+1 == maxdist) break;
-        last = lst[size(lst)-1];
+        if(int(lst.size()) >= maxcount || dists[i]+1 == maxdist) break;
+        last = lst[int(lst.size())-1];
         }
       }
     }
@@ -463,7 +463,7 @@ struct hrmap_quotient : hrmap {
   heptagon *getOrigin() { return allh[0]; }
 
   ~hrmap_quotient() {
-    for(int i=0; i<size(allh); i++) {
+    for(int i=0; i<int(allh.size()); i++) {
       clearHexes(allh[i]);
       delete allh[i];
       }
@@ -1390,7 +1390,7 @@ int celldistance(cell *c1, cell *c2) {
   }
 
 void clearCellMemory() {
-  for(int i=0; i<size(allmaps); i++) delete allmaps[i];
+  for(int i=0; i<int(allmaps.size()); i++) delete allmaps[i];
   allmaps.clear();
   }
 

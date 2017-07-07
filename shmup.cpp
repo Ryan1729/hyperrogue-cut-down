@@ -916,7 +916,7 @@ void killMonster(monster* m, eMonster who_kills, int flags = 0) {
   }
 
 void pushmonsters() {
-  for(int i=0; i<size(active); i++) {
+  for(int i=0; i<int(active.size()); i++) {
     monster *m = active[i];
     m->notpushed = isPlayer(m) || m->dead || (m->base->monst && m->base->monst != m->type);
     if(!m->notpushed) {
@@ -927,7 +927,7 @@ void pushmonsters() {
   }
 
 void popmonsters() {
-  for(int i=size(active)-1; i>=0; i--) {
+  for(int i=int(active.size())-1; i>=0; i--) {
     monster *m = active[i];
     if(!m->notpushed) {
       if(m->type == m->base->monst)
@@ -946,7 +946,7 @@ void popmonsters() {
   }
 
 void degradeDemons() {
-  for(int i=0; i<size(active); i++) {
+  for(int i=0; i<int(active.size()); i++) {
     monster *m = active[i];
     if(m->type == moGreater) m->type = moLesser;
     if(m->stk == moGreater) m->type = moLesser;
@@ -958,7 +958,7 @@ double playerturn[MAXPLAYER], playergo[MAXPLAYER];
 bool playerfire[MAXPLAYER];
 
 void awakenMimics(monster *m, cell *c2) {
-  for(int i=0; i<size(dcal); i++) {
+  for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
     if(isMimic(c->monst)) {
       // straight
@@ -1524,7 +1524,7 @@ void movePlayer(monster *m, int delta) {
   if(items[itOrbHorns]) {
     hyperpoint H = hornpos(cpid);
 
-    for(int j=0; j<size(active); j++) {
+    for(int j=0; j<int(active.size()); j++) {
       monster* m2 = active[j];
       if(m2 == m) continue;
       
@@ -1544,7 +1544,7 @@ void movePlayer(monster *m, int delta) {
     for(double d=0; d<=1.001; d += .1) {
       hyperpoint H = swordpos(cpid, b, d);
   
-      for(int j=0; j<size(active); j++) {
+      for(int j=0; j<int(active.size()); j++) {
         monster* m2 = active[j];
         if(m2 == m) continue;
         
@@ -1648,7 +1648,7 @@ bool verifyTeleport() {
   }
 
 void destroyMimics() {
-  for(int i=0; i<size(active); i++)
+  for(int i=0; i<int(active.size()); i++)
     if(isMimic(active[i]->type)) 
       active[i]->dead = true;
   }
@@ -1689,7 +1689,7 @@ eItem targetRangedOrbKey(orbAction a) {
     }
   mousetarget = NULL;
 
-  for(int j=0; j<size(active); j++) {
+  for(int j=0; j<int(active.size()); j++) {
     monster* m2 = active[j];
     if(m2->dead) continue;
     if(!mousetarget || intval(mouseh, mousetarget->pat*C0) > intval(mouseh, m2->pat*C0)) 
@@ -1828,7 +1828,7 @@ void moveBullet(monster *m, int delta) {
 
   // items[itOrbWinter] = 100; items[itOrbLife] = 100;
   
-  for(int j=0; j<size(active); j++) {
+  for(int j=0; j<int(active.size()); j++) {
     monster* m2 = active[j];
     if(m2 == m || (m2 == m->parent && m->vel >= 0) || m2->parent == m->parent) continue;
     
@@ -2021,7 +2021,7 @@ void moveMonster(monster *m, int delta) {
   else {
   
     if(m->type == moSleepBull) {  
-      for(int j=0; j<size(active); j++) if(active[j]!=m && active[j]->type != moBullet) {
+      for(int j=0; j<int(active.size()); j++) if(active[j]!=m && active[j]->type != moBullet) {
         monster* m2 = active[j];
         double d = intval(m2->pat*C0, nat*C0);
         if(d < SCALE2*3 && m2->type == moPlayer) m->type = moRagingBull;
@@ -2030,7 +2030,7 @@ void moveMonster(monster *m, int delta) {
     
     if(m->type == moWitchFlash) for(int pid=0; pid<players; pid++) {
       bool okay = intval(pc[pid]->pat*C0, m->pat*C0) < 2 * SCALE2;
-      for(int i=0; i<size(active); i++) {
+      for(int i=0; i<int(active.size()); i++) {
         monster *m2 = active[i];
         if(m2 != m && isWitch(m2->type) && intval(m2->pat*C0, m->pat*C0) < 2 * SCALE2)
           okay = false;
@@ -2046,7 +2046,7 @@ void moveMonster(monster *m, int delta) {
       }
     if(isBug(m->type)) {
       vector<monster*> bugtargets;
-      for(int i=0; i<size(active); i++)
+      for(int i=0; i<int(active.size()); i++)
         if(!isBullet(active[i]))
         if(active[i]->type != m->type)
         if(!isPlayer(active[i]) || !invismove)
@@ -2056,7 +2056,7 @@ void moveMonster(monster *m, int delta) {
       closerTo = m->pat * C0;
       sort(bugtargets.begin(), bugtargets.end(), closer);
   
-      for(int i=0; i<size(bugtargets); i++)
+      for(int i=0; i<int(bugtargets.size()); i++)
         if(m->trackroute(bugtargets[i]->pat, step)) {
           goal = bugtargets[i]->pat;
           direct = true;
@@ -2192,7 +2192,7 @@ void moveMonster(monster *m, int delta) {
 
   monster* crashintomon = NULL;
   
-  for(int j=0; j<size(active); j++) if(active[j]!=m && active[j]->type != moBullet) {
+  for(int j=0; j<int(active.size()); j++) if(active[j]!=m && active[j]->type != moBullet) {
     monster* m2 = active[j];
     double d = intval(m2->pat*C0, nat*C0);
     if(d < SCALE2 * 0.1) crashintomon = active[j];
@@ -2293,7 +2293,7 @@ void moveMonster(monster *m, int delta) {
       cell *c3 = m->base->mov[i];
       if(dirfromto(c3, c2) != -1 && c3->wall == waFreshGrave && gmatrix.count(c3)) {
         bool monstersNear = false;
-        for(int i=0; i<size(active); i++) {
+        for(int i=0; i<int(active.size()); i++) {
           if(active[i] != m && intval(active[i]->pat*C0, gmatrix[c3]*C0) < SCALE2 * .3)
             monstersNear = true;
           if(active[i] != m && intval(active[i]->pat*C0, gmatrix[c2]*C0) < SCALE2 * .3)
@@ -2487,13 +2487,13 @@ void turn(int delta) {
   
   for(int i=0; i<motypes; i++) exists[i] = false;
 
-  for(int i=0; i<size(active); i++) {
+  for(int i=0; i<int(active.size()); i++) {
     monster* m = active[i];
     m->findpat();
     exists[movegroup(m->type)] = true;
     }
   
-  for(int i=0; i<size(active); i++) {
+  for(int i=0; i<int(active.size()); i++) {
     monster* m = active[i];
     
     switch(m->type) {
@@ -2509,7 +2509,7 @@ void turn(int delta) {
       }
     }
 
-  for(int i=0; i<size(active); i++) {
+  for(int i=0; i<int(active.size()); i++) {
     monster* m = active[i];
     if(isMimic(m->type))
       moveMimic(m);
@@ -2519,19 +2519,19 @@ void turn(int delta) {
   
     // build the path data
     
-    int pqs = size(pathq);
+    int pqs = int(pathq.size());
     for(int i=0; i<pqs; i++) {
       pathq[i]->pathdist = PINFD;
       }
     pathq.clear(); 
 
-    for(int i=0; i<size(targets); i++) {
+    for(int i=0; i<int(targets.size()); i++) {
       targets[i]->pathdist = isPlayerOn(targets[i]) ? 0 : 1;
       pathq.push_back(targets[i]);
       }
 
     int qb = 0;
-    for(qb=0; qb < size(pathq); qb++) {
+    for(qb=0; qb < int(pathq.size()); qb++) {
       cell *c = pathq[qb];
       int d = c->pathdist;
       if(d == PINFD-1) continue;
@@ -2550,7 +2550,7 @@ void turn(int delta) {
   
     // move monsters of this type
     
-    for(int i=0; i<size(active); i++) 
+    for(int i=0; i<int(active.size()); i++) 
      if(movegroup(active[i]->type) == t)
         moveMonster(active[i], delta);
     }
@@ -2651,9 +2651,9 @@ void turn(int delta) {
     }
   
   // deactivate all monsters
-  for(int i=0; i<size(active); i++)
+  for(int i=0; i<int(active.size()); i++)
     if(active[i]->dead && active[i]->type != moPlayer) {
-      for(int j=0; j<size(active); j++) if(active[j]->parent == active[i])
+      for(int j=0; j<int(active.size()); j++) if(active[j]->parent == active[i])
         active[j]->parent = active[i]->parent;
       delete active[i];
       }
@@ -2753,7 +2753,7 @@ bool drawMonster(const transmatrix& V, cell *c, const transmatrix*& Vboat, trans
         (isFriendly(m->type) || m->type == moPlayer) ? 0x00FF00FF : 0xFF0000FF;
 
     int q = ptds.size();
-    if(q != size(ptds) && !m->inBoat) pushdown(c, q, view, zlev, true, false);
+    if(q != int(ptds.size()) && !m->inBoat) pushdown(c, q, view, zlev, true, false);
 
     switch(m->type) {
       case moPlayer: 
@@ -2828,7 +2828,7 @@ bool drawMonster(const transmatrix& V, cell *c, const transmatrix*& Vboat, trans
 void clearMonsters() {
   for(mit it = monstersAt.begin(); it != monstersAt.end(); it++)
     delete(it->second);
-  for(int i=0; i<size(active); i++) delete active[i];
+  for(int i=0; i<int(active.size()); i++) delete active[i];
   monstersAt.clear();
   active.clear();
   }
@@ -2851,7 +2851,7 @@ bool playerInBoat(int i) {
   }
 
 void destroyBoats(cell *c) {
-  for(int i=0; i<size(active); i++)
+  for(int i=0; i<int(active.size()); i++)
     if(active[i]->base == c && active[i]->inBoat)
       active[i]->inBoat = false;
   }

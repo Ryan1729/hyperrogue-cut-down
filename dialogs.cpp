@@ -117,7 +117,7 @@ namespace dialog {
     it.body = body;
     it.scale = 100;
 
-    if(size(body) >= 500) it.scale = 70;
+    if(int(body.size()) >= 500) it.scale = 70;
 
     items.push_back(it);
     }
@@ -182,7 +182,7 @@ namespace dialog {
     else
       xs = vid.xres * 618/1000, xo = vid.xres * 186/1000;
     
-    for(int i=0; i<=size(str); i++) {
+    for(int i=0; i<=int(str.size()); i++) {
       int ls = 0;
       int prev = last;
       if(str[i] == ' ') lastspace = i;
@@ -190,7 +190,7 @@ namespace dialog {
         if(lastspace == last) ls = i-1, last = i-1;
         else ls = lastspace, last = ls+1;
         }
-      if(str[i] == 10 || i == size(str)) ls = i, last = i+1;
+      if(str[i] == 10 || i == int(str.size())) ls = i, last = i+1;
       if(ls) {
         if(!measure) displayfr(xo, y, 2, siz, str.substr(prev, ls-prev), 0xC0C0C0, 0);
         if(ls == prev) y += siz/2;
@@ -315,19 +315,19 @@ namespace dialog {
   
   void handleNavigation(int &sym, int &uni) {
     if(uni == '\n' || uni == '\r' || sym == SDLK_KP5)
-      for(int i=0; i<size(items); i++) 
+      for(int i=0; i<int(items.size()); i++) 
         if(items[i].type == diItem)
           if(items[i].body == highlight_text) {
             uni = sym = items[i].key;
             return;
             }
     if(sym == SDLK_PAGEDOWN || sym == SDLK_KP3) {
-      for(int i=0; i<size(items); i++)
+      for(int i=0; i<int(items.size()); i++)
         if(items[i].type == diItem)
           highlight_text = items[i].body;
       }
     if(sym == SDLK_PAGEUP || sym == SDLK_KP9) {
-      for(int i=0; i<size(items); i++) 
+      for(int i=0; i<int(items.size()); i++) 
         if(items[i].type == diItem) {
           highlight_text = items[i].body;
           break;
@@ -335,11 +335,11 @@ namespace dialog {
       }    
     if(sym == SDLK_UP || sym == SDLK_KP8) {
       string last = "";
-      for(int i=0; i<size(items); i++) 
+      for(int i=0; i<int(items.size()); i++) 
         if(items[i].type == diItem)
           last = items[i].body;
       uni = sym = 0;
-      for(int i=0; i<size(items); i++)
+      for(int i=0; i<int(items.size()); i++)
         if(items[i].type == diItem) {
           if(items[i].body == highlight_text) {
             highlight_text = last; return;
@@ -350,12 +350,12 @@ namespace dialog {
       }
     if(sym == SDLK_DOWN || sym == SDLK_KP2) {
       int state = 0;
-      for(int i=0; i<size(items); i++)
+      for(int i=0; i<int(items.size()); i++)
         if(items[i].type == diItem) {
           if(state) { highlight_text = items[i].body; return; }
           else if(items[i].body == highlight_text) state = 1;
           }
-      for(int i=0; i<size(items); i++)
+      for(int i=0; i<int(items.size()); i++)
         if(items[i].type == diItem) 
           highlight_text = items[i].body;
       uni = sym = 0;
@@ -599,7 +599,7 @@ namespace dialog {
 
     if(ne.help != "") {
       addHelp(ne.help);
-      bool scal = size(ne.help) > 160;
+      bool scal = int(ne.help.size()) > 160;
 #ifndef PANDORA
       scal = false;
 #endif
@@ -626,7 +626,7 @@ namespace dialog {
       affect('s');
       }
     else if(uni == '\b' || uni == '\t') {
-      ne.s = ne.s. substr(0, size(ne.s)-1);
+      ne.s = ne.s. substr(0, int(ne.s.size())-1);
       sscanf(ne.s.c_str(), LDF, ne.editwhat);
       affect('s');
       }

@@ -181,14 +181,14 @@ void loadfont(int siz) {
 int gl_width(int size, const char *s);
 
 int textwidth(int siz, const string &str) {
-  if(size(str) == 0) return 0;
+  if(int(str.size()) == 0) return 0;
 
 
   loadfont(siz);
   
   int w, h;
   TTF_SizeUTF8(font[siz], str.c_str(), &w, &h);
-  // printf("width = %d [%d]\n", w, size(str));
+  // printf("width = %d [%d]\n", w, int(str.size()));
   return w;
   }
 
@@ -732,7 +732,7 @@ vector<msginfo> msgs;
 vector<msginfo> gamelog;
 
 void flashMessages() {
-  for(int i=0; i<size(msgs); i++) 
+  for(int i=0; i<int(msgs.size()); i++) 
     if(msgs[i].stamp < ticks - 1000 && !msgs[i].flashout) {
       msgs[i].flashout = true;
       msgs[i].stamp = ticks;
@@ -741,19 +741,19 @@ void flashMessages() {
 
 void addMessageToLog(msginfo& m, vector<msginfo>& log) {
 
-  if(size(log) != 0) {
-    msginfo& last = log[size(log)-1];
+  if(int(log.size()) != 0) {
+    msginfo& last = log[int(log.size())-1];
     if(last.msg == m.msg) {
       int q = m.quantity + last.quantity;
       last = m; last.quantity = q;
       return;
       }
     }
-  if(size(log) < 200)
+  if(int(log.size()) < 200)
     log.push_back(m);
   else {
-    for(int i=0; i<size(log)-1; i++) swap(log[i], log[i+1]);
-    log[size(log)-1] = m;
+    for(int i=0; i<int(log.size())-1; i++) swap(log[i], log[i+1]);
+    log[int(log.size())-1] = m;
     }
   }
 
@@ -774,15 +774,15 @@ void drawmessages() {
   DEBB(DF_GRAPH, (debugfile,"draw messages\n"));
   int i = 0;
   int t = ticks;
-  for(int j=0; j<size(msgs); j++) {
+  for(int j=0; j<int(msgs.size()); j++) {
     int age = msgs[j].flashout * (t - msgs[j].stamp);
     if(msgs[j].spamtype) {
-      for(int i=j+1; i<size(msgs); i++) if(msgs[i].spamtype == msgs[j].spamtype)
+      for(int i=j+1; i<int(msgs.size()); i++) if(msgs[i].spamtype == msgs[j].spamtype)
         msgs[j].flashout = 2;
       }
     if(age < 256*vid.flashtime) {
       int x = vid.xres / 2;
-      int y = vid.yres - vid.fsize * (size(msgs) - j) - (ISIOS ? 4 : 0);
+      int y = vid.yres - vid.fsize * (int(msgs.size()) - j) - (ISIOS ? 4 : 0);
       string s = msgs[j].msg;
       if(msgs[j].quantity > 1) s += " (x" + its(msgs[j].quantity) + ")";
       displayfr(x, y, 1, vid.fsize, s, 0x10101 * (255 - age/vid.flashtime), 8);
@@ -2810,13 +2810,13 @@ void drawEmeraldFloor(const transmatrix& V, cell *c, int col) {
 double fanframe;
 
 void viewBuggyCells(cell *c, transmatrix V) {
-  for(int i=0; i<size(buggycells); i++)
+  for(int i=0; i<int(buggycells.size()); i++)
     if(c == buggycells[i]) {
       queuepoly(V, shPirateX, 0xC000C080);
       return;
       }
 
-  for(int i=0; i<size(buggycells); i++) {
+  for(int i=0; i<int(buggycells.size()); i++) {
     cell *c1 = buggycells[i];
     cell *cf = cwt.c;
     
@@ -3456,7 +3456,7 @@ void pushdown(cell *c, int& q, const transmatrix &V, double down, bool rezoom, b
   // since we might be changing priorities, we have to make sure that we are sorting correctly
   if(down > 0 && repriority) { 
     int qq = q+1;
-    while(qq < size(ptds))
+    while(qq < int(ptds.size()))
       if(qq > q && ptds[qq].prio < ptds[qq-1].prio) {
         swap(ptds[qq], ptds[qq-1]);
         qq--;
@@ -3464,7 +3464,7 @@ void pushdown(cell *c, int& q, const transmatrix &V, double down, bool rezoom, b
       else qq++;
     }
   
-  while(q < size(ptds)) {
+  while(q < int(ptds.size())) {
     polytodraw& ptd = ptds[q++];
     if(ptd.kind == pkPoly) {
     
@@ -4463,7 +4463,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       }
     
     if(chasmg) {
-      int q = size(ptds);
+      int q = int(ptds.size());
       if(fallanims.count(c)) {
          fallanim& fa = fallanims[c];
          bool erase = true;
@@ -4654,7 +4654,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     if(true) {
       int q = ptds.size();
       error |= drawMonster(V, ct, c, moncol); 
-      if(Vboat != &V && Vboat != &Vboat0 && q != size(ptds)) 
+      if(Vboat != &V && Vboat != &Vboat0 && q != int(ptds.size())) 
         pushdown(c, q, V, -geom3::factor_to_lev(zlevel(tC0((*Vboat)))),
           !isMultitile(c->monst), false);
       }
@@ -5035,7 +5035,7 @@ void drawMarkers() {
   }
 
 void drawFlashes() {
-  for(int k=0; k<size(flashes); k++) {
+  for(int k=0; k<int(flashes.size()); k++) {
     flashdata& f = flashes[k];
     transmatrix V = gmatrix[f.where];
     int tim = ticks - f.t;
@@ -5079,7 +5079,7 @@ void drawFlashes() {
       }
 
     if(kill) {
-      f = flashes[size(flashes)-1];
+      f = flashes[int(flashes.size())-1];
       flashes.pop_back(); k--;
       }
     }
@@ -5301,7 +5301,7 @@ string generateHelpForWall(eWall w) {
   }
 
 void buteol(string& s, int current, int req) {
-  int siz = size(s);
+  int siz = int(s.size());
   if(s[siz-1] == '\n') s.resize(siz-1);
   char buf[100]; sprintf(buf, " (%d/%d)", current, req);
   s += buf; s += "\n";
@@ -5612,11 +5612,11 @@ void describeMouseover() {
 /*  // Hive debug
     if(c->land == laHive) {
       out += " [" + its(c->tmp) + " H" + its(int(c->heat));
-      if(c->tmp >= 0 && c->tmp < size(buginfo) && buginfo[c->tmp].where == c) {
+      if(c->tmp >= 0 && c->tmp < int(buginfo.size()) && buginfo[c->tmp].where == c) {
         buginfo_t b(buginfo[c->tmp]);
         for(int k=0; k<3; k++) out += ":" + its(b.dist[k]);
         for(int k=0; k<3; k++) 
-        for(int i=0; i<size(bugqueue[k]); i++)
+        for(int i=0; i<int(bugqueue[k].size()); i++)
           if(bugqueue[k][i] == c->tmp)
             out += " B"+its(k)+":"+its(i);
         }
@@ -5890,7 +5890,7 @@ void drawthemap() {
     
   using namespace yendor;
   
-  if(yii < size(yi)) {
+  if(yii < int(yi.size())) {
     if(!yi[yii].found) 
       for(int i=0; i<YDIST; i++) 
         if(yi[yii].path[i]->cpdist <= sightrange) {
@@ -6330,7 +6330,7 @@ void showGameover() {
       dialog::addInfo(XLAT("Collect at least 10 treasures in each of 9 types to access Hell"));
     else if(items[itHell] < 10)
       dialog::addInfo(XLAT("Collect at least 10 Demon Daisies to find the Orbs of Yendor"));
-    else if(size(yendor::yi) == 0)
+    else if(int(yendor::yi.size()) == 0)
       dialog::addInfo(XLAT("Look for the Orbs of Yendor in Hell or in the Crossroads!"));
     else 
       dialog::addInfo(XLAT("Unlock the Orb of Yendor!"));
@@ -6374,7 +6374,7 @@ void showGameover() {
   
   msgs.clear();
   if(msgscroll < 0) msgscroll = 0;
-  int gls = size(gamelog) - msgscroll;
+  int gls = int(gamelog.size()) - msgscroll;
   int mnum = 0;
   for(int i=gls-5; i<gls; i++) 
     if(i>=0) {
@@ -6505,7 +6505,7 @@ void loadScores() {
       }
     }
   fclose(f);
-  addMessage(its(size(scores))+" games have been recorded in "+scorefile);
+  addMessage(its(int(scores.size()))+" games have been recorded in "+scorefile);
   cmode = emScores;
   boxid = 0; applyBoxes();
   scoresort = 2; reverse(scores.begin(), scores.end());
@@ -6717,7 +6717,7 @@ void drawStats() {
     int qty[64];
     vector<cell*>& ac = currentmap->allcells();
     for(int i=0; i<64; i++) qty[i] = 0;
-    for(int i=0; i<size(ac); i++) {
+    for(int i=0; i<int(ac.size()); i++) {
       int d = celldistance(ac[i], cwt.c);
       if(d >= 0 && d < 64) qty[d]++;
       }
@@ -7011,7 +7011,7 @@ void drawfullmap() {
     polygonal::drawBoundary(darkena(0xFF, 0, 0xFF));
   
   /* if(vid.wallmode < 2 && !euclid && !mapeditor::whichShape) {
-    int ls = size(lines);
+    int ls = int(lines.size());
     if(ISMOBILE) ls /= 10;
     for(int t=0; t<ls; t++) queueline(View * lines[t].P1, View * lines[t].P2, lines[t].col >> (darken+1));
     } */
@@ -8223,7 +8223,7 @@ void indAnimateMovement(cell *src, cell *tgt, int layer) {
   }
 
 void commitAnimations(int layer) {
-  for(int i=0; i<size(animstack); i++)
+  for(int i=0; i<int(animstack.size()); i++)
     animations[layer][animstack[i].first] = animstack[i].second;
   animstack.clear();
   }

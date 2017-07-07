@@ -117,7 +117,7 @@ void initgame() {
     }
   
   if(quotient && generateAll(firstland)) {
-    for(int i=0; i<size(currentmap->allcells()); i++)
+    for(int i=0; i<int(currentmap->allcells().size()); i++)
       setdist(currentmap->allcells()[i], 8, NULL);
     }
 
@@ -846,7 +846,7 @@ namespace gamestack {
 
   vector<gamedata> gd;
   
-  bool pushed() { return size(gd); }
+  bool pushed() { return int(gd.size()); }
   
   void push() {
     if(geometry) {
@@ -865,7 +865,7 @@ namespace gamestack {
     }
     
   void pop() {
-    gamedata& gdn = gd[size(gd)-1];
+    gamedata& gdn = gd[int(gd.size())-1];
     currentmap = gdn.hmap;
     cwt = gdn.cwt;
     viewctr = gdn.viewctr;

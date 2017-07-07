@@ -212,7 +212,7 @@ void flashCell(cell *c, eMonster killer, flagtype flags) {
 void activateFlashFrom(cell *cf, eMonster who, flagtype flags) {
   drawFlash(cf);
   playSound(cf, "storm");
-  for(int i=0; i<size(dcal); i++) {
+  for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
     if(c == cf) continue;
     for(int t=0; t<c->type; t++)
@@ -239,7 +239,7 @@ void checkFreedom(cell *cf) {
   avcells.clear();
   avcells.push_back(cf);
   cf->aitmp = sval;
-  for(int i=0; i<size(avcells); i++) {
+  for(int i=0; i<int(avcells.size()); i++) {
     cell *c = avcells[i];
     if(c->cpdist >= 5) return;
     for(int i=0; i<c->type; i++) {
@@ -263,7 +263,7 @@ void checkFreedom(cell *cf) {
   drainOrb(itOrbFreedom);
   for(int i=0; i<numplayers(); i++)
     drawBigFlash(playerpos(i));
-  for(int i=0; i<size(dcal); i++) {
+  for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
     if(c == cf && !shmup::on) continue;
     if(c->cpdist > 5) break;
@@ -280,7 +280,7 @@ void activateFlash() {
   addMessage(XLAT("You activate the Flash spell!"));
   playSound(cwt.c, "storm");
   drainOrb(itOrbFlash);
-  for(int i=0; i<size(dcal); i++) {
+  for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
     if(c->cpdist > 2) break;
     flashCell(c, moPlayer, AF_MAGIC);
@@ -467,7 +467,7 @@ void activateLightning() {
   drawLightning();
   addMessage(XLAT("You activate the Lightning spell!"));
 
-  for(int i=0; i<size(dcal); i++) if(dcal[i]) dcal[i]->ligon = 0;
+  for(int i=0; i<int(dcal.size()); i++) if(dcal[i]) dcal[i]->ligon = 0;
 
   drainOrb(itOrbLightning);
 
@@ -489,7 +489,7 @@ void activateLightning() {
 bool haveRangedTarget() {
   if(!haveRangedOrb())
     return false;
-  for(int i=0; i<size(dcal); i++) {
+  for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
     if(targetRangedOrb(c, roCheck)) {
       return true;

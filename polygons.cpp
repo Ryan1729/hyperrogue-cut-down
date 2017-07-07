@@ -92,9 +92,9 @@ struct polytodraw {
 
 vector<polytodraw> ptds;
 
-polytodraw& lastptd() { return ptds[size(ptds)-1]; }
+polytodraw& lastptd() { return ptds[int(ptds.size())-1]; }
 
-polytodraw& nextptd() { ptds.resize(size(ptds)+1); return lastptd(); }
+polytodraw& nextptd() { ptds.resize(int(ptds.size())+1); return lastptd(); }
 
 bool ptdsort(const polytodraw& p1, const polytodraw& p2) {
   return p1.prio < p2.prio;
@@ -426,7 +426,7 @@ void prettyline(hyperpoint h1, hyperpoint h2, int col, int lev) {
   prettylinepoints.clear();
   prettypoint(h1);
   prettylinesub(h1, h2, lev);
-  drawpolyline(Id, &prettylinepoints[0], size(prettylinepoints)/3, 0, col);
+  drawpolyline(Id, &prettylinepoints[0], int(prettylinepoints.size())/3, 0, col);
   }
 
 vector<GLfloat> curvedata;
@@ -435,7 +435,7 @@ int curvestart = 0;
 void drawqueue() {
 #ifdef USEPOLY
 
-  int siz = size(ptds);
+  int siz = int(ptds.size());
 
   setcameraangle(true);
 
@@ -759,13 +759,13 @@ void pushShape(const usershapelayer& ds) {
   transmatrix T = rgpushxto0(ds.shift) * rspintox(ds.spin);
   
   for(int r=0; r<ds.rots; r++) {
-    for(int i=0; i<size(ds.list); i++)
+    for(int i=0; i<int(ds.list.size()); i++)
       hpcpush(T * spin(2*M_PI*r/ds.rots) * ds.list[i]);
 
     if(ds.sym) {
   
       transmatrix mirrortrans = Id; mirrortrans[1][1] = -1;
-      for(int i=size(ds.list)-1; i>=0; i--)
+      for(int i=int(ds.list.size())-1; i>=0; i--)
         hpcpush(T * spin(2*M_PI*r/ds.rots) * mirrortrans * ds.list[i]);
       }
     }
@@ -1666,9 +1666,9 @@ void curvepoint(const hyperpoint& H1) {
   }
 
 void queuecurve(int linecol, int fillcol, int prio) {
-  queuetable(Id, &curvedata[curvestart], (size(curvedata)-curvestart)/3, linecol, fillcol, prio);
+  queuetable(Id, &curvedata[curvestart], (int(curvedata.size())-curvestart)/3, linecol, fillcol, prio);
   lastptd().u.poly.curveindex = curvestart;
-  curvestart = size(curvedata);
+  curvestart = int(curvedata.size());
   }
 
 void queueline(const hyperpoint& H1, const hyperpoint& H2, int col, int prf = 0, int prio = PPR_LINE) {

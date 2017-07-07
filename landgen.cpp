@@ -2137,7 +2137,7 @@ void buildAnotherEquidistant(cell *c) {
 
   cellwalker cw(c, (gdir+3) % c->type);
   vector<cell*> coastpath;
-  while(size(coastpath) < radius || cw.c->type != 7) {
+  while(int(coastpath.size()) < radius || cw.c->type != 7) {
     // this leads to bugs for some reason!
     if(cw.c->land == laCrossroads2) {
 #ifdef AUTOPLAY
@@ -2157,7 +2157,7 @@ void buildAnotherEquidistant(cell *c) {
     coastpath.push_back(cw.c);
     if(cw.c->land == laNone && cw.c->mpdist <= 7) {
       raiseBuggyGeneration(cw.c, "landNone 1");
-      for(int i=0; i<size(coastpath); i++) coastpath[i]->item = itPirate;
+      for(int i=0; i<int(coastpath.size()); i++) coastpath[i]->item = itPirate;
       return;
       }
     cwstep(cw); cwspin(cw, 3); 
@@ -2167,16 +2167,16 @@ void buildAnotherEquidistant(cell *c) {
   for(int i=0; i<10; i++) mpd[i] = coastpath[i]->mpdist;
   coastpath.push_back(cw.c);
   // printf("setdists\n");
-  for(int i=1; i<size(coastpath) - 1; i++) {
+  for(int i=1; i<int(coastpath.size()) - 1; i++) {
     if(coastpath[i-1]->land == laNone) {
       raiseBuggyGeneration(cwt.c, "landNone 3");
       {for(int i=0; i<10; i++) printf("%d ", mpd[i]);} printf("\n");
-      for(int i=0; i<size(coastpath); i++) coastpath[i]->item = itPirate;
+      for(int i=0; i<int(coastpath.size()); i++) coastpath[i]->item = itPirate;
       return;
       }
     setdist(coastpath[i], BARLEV, coastpath[i-1]);
     setdist(coastpath[i], BARLEV-1, coastpath[i-1]);
-    if(i < size(coastpath) - 5) {
+    if(i < int(coastpath.size()) - 5) {
       coastpath[i]->bardir = NOBARRIERS;
 //      coastpath[i]->item = itSapphire;
 //      forCellEx(c2, coastpath[i]) c2->bardir = NOBARRIERS;
@@ -2191,7 +2191,7 @@ void buildAnotherEquidistant(cell *c) {
   
   if(c2->land == laNone) {
     raiseBuggyGeneration(c2, "landNone 2");
-    for(int i=0; i<size(coastpath); i++) coastpath[i]->item = itPirate;
+    for(int i=0; i<int(coastpath.size()); i++) coastpath[i]->item = itPirate;
     return;
     }
 
@@ -2210,7 +2210,7 @@ void buildAnotherEquidistant(cell *c) {
   //printf("building barrier II\n");
   if(hasbardir(c2)) extendBarrier(c2);
 
-  for(int i=size(coastpath)-(nowall?1:2); i>=0; i--) {
+  for(int i=int(coastpath.size())-(nowall?1:2); i>=0; i--) {
     for(int j=BARLEV; j>=6; j--)
       setdist(coastpath[i], j, NULL);
     }
@@ -4735,8 +4735,8 @@ void setdist(cell *c, int d, cell *from) {
               c2->monst = moHexSnakeTail;
               i = (j + (len%2 ? 2 : 4)) % 6;
               }
-            if(size(rocksnake) < ROCKSNAKELENGTH/2 && !purehepta) {
-              for(int i=0; i<size(rocksnake); i++) 
+            if(int(rocksnake.size()) < ROCKSNAKELENGTH/2 && !purehepta) {
+              for(int i=0; i<int(rocksnake.size()); i++) 
                 rocksnake[i]->monst = moNone;
               }
             else c2->mondir = NODIR;
@@ -4761,8 +4761,8 @@ void setdist(cell *c, int d, cell *from) {
           // printf("dragon generated with dchance = %d\n", dchance);
           vector<int> possi;
           for(int t=0; t<6; t++) if(c->mov[t]->mpdist > c->mpdist) possi.push_back(t);
-          if(size(possi)) {
-            int i = possi[hrand(size(possi))];
+          if(int(possi.size())) {
+            int i = possi[hrand(int(possi.size()))];
             int dragonlength = 6 + items[itDragon] / 2;
             c->monst = moDragonHead; c->hitpoints = 1;
             preventbarriers(c);
@@ -4783,8 +4783,8 @@ void setdist(cell *c, int d, cell *from) {
               i = j + 2 + hrand(c2->type-3);
               i %= c2->type;
               }
-            if(size(dragon) < 5 || size(dragon) < dragonlength / 2) {
-              for(int i=0; i<size(dragon); i++) 
+            if(int(dragon.size()) < 5 || int(dragon.size()) < dragonlength / 2) {
+              for(int i=0; i<int(dragon.size()); i++) 
                 dragon[i]->monst = moNone;
               }
             else c2->mondir = NODIR;
@@ -5157,7 +5157,7 @@ bool canReachPlayer(cell *cf, eMonster m) {
   vector<cell*> v;
   sval++;
   v.push_back(cf); cf->aitmp = sval;
-  for(int i=0; i<size(v); i++) {
+  for(int i=0; i<int(v.size()); i++) {
     cell *c = v[i];
     for(int j=0; j<c->type; j++) {
       cell *c2 = c->mov[j];
@@ -5173,7 +5173,7 @@ bool canReachPlayer(cell *cf, eMonster m) {
 
 bool haveOrbPower() {
   for(int i=0; i<ittypes; i++) if(itemclass(eItem(i)) == IC_ORB && items[i]) return true;
-  if(quotient) for(int i=0; i<size(dcal); i++) {
+  if(quotient) for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
     if(itemclass(c->item) == IC_ORB) return true;
     }
@@ -5204,16 +5204,16 @@ void wandering() {
     
   if(sphere || quotient == 1) {
     int maxdist = 0;
-    for(int i=0; i<size(dcal); i++) if(dcal[i]->cpdist > maxdist) maxdist = dcal[i]->cpdist;
-    for(int i=0; i<size(dcal); i++) if(dcal[i]->cpdist >= maxdist-1) { first7 = i; break; }
+    for(int i=0; i<int(dcal.size()); i++) if(dcal[i]->cpdist > maxdist) maxdist = dcal[i]->cpdist;
+    for(int i=0; i<int(dcal.size()); i++) if(dcal[i]->cpdist >= maxdist-1) { first7 = i; break; }
     
     if(hrand(5) == 0) {
       // spawn treasure
       }
     }
   
-  while(first7 < size(dcal)) {
-    int i = first7 + hrand(size(dcal) - first7);
+  while(first7 < int(dcal.size())) {
+    int i = first7 + hrand(int(dcal.size()) - first7);
     cell *c = dcal[i];
     
     if((sphere || quotient == 1) && !c->item && hrand(5) == 0 && c->land != laHalloween) {
@@ -5354,7 +5354,7 @@ void wandering() {
     else if(c->land == laBull && wchance(items[itBull], 40))
       c->monst = moGadfly;
 
-    else if(items[itBull] >= 50 && size(butterflies) && wchance(items[itBull]-49, 25))
+    else if(items[itBull] >= 50 && int(butterflies.size()) && wchance(items[itBull]-49, 25))
       c->monst = moGadfly;
 
     else if(c->land == laPrairie && cwt.c->LHU.fi.flowerdist > 3 && wchance(items[itGreenGrass], prairie::isriver(cwt.c) ? 150 : 40))
@@ -5615,7 +5615,7 @@ namespace halloween {
     cell* validcells[100];
     int qvc = 0;
     int firstfar1 = 0;
-    for(int i=1; i<size(dcal); i++) {
+    for(int i=1; i<int(dcal.size()); i++) {
       bool okay = 
         dcal[i]->item == itNone && dcal[i]->monst == moNone && dcal[i]->wall == waNone;
       if(lastresort)
@@ -5846,7 +5846,7 @@ namespace halloween {
   }
 
 void doOvergenerate() {
-  int dcs = size(dcal);
+  int dcs = int(dcal.size());
   for(int i=0; i<dcs; i++) {
     cell *c = dcal[i];
     if(c->cpdist <= sightrange-6) setdist(c, 1, NULL);

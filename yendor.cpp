@@ -25,7 +25,7 @@ void displayScore(subscoreboard& s, int x) {
     }
   else {
     sort(s.begin(), s.end());
-    for(int i=0; i<size(s); i++) {
+    for(int i=0; i<int(s.size()); i++) {
       int i0 = 56 + i * vf;
       displayfr(x, i0, 1, vf, its(-s[i].first), 0xC0C0C0, 16);
       displayfr(x+8, i0, 1, vf, s[i].second, 0xC0C0C0, 0);
@@ -152,7 +152,7 @@ namespace yendor {
   
   int hardness() {
     int thf = 0;
-    for(int i=0; i<size(yi); i++) {
+    for(int i=0; i<int(yi.size()); i++) {
       yendorinfo& ye ( yi[i] );
       if(!ye.foundOrb && ye.howfar > 25)
         thf += (ye.howfar - 25);
@@ -165,16 +165,16 @@ namespace yendor {
   enum eState { ysUntouched, ysLocked, ysUnlocked };
   
   eState state(cell *yendor) {
-    for(int i=0; i<size(yi); i++) if(yi[i].path[0] == yendor)
+    for(int i=0; i<int(yi.size()); i++) if(yi[i].path[0] == yendor)
       return yi[i].found ? ysUnlocked : ysLocked;
     return ysUntouched;
     }
   
   bool check(cell *yendor) {
-    int byi = size(yi);
-    for(int i=0; i<size(yi); i++) if(yi[i].path[0] == yendor) byi = i;
-    if(byi < size(yi) && yi[byi].found) return false;
-    if(byi == size(yi)) {
+    int byi = int(yi.size());
+    for(int i=0; i<int(yi.size()); i++) if(yi[i].path[0] == yendor) byi = i;
+    if(byi < int(yi.size()) && yi[byi].found) return false;
+    if(byi == int(yi.size())) {
       yendorinfo nyi;
       nyi.path[0] = yendor;
       nyi.howfar = 0;
@@ -302,7 +302,7 @@ namespace yendor {
   
   void onpath() {
     path = false;
-    if(yii < size(yi)) {
+    if(yii < int(yi.size())) {
       for(int i=0; i<YDIST; i++) if(yi[yii].path[i]->cpdist <= 7) {
         if(i > yi[yii].howfar) yi[yii].howfar = i;
         path = true;
@@ -460,7 +460,7 @@ namespace yendor {
     if(yc > 0 && yc < YENDORLEVELS) {
       subscoreboard scorehere;
 
-      for(int i=0; i<size(scoreboard); i++) {
+      for(int i=0; i<int(scoreboard.size()); i++) {
         int sc = scoreboard[i].scores[yc];
         if(sc > 0) 
           scorehere.push_back(
@@ -687,7 +687,7 @@ namespace tactic {
     if(getcstat >= 1000) {
       int ld = land_tac[getcstat-1000].l;      
       subscoreboard scorehere;
-      for(int i=0; i<size(scoreboard[xc]); i++) {
+      for(int i=0; i<int(scoreboard[xc].size()); i++) {
         int sc = scoreboard[xc][i].scores[ld];
         if(sc > 0) 
           scorehere.push_back(

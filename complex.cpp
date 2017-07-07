@@ -87,8 +87,8 @@ namespace whirlwind {
   
   void build(vector<cell*>& whirlline, int d) {
     again: 
-    cell *at = whirlline[size(whirlline)-1];
-    cell *prev = whirlline[size(whirlline)-2];
+    cell *at = whirlline[int(whirlline.size())-1];
+    cell *prev = whirlline[int(whirlline.size())-2];
     for(int i=0; i<at->type; i++) 
       if(at->mov[i] && (euclid || at->mov[i]->master->alt) && celldistAlt(at->mov[i]) == d && at->mov[i] != prev) {
         whirlline.push_back(at->mov[i]);
@@ -117,7 +117,7 @@ namespace whirlwind {
         c2 = c2->mov[dfrom[0]];
       prev = cc2;
       }
-    int z = size(whirlline);
+    int z = int(whirlline.size());
     // printf("Cycle built from %p, length = %d\n", c, z);
     for(int i=0; i<z; i++) {
       // printf("%d%c", whirlline[i]->mpdist, whirlline[i]->item ? '*' : ' ');
@@ -137,13 +137,13 @@ namespace whirlwind {
   
   void move() {
     sval++;
-    for(int i=0; i<size(dcal); i++) {
+    for(int i=0; i<int(dcal.size()); i++) {
       cell *c = dcal[i];
       moveAt(c);
       }
     // Keys and Orbs of Yendor always move
     using namespace yendor;
-    for(int i=0; i<size(yi); i++) {
+    for(int i=0; i<int(yi.size()); i++) {
       moveAt(yi[i].path[0]);
       moveAt(yi[i].path[YDIST-1]);
       }
@@ -258,7 +258,7 @@ namespace elec {
   vector<cell*> chargecells;
   
   bool hasdata(cell *c) {
-    return c->aitmp >= 0 && c->aitmp < size(charges) && charges[c->aitmp].c == c;
+    return c->aitmp >= 0 && c->aitmp < int(charges.size()) && charges[c->aitmp].c == c;
     }
   
   void connect(int from, cell *c) {
@@ -270,7 +270,7 @@ namespace elec {
         charges[from].lowlink = c->aitmp;
       }
     else {
-      int id = size(charges);
+      int id = int(charges.size());
       charges.push_back(chargedata());
       chargedata& ch(charges[id]);
       ch.c = c; ch.otmp = c->aitmp; ch.lowlink = id; c->aitmp = id;
@@ -362,7 +362,7 @@ namespace elec {
     chargecells.clear();
     if(!haveelec && !afterOrb) return;
     sval++;
-    for(int i=0; i<size(dcal); i++) listChargedCells(dcal[i]);
+    for(int i=0; i<int(dcal.size()); i++) listChargedCells(dcal[i]);
     
     charges.resize(2); 
     charges[0].lowlink = 0; charges[1].lowlink = 1;
@@ -370,12 +370,12 @@ namespace elec {
     
     xstack.clear();
     
-    for(int i=0; i<size(chargecells); i++) 
+    for(int i=0; i<int(chargecells.size()); i++) 
       connect(1, chargecells[i]);
   
     havethunder = charges[1].lowlink == 0;
     if(havethunder) {
-      for(int i=0; i<size(xstack); i++) { 
+      for(int i=0; i<int(xstack.size()); i++) { 
         int k = xstack[i].first;
         int l = xstack[i].second;
         // printf("connected %d-%d\n", k, l);
@@ -390,13 +390,13 @@ namespace elec {
       addMessage(XLAT("There is a flash of thunder!"));
       playSound(NULL, "storm");
       drawLightning();
-      for(int i=2; i<size(charges); i++) if(charges[i].fire)
+      for(int i=2; i<int(charges.size()); i++) if(charges[i].fire)
         affect(charges[i].c);
       }
     }
   
   void cleanup() {
-    for(int i=2; i<size(charges); i++) 
+    for(int i=2; i<int(charges.size()); i++) 
       charges[i].c->aitmp = charges[i].otmp;
     charges.resize(0); 
     }
@@ -414,13 +414,13 @@ namespace elec {
     }
   
   void drawcharges() {
-    for(int i=0; i<size(dcal); i++) 
+    for(int i=0; i<int(dcal.size()); i++) 
       if(getCharge(dcal[i]) == ecCharged)
         draw(dcal[i], ecCharged);
     }
   
   bool affected(cell *c) {
-    if(c->aitmp >= 0 && c->aitmp < size(charges) && charges[c->aitmp].c == c) 
+    if(c->aitmp >= 0 && c->aitmp < int(charges.size()) && charges[c->aitmp].c == c) 
       return charges[c->aitmp].fire;
     return false;
     }
@@ -500,7 +500,7 @@ namespace princess {
     i->prison = c;
     i->princess = c;
     i->alt = c->master->alt;
-    i->id = size(infos);
+    i->id = int(infos.size());
     i->bestdist = 0;
     i->bestnear = OUT_OF_PRISON;
     infos.push_back(i);
@@ -512,7 +512,7 @@ namespace princess {
     i->prison = NULL;
     i->princess = c;
     i->alt = NULL;
-    i->id = size(infos);
+    i->id = int(infos.size());
     i->bestdist = OUT_OF_PALACE;
     i->bestnear = 0;
     infos.push_back(i);
@@ -524,13 +524,13 @@ namespace princess {
     if(c->land != laPalace) return NULL;
     if(!c->master->alt) return NULL;
     int ev = c->master->alt->emeraldval; // NEWYEARFIX
-    if(ev < 0 || ev >= size(infos)) return NULL;
+    if(ev < 0 || ev >= int(infos.size())) return NULL;
     if(infos[ev]->alt != c->master->alt->alt) return NULL;
     return infos[ev];
     }
   
   info *getPrincessInfo(cell *c) {
-    for(int i=0; i<size(infos); i++) if(infos[i]->princess == c) {
+    for(int i=0; i<int(infos.size()); i++) if(infos[i]->princess == c) {
       while(i) {
         infos[i]->id = i-1; assign(infos[i]);
         infos[i-1]->id = i; assign(infos[i-1]);
@@ -550,7 +550,7 @@ namespace princess {
     }
   
   void clear() {
-    for(int i=0; i<size(infos); i++) delete infos[i];
+    for(int i=0; i<int(infos.size()); i++) delete infos[i];
     infos.clear();
     }
  
@@ -564,7 +564,7 @@ namespace princess {
     playSound(c, princessgender() ? "heal-princess" : "heal-prince");
 
     info *inf = NULL;
-    for(int i=0; i<size(infos); i++) 
+    for(int i=0; i<int(infos.size()); i++) 
       if(infos[i]->princess && infos[i]->bestdist == OUT_OF_PALACE)
         inf = infos[i];
 
@@ -575,7 +575,7 @@ namespace princess {
 
   void bringBack() {
     if(bringBackAt(cwt.c->mov[cwt.spin])) return;
-    for(int i=1; i<size(dcal); i++)
+    for(int i=1; i<int(dcal.size()); i++)
       if(bringBackAt(dcal[i])) return;
     }
   
@@ -891,8 +891,8 @@ namespace whirlpool {
   
   void build(vector<cell*>& whirlline, int d) {
     again: 
-    cell *at = whirlline[size(whirlline)-1];
-    cell *prev = whirlline[size(whirlline)-2];
+    cell *at = whirlline[int(whirlline.size())-1];
+    cell *prev = whirlline[int(whirlline.size())-2];
     for(int i=0; i<at->type; i++) 
       if(at->mov[i] && (euclid || at->mov[i]->master->alt) && celldistAlt(at->mov[i]) == d && at->mov[i] != prev) {
         whirlline.push_back(at->mov[i]);
@@ -965,7 +965,7 @@ namespace whirlpool {
     build(whirlline, d);
     reverse(whirlline.begin(), whirlline.end());
     build(whirlline, d);
-    int z = size(whirlline);
+    int z = int(whirlline.size());
     
     for(int i=0; i<z; i++) 
       whirlline[i]->aitmp = sval;
@@ -980,13 +980,13 @@ namespace whirlpool {
   
   void move() {
     sval++;
-    for(int i=0; i<size(dcal); i++) {
+    for(int i=0; i<int(dcal.size()); i++) {
       cell *c = dcal[i];
       moveAt(c);
       }
     // Keys and Orbs of Yendor always move
     using namespace yendor;
-    for(int i=0; i<size(yi); i++) {
+    for(int i=0; i<int(yi.size()); i++) {
       moveAt(yi[i].path[0]);
       moveAt(yi[i].path[YDIST-1]);
       }
@@ -1080,7 +1080,7 @@ namespace mirror {
     }
   
   void spin(int d) {
-    for(int i=0; i<size(mirrors); i++) {
+    for(int i=0; i<int(mirrors.size()); i++) {
       cell *c = mirrors[i];
       if(c->hitpoints != multi::cpid) continue;
       if(c->monst == moMirror) 
@@ -1092,7 +1092,7 @@ namespace mirror {
     }
   
   void destroy() {
-    for(int i=0; i<size(mirrors); i++) {
+    for(int i=0; i<int(mirrors.size()); i++) {
       cell *c = mirrors[i];
       eMonster m = c->monst;
       if(isMimic(m)) c->monst = moNone;
@@ -1101,7 +1101,7 @@ namespace mirror {
     }
   
   void destroyStray() {
-    for(int i=0; i<size(mirrors2); i++) {
+    for(int i=0; i<int(mirrors2.size()); i++) {
       cell *c = mirrors2[i];
       if(c->cpdist > 7 && isMimic(c)) {
         c->monst = moNone;
@@ -1113,7 +1113,7 @@ namespace mirror {
     int tk = tkills();
     int nummirage = 0;
     mirrors2.clear();
-    for(int i=0; i<size(mirrors); i++) {
+    for(int i=0; i<int(mirrors.size()); i++) {
       cell *c = mirrors[i];
       if(c->hitpoints != multi::cpid) continue;
       eMonster m = c->monst;
@@ -1160,7 +1160,7 @@ namespace mirror {
           c2->monst = switchtype(c2->monst);
         }
       }
-    for(int i=0; i<size(mirrors2); i++) {
+    for(int i=0; i<int(mirrors2.size()); i++) {
       cell *c = mirrors2[i];
       if(c->hitpoints != multi::cpid) continue;
       eMonster m = c->monst;
@@ -1242,9 +1242,9 @@ namespace hive {
   
   void bugcell(cell *c) {
     short& i(c->aitmp);
-    if(i >= 0 && i < size(buginfo) && buginfo[i].where == c)
+    if(i >= 0 && i < int(buginfo.size()) && buginfo[i].where == c)
       return;
-    i = size(buginfo);
+    i = int(buginfo.size());
     buginfo.resize(i+1);
     buginfo_t& b(buginfo[i]);
     b.where = c;
@@ -1263,7 +1263,7 @@ namespace hive {
       }
   /*// bugs communicate if the distance is at most 2
     // also all nearby cells are inserted to the buginfo structure
-    if(size(buginfo) < 30000) {
+    if(int(buginfo.size()) < 30000) {
       for(int dir=0; dir<c->type; dir++) {
         cell *c2 = c->mov[dir];
         if(c2) {
@@ -1303,7 +1303,7 @@ namespace hive {
     for(int dir=0; dir<c->type; dir++) {
       cell *c2 = c->mov[dir];
       if(!c2) continue;
-      if(c2->aitmp < 0 || c2->aitmp >= size(buginfo)) continue;
+      if(c2->aitmp < 0 || c2->aitmp >= int(buginfo.size())) continue;
       if(!passable(c, c2, P_MONSTER)) continue;
       int j = c2->aitmp;
       if(buginfo[j].where != c2) continue;
@@ -1332,27 +1332,27 @@ namespace hive {
     bugtomove.clear();
     deadbug.clear();
     
-    int xdcs = size(dcal); for(int i=0; i<xdcs; i++) bugcell(dcal[i]);
-    for(int i=0; i<size(bugcellq); i++) bugcell(bugcellq[i]);
+    int xdcs = int(dcal.size()); for(int i=0; i<xdcs; i++) bugcell(dcal[i]);
+    for(int i=0; i<int(bugcellq.size()); i++) bugcell(bugcellq[i]);
     bugcellq.clear();
     
-    // printf("buginfo = %d\n", size(buginfo));
+    // printf("buginfo = %d\n", int(buginfo.size()));
     
     for(int k=0; k<BUGCOLORS; k++) {
       int t = 0;
       last_d = -1;
       int invadist = 4 - (items[itRoyalJelly]+10) / 20;
       if(invadist<0) invadist = 0;
-      for(; t<size(bugqueue[k]) && last_d < invadist-1; t++) handleBugQueue(k, t);
-      for(int u=0; u<size(bugqueue4[k]); u++)
+      for(; t<int(bugqueue[k].size()) && last_d < invadist-1; t++) handleBugQueue(k, t);
+      for(int u=0; u<int(bugqueue4[k].size()); u++)
         bugQueueInsert(k, bugqueue4[k][u], invadist);
       bugqueue4[k].clear();
-      for(; t<size(bugqueue[k]); t++) handleBugQueue(k, t);
+      for(; t<int(bugqueue[k].size()); t++) handleBugQueue(k, t);
       }
     
     for(int k=0; k<BUGCOLORS; k++) {
       set<int> check;
-      for(int t=0; t<size(bugqueue[k]); t++) {
+      for(int t=0; t<int(bugqueue[k].size()); t++) {
         if(check.count(bugqueue[k][t])) {
           printf("REPETITION! [%d]\n", t);
           }
@@ -1364,7 +1364,7 @@ namespace hive {
     sort(bugtomove.begin(), bugtomove.end());
     
     int battlecount = 0;
-    for(int t=0; t<size(bugtomove); t++) {
+    for(int t=0; t<int(bugtomove.size()); t++) {
       bugtomove_t& bm(bugtomove[t]);
       int i = bm.index;
         
@@ -1387,7 +1387,7 @@ namespace hive {
           qual = c2->monst == moDeadBug ? -60: isBugEnemy(c2,k) ? 2 : -20;
         else if(!passable(c2, c, 0)) 
           qual = passable(c2, c, P_DEADLY) ? -30 : -60;
-        else if(c2->aitmp < 0 || c2->aitmp >= size(buginfo)) qual = -15;
+        else if(c2->aitmp < 0 || c2->aitmp >= int(buginfo.size())) qual = -15;
         else if(buginfo[c2->aitmp].where != c2) qual = -15;
         else if(buginfo[c2->aitmp].dist[k] < b.dist[k])
           qual = 1;
@@ -1429,7 +1429,7 @@ namespace hive {
       }
     
     // cleanup
-    for(int i=0; i<size(deadbug); i++) deadbug[i]->monst = moNone;
+    for(int i=0; i<int(deadbug.size()); i++) deadbug[i]->monst = moNone;
     if(battlecount)
       addMessage(XLAT("The Hyperbugs are fighting!"));
       
@@ -1441,9 +1441,9 @@ namespace hive {
   
   void bugcitycell(cell *c, int d) {
     short& i = c->aitmp;
-    if(i >= 0 && i < size(buginfo) && buginfo[i].where == c)
+    if(i >= 0 && i < int(buginfo.size()) && buginfo[i].where == c)
       return;
-    i = size(buginfo);
+    i = int(buginfo.size());
     buginfo_t b;
     b.where = c;
     b.dist[0] = d;
@@ -1502,7 +1502,7 @@ namespace hive {
     
     // mark the area with BFS
     bugcitycell(citycenter, 0);
-    for(int i=0; i<size(buginfo); i++) {
+    for(int i=0; i<int(buginfo.size()); i++) {
       buginfo_t& b(buginfo[i]);
       cell *c = b.where;
       int d = b.dist[0];
@@ -1516,7 +1516,7 @@ namespace hive {
       }
   
     // place everything
-    for(int i=0; i<size(buginfo); i++) {
+    for(int i=0; i<int(buginfo.size()); i++) {
       buginfo_t& b(buginfo[i]);
       cell *c = b.where;
       int d = b.dist[0];
@@ -1561,7 +1561,7 @@ namespace heat {
     
     vector<cell*> offscreen2;
     
-    for(int i=0; i<size(offscreen); i++) {
+    for(int i=0; i<int(offscreen.size()); i++) {
       cell *c = offscreen[i];
       if(c->cpdist > 7) {
         bool readd = false;
@@ -1602,7 +1602,7 @@ namespace heat {
         
     vector<cell*>& allcells = currentmap->allcells();
 
-    int dcs = size(allcells);
+    int dcs = int(allcells.size());
     
     vector<ld> hmods(dcs, 0);
     
@@ -1734,7 +1734,7 @@ namespace heat {
         }
       }
   
-    if(tick) for(int i=0; i<size(vinefires); i++) {
+    if(tick) for(int i=0; i<int(vinefires.size()); i++) {
       cell* c = vinefires[i];
       if(c->wall == waNone && c->land == laRose)
         makeflame(c, 6, false);
@@ -1747,7 +1747,7 @@ namespace heat {
       else if(cellHalfvine(c)) destroyHalfvine(c, waPartialFire, 6);
       }
     
-    if(tick) for(int i=0; i<size(rosefires); i++) {
+    if(tick) for(int i=0; i<int(rosefires.size()); i++) {
       cell* c = rosefires[i].first;
       int qty = rosefires[i].second;
       qty /= 2;
@@ -1761,7 +1761,7 @@ namespace heat {
   
   void dryforest() {
     vector<cell*>& allcells = currentmap->allcells();
-    int dcs = size(allcells);
+    int dcs = int(allcells.size());
     for(int i=0; i<dcs; i++) {
       cell *c = allcells[i];
       if(!quotient && c->cpdist > 8) break;
@@ -1790,7 +1790,7 @@ bool lifebrought = false; // was Life brought to the Dead Caves?
 
 void livecaves() {
   vector<cell*>& allcells = currentmap->allcells();
-  int dcs = size(allcells);
+  int dcs = int(allcells.size());
   
   vector<cell*> bringlife;
   
@@ -1925,7 +1925,7 @@ void livecaves() {
       }     
     }
   
-  for(int i=0; i<size(bringlife); i++) {
+  for(int i=0; i<int(bringlife.size()); i++) {
     cell *c = bringlife[i];
     if(c->land == laDeadCaves && !lifebrought) { 
       lifebrought = true;
@@ -2070,7 +2070,7 @@ namespace dragon {
   
   void validate(const char *where) {
     dragbugs = false;
-    for(int i=0; i<size(dcal); i++)
+    for(int i=0; i<int(dcal.size()); i++)
       if(dcal[i]->monst == moDragonTail)
         findhead(dcal[i]);
     if(dragbugs) {
@@ -2154,7 +2154,7 @@ namespace dragon {
       // SWAPBITFIELD(c->hitpoints, buffer->hitpoints, int);
       c->stuntime = 2;
       if(c == until) {
-        for(int i=size(allcells)-2; i>=0; i--) {
+        for(int i=int(allcells.size())-2; i>=0; i--) {
           cell *cmt = allcells[i+1];
           cell *cft = allcells[i];
           cmt->hitpoints = cft->hitpoints;
@@ -2311,7 +2311,7 @@ namespace kraken {
   void attacks() {
     bool offboat[MAXPLAYER];
     for(int i=0; i<MAXPLAYER; i++) offboat[i] = false;
-    for(int i=0; i<size(dcal); i++) {
+    for(int i=0; i<int(dcal.size()); i++) {
       cell *c = dcal[i];
       if(c->monst == moKrakenT && !c->stuntime) forCellEx(c2, c) {
         bool dboat = false;
@@ -2332,7 +2332,7 @@ namespace kraken {
         if(dboat) destroyBoats(c2, c, true);
         }
       }
-    for(int i=0; i<size(dcal); i++) {
+    for(int i=0; i<int(dcal.size()); i++) {
       cell *c = dcal[i];
       if(c->monst == moKrakenH && !c->stuntime && !isWateryOrBoat(c)) {
         int qdir = 0;
@@ -2383,18 +2383,18 @@ namespace kraken {
         }
       }
     
-    while(size(acells)) {
+    while(int(acells.size())) {
       // bool found = false;
-      for(int i=0; i<size(acells); i++) {
+      for(int i=0; i<int(acells.size()); i++) {
         /* bool noconflict = true;
-        for(int j=0; j<size(acells); j++) 
+        for(int j=0; j<int(acells.size()); j++) 
           if(acells[i].second == acells[j].first)
             noconflict = false; */
         /* if(noconflict) */ {
           // found = true;
           indAnimateMovement(acells[i].first, acells[i].second, LAYER_BIG);
-          acells[i] = acells[size(acells)-1];
-          acells.resize(size(acells)-1);
+          acells[i] = acells[int(acells.size())-1];
+          acells.resize(int(acells.size())-1);
           i--;
           }
         }
@@ -2437,7 +2437,7 @@ namespace prairie {
       }
     else {
       if(!from) {
-        for(int i=0; i<size(fp43.matrices); i++)
+        for(int i=0; i<int(fp43.matrices.size()); i++)
           if(fp43.distflower[i] == 0)
             c->fval = fp43.inverses[i]+1;
         }
@@ -2576,7 +2576,7 @@ namespace prairie {
     reverse(whirlline.begin(), whirlline.end());
     c2 = next(c); 
     while(c2 && !eq(c2->aitmp, sval)) whirlline.push_back(c2), c2->aitmp = sval, c2 = next(c2);
-    int qty = size(whirlline);
+    int qty = int(whirlline.size());
     // for(int i=0; i<qty; i++) whirlline[i]->aitmp = sval;
     if(shmup::on) {
       for(int i=0; i<qty; i++) if(whirlline[i]->cpdist <= 7) {
@@ -2615,11 +2615,11 @@ namespace prairie {
           
   void move() {
     sval++;
-    for(int i=0; i<size(dcal); i++) {
+    for(int i=0; i<int(dcal.size()); i++) {
       cell *c = dcal[i];
       if(isriver(c)) moveAt(c);
       }
-    for(int i=0; i<size(beaststogen); i++)
+    for(int i=0; i<int(beaststogen.size()); i++)
       generateBeast(beaststogen[i]);
     beaststogen.clear();
     }
@@ -2655,7 +2655,7 @@ namespace prairie {
   void treasures() {
     if(enter && !isriver(cwt.c)) enter = NULL;
     else if(!enter && isriver(cwt.c)) enter = cwt.c;
-    if(size(tchoices)) {
+    if(int(tchoices.size())) {
       if(lasttreasure && lasttreasure->item == itGreenGrass) {
         if(celldistance(lasttreasure, cwt.c) >= (purehepta ? 7 : 10)) {
           lasttreasure->item = itNone;
@@ -2663,10 +2663,10 @@ namespace prairie {
           }
         else { tchoices.clear(); return; }
         }
-      if(size(tchoices) < 3) { tchoices.clear(); return; }
-      lasttreasure = tchoices[hrand(size(tchoices))];
+      if(int(tchoices.size()) < 3) { tchoices.clear(); return; }
+      lasttreasure = tchoices[hrand(int(tchoices.size()))];
       lasttreasure->item = itGreenGrass;
-      for(int i=0; i<size(tchoices); i++) if(isNeighbor(tchoices[i], lasttreasure))
+      for(int i=0; i<int(tchoices.size()); i++) if(isNeighbor(tchoices[i], lasttreasure))
         tchoices[i]->item = itGreenGrass;
       tchoices.clear();
       }
@@ -2714,7 +2714,7 @@ namespace ca {
   void simulate() {
     if(cwt.c->land != laCA) return;
     vector<cell*>& allcells = currentmap->allcells();
-    int dcs = size(allcells);
+    int dcs = int(allcells.size());
     bool willlive[dcs];
     for(int i=0; i<dcs; i++) {
       cell *c = allcells[i];

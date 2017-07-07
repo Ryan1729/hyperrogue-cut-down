@@ -150,7 +150,7 @@ namespace mapeditor {
   bool hasInfix(const string &s) {
     if(infix == "") return true;
     string t = "";
-    for(int i=0; i<size(s); i++) {
+    for(int i=0; i<int(s.size()); i++) {
       char c = s[i];
       char tt = 0;
       if(c >= 'a' && c <= 'z') tt += c - 32;
@@ -163,7 +163,7 @@ namespace mapeditor {
   bool editInfix(int uni) {
     if(uni >= 'A' && uni <= 'Z') infix += uni;
     else if(uni >= 'a' && uni <= 'z') infix += uni-32;
-    else if(infix != "" && uni == 8) infix = infix.substr(0, size(infix)-1);
+    else if(infix != "" && uni == 8) infix = infix.substr(0, int(infix.size())-1);
     else if(infix != "" && uni != 0) infix = "";
     else return false;
     return true;
