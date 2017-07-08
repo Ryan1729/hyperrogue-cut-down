@@ -1021,10 +1021,6 @@ void shootBullet(monster *m) {
     }
   }
 
-void killThePlayer(eMonster m) {
-  pc[cpid]->dead = true;
-  }
-
 monster *playerCrash(monster *who, hyperpoint where) {
   for(int j=0; j<players; j++) if(pc[j]!=who) {
     double d = intval(pc[j]->pat*C0, where);

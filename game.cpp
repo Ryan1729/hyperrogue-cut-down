@@ -2098,7 +2098,7 @@ bool notthateasy(eMonster m) {
 bool attackMonster(cell *c, flagtype flags, eMonster killer) {
 
   if((flags & AF_GETPLAYER) && isPlayerOn(c)) {
-    killThePlayerAt(killer, c, flags);
+
     return true;
     }
 
@@ -3446,7 +3446,7 @@ cell *moveNormal(cell *c, flagtype mf) {
   cell *c2 = c->mov[d];
 
   if(isPlayerOn(c2)) {
-    killThePlayerAt(m, c2, 0);
+
     return c2;
     }
 
@@ -3501,50 +3501,6 @@ void explodeAround(cell *c) {
       if(c2->wall != ow && ow) drawParticles(c2, winf[ow].color, 16);
       }
     }
-  }
-
-void killThePlayer(eMonster m, int id, flagtype flags) {
-  if(markOrb(itOrbShield)) return;
-  if(shmup::on) {
-    multi::cpid = id;
-    shmup::killThePlayer(m);
-    }
-  else if(items[itOrbDomination] && playerpos(id)->monst) {
-    addMessage(XLAT("%The1 tries to dismount you!", m));
-    attackMonster(playerpos(id), AF_ORSTUN, m);
-    useupOrb(itOrbDomination, items[itOrbDomination]/2);
-    }
-  else if(items[itOrbShell] && !(flags & AF_EAT)) {
-    addMessage(XLAT("%The1 attacks your shell!", m));
-    useupOrb(itOrbShell, 10);
-    if(items[itOrbShell] < 1) items[itOrbShell] = 1, orbused[itOrbShell] = true;
-    }
-  else if(hardcore) {
-    addMessage(XLAT("You are killed by %the1!", m));
-    if(multi::players > 1 && multi::activePlayers() > 1) 
-      multi::leaveGame(id);
-    else {
-      canmove = false;
-
-      msgscroll = 0;
-      }
-    }
-  else if(m == moLightningBolt && lastmovetype == lmAttack && isAlchAny(playerpos(id))) {
-    addMessage(XLAT("You are killed by %the1!", m));
-    addMessage(XLAT("Don't play with slime and electricity next time, okay?"));
-    kills[moPlayer]++;
-    items[itOrbSafety] = 0;
-    }
-  else {
-    printf("confused!\n");
-    addMessage(XLAT("%The1 is confused!", m));
-    }
-  }
-
-void killThePlayerAt(eMonster m, cell *c, flagtype flags) {
-  for(int i=0; i<numplayers(); i++) 
-    if(playerpos(i) == c) 
-      killThePlayer(m, i, flags);
   }
 
 void afterplayermoved() {
@@ -3760,64 +3716,6 @@ void removeIvy(cell *c) {
     if(m == moIvyDead)
       m = moIvyWait;
     drawParticles(c, minf[m].color, 2);
-    }
-  }
-
-void moveivy() {
-  if(int(ivies.size()) == 0) return;
-  computePathdist(moIvyRoot);
-  for(int i=0; i<int(ivies.size()); i++) {
-    cell *c = ivies[i];
-    cell *co = c;
-    if(c->monst != moIvyHead) continue;
-    ivynext(c);
-
-    cell *mto = NULL;
-    int pd = c->pathdist;
-    int sp = 0;
-    
-    while(c->monst != moIvyRoot) {
-      if(!isIvy(c->monst)) {
-        raiseBuggyGeneration(c, "that's not an Ivy!");
-        }
-      if(c->mondir == NODIR)
-        raiseBuggyGeneration(c, "wrong mondir!");
-      for(int j=0; j<c->type; j++) {
-        if(c->mov[j] && canAttack(c, c->monst, c->mov[j], c->mov[j]->monst, AF_ONLY_FRIEND | AF_GETPLAYER)) {
-          if(isPlayerOn(c->mov[j]))
-            killThePlayerAt(c->monst, c->mov[j], 0);
-          else {
-            if(attackJustStuns(c->mov[j]))
-              addMessage(XLAT("The ivy attacks %the1!", c->mov[j]->monst));
-            else if(isNonliving(c->mov[j]->monst))
-              addMessage(XLAT("The ivy destroys %the1!", c->mov[j]->monst));
-            else
-              addMessage(XLAT("The ivy kills %the1!", c->mov[j]->monst));
-            attackMonster(c->mov[j], AF_ORSTUN, c->monst);
-            }
-          continue;
-          }
-        if(c->mov[j] && signed(c->mov[j]->pathdist) < pd && passable(c->mov[j], c, 0)
-          && !strictlyAgainstGravity(c->mov[j], c, false, MF_IVY))
-          mto = c->mov[j], pd = mto->pathdist, sp = c->spn(j);
-        }
-      c = c->mov[c->mondir];
-      }
-
-    if(mto && mto->cpdist) {
-      animateMovement(mto->mov[sp], mto, LAYER_BIG);
-      mto->monst = moIvyWait, mto->mondir = sp;
-      moveEffect(mto, NULL, moIvyWait);
-      // if this is the only branch, we want to move the head immediately to mto instead
-      if(mto->mov[mto->mondir]->monst == moIvyHead) {
-        mto->monst = moIvyHead; co->monst = moIvyBranch;
-        }
-      }
-    else if(co->mov[co->mondir]->monst != moIvyRoot) {
-      // shrink useless branches, but do not remove them completely (at the root)
-      if(co->monst == moIvyHead) co->mov[co->mondir]->monst = moIvyHead;
-      removeIvy(co);
-      }
     }
   }
 
@@ -4677,7 +4575,7 @@ void specialMoves() {
       }
     
     else if(m == moOutlaw && c->pathdist <= GUNRANGE) {
-      killThePlayer(m, nearestPathPlayer(c), 0);
+
       c->stuntime = 1;
       }
 
@@ -5007,7 +4905,7 @@ void movemonsters() {
   if(sagefresh) sagephase = 0;
   
   DEBT("ivy");
-  moveivy();
+
   DEBT("slimes");
   groupmove(moSlime, 0);
   DEBT("sharks");

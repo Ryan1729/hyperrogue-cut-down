@@ -324,7 +324,7 @@ namespace elec {
       killMonster(c, moLightningBolt);
       }
     if(isPlayerOn(c)) {
-      killThePlayerAt(moLightningBolt, c, 0);
+
       }
     if(c->wall == waSandstone)
       c->wall = waNone, c->item = itFulgurite,
@@ -2321,7 +2321,7 @@ namespace kraken {
             offboat[i] = true;
             }
           else if(offboat[i]) ;
-          else killThePlayer(moKrakenH, i, 0);
+
           sleep(c);
           }
         if(dboat) destroyBoats(c2, c, true);
