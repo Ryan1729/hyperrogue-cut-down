@@ -126,43 +126,6 @@ const char* axemodes[SHMUPAXES] = {
 
 int centerplayer = -1;
 
-#ifndef NOCONFIG
-void saveConfig(FILE *f) {
-  fprintf(f, "%d %d %d", VERNUM, vid.scfg.players, alwaysuse);
-  for(int i=0; i<512; i++) fprintf(f, " %d", vid.scfg.keyaction[i]);
-  for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXBUTTON; j++) fprintf(f, " %d", vid.scfg.joyaction[i][j]);
-  for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXAXE; j++) fprintf(f, " %d", vid.scfg.axeaction[i][j]);
-  for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXAXE; j++) fprintf(f, " %d", vid.scfg.deadzoneval[i][j]);
-  for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXHAT; j++) for(int k=0; k<4; k++)
-    fprintf(f, " %d", vid.scfg.hataction[i][j][k]);
-  fprintf(f, "\n");
-  for(int i=0; i<MAXPLAYER; i++) savecs(f, scs[i], VERNUM);
-  }
-
-void scanchar(FILE *f, char& c) {
-  int i = c;
-  int err = fscanf(f, "%d", &i);
-  if(err == 1) c = i;
-  }
-  
-void loadConfig(FILE *f) {
-  int xvernum;
-  int err = fscanf(f, "%d %d", &xvernum, &vid.scfg.players);
-  if(vid.scfg.players < 1 || vid.scfg.players > MAXPLAYER)
-    vid.scfg.players = 1;
-  if(err != 2) return;
-  if(xvernum >= 8990) { int b=alwaysuse; err=fscanf(f, " %d", &b); alwaysuse = b; }
-  for(int i=0; i<512; i++) scanchar(f, vid.scfg.keyaction[i]);
-  for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXBUTTON; j++) scanchar(f, vid.scfg.joyaction[i][j]);
-  for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXAXE; j++) scanchar(f, vid.scfg.axeaction[i][j]);
-  
-  if(xvernum >= 9007)
-    for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXAXE; j++) err = fscanf(f, " %d", &vid.scfg.deadzoneval[i][j]);
-  for(int i=0; i<MAXJOY; i++) for(int j=0; j<MAXHAT; j++) for(int k=0; k<4; k++)
-    scanchar(f, vid.scfg.hataction[i][j][k]);
-  for(int i=0; i<(xvernum < 8990 ? 4 : 7); i++) loadcs(f, scs[i], xvernum);
-  }
-#endif
 
 int shmupnumkeys;
 const char** shmupcmdtable;
@@ -228,10 +191,6 @@ void handleConfig(int sym, int uni) {
         kills[i] = deaths[i] = treasures[i] = 0;
     else if(uni == 's' || uni == 't') 
       shmupcfg = !shmupcfg;
-#ifndef NOCONFIG
-    else if(uni == 'c')
-      ::saveConfig();
-#endif
     else if(uni == 'n' || uni == 'N') {
       vid.scfg.players += shiftmul > 0 ? 1 : -1;
       vid.scfg.players %= MAXPLAYER;

@@ -312,9 +312,6 @@ void showVisual1() {
 
   dialog::addBreak(50);
   dialog::addItem(XLAT("exit configuration"), 'v');
-#ifndef NOCONFIG
-  dialog::addItem(XLAT("save the current config"), 's');
-#endif
 
   if(lang() != 0) {
     string tw = "";
@@ -390,9 +387,6 @@ void handleVisual1(int sym, int uni) {
   
   if(xuni == 'v') cmode = emNormal;
   if(sym == SDLK_F2) cmode = emVisual2;
-#ifndef NOCONFIG
-  if(xuni == 's') saveConfig();
-#endif
   
   if(xuni == '7') { vid.darkhepta = !vid.darkhepta; }
   if(xuni == 'w') { vid.wallmode += 60 + (shiftmul > 0 ? 1 : -1); vid.wallmode %= 6; }
@@ -652,9 +646,6 @@ void showVisual2() {
 
   dialog::addBreak(50);
   dialog::addItem(XLAT("exit configuration"), 'v');
-#ifndef NOCONFIG
-  dialog::addItem(XLAT("save the current config"), 's');
-#endif
 
   dialog::display();
   }
@@ -666,9 +657,6 @@ void handleVisual2(int sym, int uni) {
   if((xuni >= 'A' && xuni <= 'Z') || (xuni >= 1 && xuni <= 26)) xuni |= 32;
   
   if(xuni == 'v' || sym == SDLK_F2 || sym == SDLK_ESCAPE) cmode = emNormal;
-#ifndef NOCONFIG
-  if(xuni == 's') saveConfig();
-#endif
   
   if(xuni == '3') cmode = em3D;
   
