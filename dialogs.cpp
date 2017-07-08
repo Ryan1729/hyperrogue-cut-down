@@ -5,7 +5,6 @@ namespace dialog {
     bool zoomoff = false;
     };
 
-#ifdef MENU_SCALING
   void handleZooming(SDL_Event &ev) {
     using namespace zoom;
     if(zoomoff || (cmode != emOverview && cmode != emTactic)) { 
@@ -22,9 +21,6 @@ namespace dialog {
       zoomoff = true;
       }
     }
-#else
-  inline void handleZooming(SDL_Event &ev) {}
-#endif
 
   bool displayzoom(int x, int y, int b, int size, const string &s, int color, int align) {
     using namespace zoom;

@@ -106,69 +106,6 @@ int PREC(ld x) {
   return int(shiftmul * x);
   }
 
-void handleOverview(int sym, int uni) {
-  int umod = uni % 1000;
-  int udiv = uni / 1000;
-  if(udiv == 1 && umod < landtypes) {
-    if(cheater && !hiliteclick) {
-      eLand l = eLand(umod);
-      cheater++;
-      bool princ = (l == laPrincessQuest);
-      if(princ) {
-        if(kills[moVizier] == 0) kills[moVizier] = 1;
-        princess::forceMouse = true;
-        princess::gotoPrincess = true;
-        l = laPalace;
-        }
-      cheatMoveTo(l);
-      cmode = emNormal;
-      canmove = true;
-      if(princ) fullcenter();
-      }
-    else {
-      lastmode = cmode;
-      cmode = emHelp; help = generateHelpForLand(eLand(umod));
-      }
-    }
-  else if(udiv == 2 && umod < ittypes) {
-    if(cheater && !hiliteclick) {
-      cheater++;
-      int ic = itemclass(eItem(umod));
-      if(ic == IC_TREASURE) items[umod] += PREC(10);
-      if(ic == IC_ORB) items[umod] += PREC(60);
-      if(umod == itGreenStone) items[umod] += PREC(100);
-      else if(ic == IC_OTHER) items[umod] += (shiftmul>0?1:-1);
-      if(items[umod] < 0) items[umod] = 0;
-      if(hardcore) canmove = true;
-      else checkmove();
-      }
-    else {
-      lastmode = cmode;
-      cmode = emHelp; help = generateHelpForItem(eItem(umod));
-      }
-    }
-  else if(udiv == 3 && umod < walltypes) {
-    lastmode = cmode;
-    cmode = emHelp; help = generateHelpForWall(eWall(umod));
-    }
-  else if(uni == SDLK_F1) {
-    lastmode = cmode;
-    cmode = emHelp; 
-    help = 
-      "This displays all lands available in the game. "
-      "Bonus lands (available only in separate challenges) "
-      "are not included. Lands written in dark have to be "
-      "unlocked, and lands in dark red are unavailable "
-      "because of using special options. Click on any "
-      "land or item to get information about it. Hover over "
-      "an Orb to know its relation to the current land. "
-      "Cheaters can click to move between lands, and use the "
-      "mousewheel to gain or lose treasures and orbs quickly (Ctrl = precise, Shift = reverse).";
-    }
-  else if(dialog::handlePageButtons(uni)) ;
-  else if(uni) cmode = emNormal;
-  }
-
 bool checkHalloweenDate() {
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
