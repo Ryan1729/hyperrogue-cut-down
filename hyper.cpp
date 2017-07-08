@@ -88,7 +88,6 @@ int arg::readCommon() {
   if(argis("-c")) { PHASE(1); shift(); conffile = args(); }
   else if(argis("-s")) { PHASE(1); shift(); scorefile = args(); }
   else if(argis("-m")) { PHASE(1); shift(); musicfile = args(); }
-  else if(argis("-se")) { PHASE(1); shift(); wheresounds = args(); }
   else if(argis("-canvas")) {
     firstland = euclidland = laCanvas;
     shift();

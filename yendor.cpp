@@ -124,7 +124,7 @@ namespace yendor {
       if(tscore >= 15000) achievement_gain("YENDC3", 'x');
       }
 
-    achievement_score(LB_YENDOR_CHALLENGE, tscore);
+
     }
     
   yendorlevel& clev() { return levels[challenge]; }
@@ -294,7 +294,7 @@ namespace yendor {
     if(yii != byi) {
       yii = byi;
       achievement_gain("YENDOR1");
-      playSound(yendor, "pickup-yendor");
+
       return true;
       }
     return false;
@@ -604,7 +604,7 @@ namespace tactic {
       if(tscore >= 5000) achievement_gain("PTM2", 'x');
       if(tscore >= 15000) achievement_gain("PTM3", 'x');
       }
-    achievement_score(lb, tscore);
+
     }
 
   void uploadScore() {

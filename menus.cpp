@@ -303,10 +303,6 @@ void showVisual1() {
   dialog::addSelItem(XLAT("monster display mode"), XLAT(mdmodes[vid.monmode]), 'm');
   const char *axmodes[5] = {"OFF", "auto", "light", "heavy", "arrows"};
   dialog::addSelItem(XLAT("help for keyboard users"), XLAT(axmodes[vid.axes]), 'c');
-#ifndef NOAUDIO
-  dialog::addSelItem(XLAT("background music volume"), its(musicvolume), 'b');
-  dialog::addSelItem(XLAT("sound effects volume"), its(effvolume), 'e');
-#endif
 #ifndef NOTRANS
   dialog::addSelItem(XLAT("language"), XLAT("EN"), 'l');
 #endif
@@ -402,14 +398,6 @@ void handleVisual1(int sym, int uni) {
   if(xuni == 'w') { vid.wallmode += 60 + (shiftmul > 0 ? 1 : -1); vid.wallmode %= 6; }
   if(xuni == 'm') { vid.monmode += 60 + (shiftmul > 0 ? 1 : -1); vid.monmode %= 6; }
   if(xuni == 'c') { vid.axes += 60 + (shiftmul > 0 ? 1 : -1); vid.axes %= 5; }
-#ifndef NOAUDIO
-  if(xuni == 'b') {
-    dialog::editNumber(musicvolume, 0, 128, 10, 60, XLAT("background music volume"), "");
-    }
-  if(xuni == 'e') {
-    dialog::editNumber(effvolume, 0, 128, 10, 60, XLAT("sound effects volume"), "");
-    }
-#endif
   
   if(sym == SDLK_ESCAPE) cmode = emNormal;
   

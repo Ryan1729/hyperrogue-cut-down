@@ -2276,14 +2276,14 @@ void moveMonster(monster *m, int delta) {
     if(c2->wall == waChasm) {
       c2->wall = waReptile;
       c2->wparam = reptilemax();
-      playSound(c, "click");
+
       m->dead = true;
       }
     else if(isChasmy(c2) || isWatery(c2)) {
       c2->wall = waReptileBridge;
       c2->item = itNone;
       c2->wparam = reptilemax();
-      playSound(c, "click");
+
       m->dead = true;
       }
     }

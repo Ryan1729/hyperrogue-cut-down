@@ -211,7 +211,7 @@ void flashCell(cell *c, eMonster killer, flagtype flags) {
 
 void activateFlashFrom(cell *cf, eMonster who, flagtype flags) {
   drawFlash(cf);
-  playSound(cf, "storm");
+
   for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
     if(c == cf) continue;
@@ -278,7 +278,7 @@ void activateFlash() {
     drawFlash(playerpos(i));
 
   addMessage(XLAT("You activate the Flash spell!"));
-  playSound(cwt.c, "storm");
+
   drainOrb(itOrbFlash);
   for(int i=0; i<int(dcal.size()); i++) {
     cell *c = dcal[i];
@@ -479,7 +479,7 @@ void activateLightning() {
   elec::afterOrb = false;
   
   achievement_count("LIGHTNING", tkills(), tk);
-  playSound(cwt.c, "storm");
+
   }
 
 // roCheck: return orb type if successful, 0 otherwise
@@ -514,7 +514,7 @@ int teleportAction() {
   }
 
 void teleportTo(cell *dest) {
-  playSound(dest, "other-teleport");
+
   if(dest->monst) {
     cwt.c->monst = dest->monst;
     dest->monst = moNone;
@@ -557,7 +557,7 @@ void teleportTo(cell *dest) {
   }
 
 void jumpTo(cell *dest, eItem byWhat, int bonuskill = 0, eMonster dashmon = moNone) {
-  if(byWhat != itStrongWind) playSound(dest, "orb-frog");
+
   movecost(cwt.c, dest);
   
   killFriendlyIvy();
@@ -745,7 +745,7 @@ eMonster summonedAt(cell *dest) {
   }
 
 void summonAt(cell *dest) {
-  playSound(dest, "orb-ranged");
+
   dest->monst = summonedAt(dest);
   dest->stuntime = 3;
   if(dest->monst == moPirate || dest->monst == moViking || (dest->monst == moRatling && dest->wall == waSea))
@@ -796,7 +796,7 @@ void tempWallAt(cell *dest) {
   }
 
 void psi_attack(cell *dest) {
-  playSound(dest, "other-mind");
+
   if(isNonliving(dest->monst))
     addMessage(XLAT("You destroy %the1 with a mental blast!", dest->monst));
   else if(isDragon(dest->monst) || isKraken(dest->monst))
@@ -812,7 +812,7 @@ void psi_attack(cell *dest) {
   }
 
 void gun_attack(cell *dest) {
-  playSound(dest, "orb-ranged");
+
   addMessage(XLAT("You shoot %the1!", dest->monst));
   attackMonster(dest, AF_GUN, moNone);
   items[itRevolver] --;
@@ -839,7 +839,7 @@ void checkStunKill(cell *dest) {
   }
 
 void stun_attack(cell *dest) {
-  playSound(dest, "orb-ranged");
+
   addMessage(XLAT("You stun %the1!", dest->monst));
   dest->stuntime += 5;
   checkStunKill(dest);
@@ -858,7 +858,7 @@ void placeIllusion(cell *c) {
   }
 
 void blowoff(cell *cf, cell *ct) {
-  playSound(ct, "orb-ranged");
+
   addMessage(XLAT("You blow %the1 away!", cf->monst));
   pushMonster(ct, cf);
   if(cf->item == itBabyTortoise && !ct->item) 
@@ -871,7 +871,7 @@ void blowoff(cell *cf, cell *ct) {
 
 void useOrbOfDragon(cell *c) {
   makeflame(c, 20, false);
-  playSound(c, "fire");
+
   addMessage(XLAT("You throw fire!"));
   useupOrb(itOrbDragon, 5);
   createNoise(3);

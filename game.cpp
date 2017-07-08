@@ -169,7 +169,7 @@ bool doesFall(cell *c) { return !doesnotFall(c); }
 
 bool doesFallSound(cell *c) { 
   if(c->land != laMotion && c->land != laZebra)
-    playSound(c, "trapdoor");  
+
   return !doesnotFall(c); 
   }
 
@@ -1542,7 +1542,7 @@ void explodeMine(cell *c) {
   if(c->wall != waMineMine)
     return;
   
-  playSound(c, "explosion");
+
   drawFireParticles(c, 30, 150);
   
   c->wall = waMineOpen;
@@ -1582,8 +1582,6 @@ void stunMonster(cell *c2) {
   if(c2->monst != moSkeleton && !isMetalBeast(c2->monst) && c2->monst != moTortoise &&
     c2->monst != moReptile) {
     c2->hitpoints--;
-    if(c2->monst == moPrincess)
-      playSound(c2, princessgender() ? "hit-princess" : "hit-prince");
     }
   c2->stuntime = (
     c2->monst == moFatGuard ? 2 : 
@@ -1748,7 +1746,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
     
     if(connected) {
       pcount = 0;
-      playSound(c, "die-troll");
+
       destroyHalfvine(c);
       if(cellUnstableOrChasm(c)) c->wall = waGargoyleFloor;
       else if(isWatery(c)) c->wall = waGargoyleBridge;
@@ -1761,7 +1759,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
     destroyHalfvine(c);
     if(doesnotFall(c)) {
       pcount = 0;
-      playSound(c, "die-troll");
+
       if(isReptile(c->wall)) kills[moReptile]++;
       c->wall = waDeadTroll;
       }
@@ -1779,7 +1777,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
       if(isReptile(c->wall)) kills[moReptile]++;
       c->wall = waDeadTroll2;
       pcount = 0;
-      playSound(c, "die-troll");
+
       }
     else fallingFloorAnimation(c, waDeadTroll2, m), pcount = 0;
     c->wparam = m;
@@ -1787,7 +1785,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
     }
   if(m == moMiner) {
     pcount = 32;
-    playSound(c, "splash" + pick12());
+
     destroyHalfvine(c);
     minerEffect(c);
     for(int i=0; i<c->type; i++) if(passable(c->mov[i], c, P_MONSTER | P_MIRROR | P_CLIMBUP | P_CLIMBDOWN)) {
@@ -1815,7 +1813,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
       }
     }
   if(m == moPrincess) {
-    playSound(c, princessgender() ? "die-princess" : "die-prince");
+
     }
   if(m == moVineBeast) {
     destroyHalfvine(c);
@@ -1823,7 +1821,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
       if(isReptile(c->wall)) kills[moReptile]++;
       c->wall = waVinePlant;
       pcount = 0;
-      playSound(c, "die-vinebeast");
+
       }
     else fallingFloorAnimation(c, waVinePlant, m), pcount = 0;
     c->item = itNone;
@@ -1831,7 +1829,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
   if(isBird(m)) moveEffect(c, c, moDeadBird);
   if(m == moBomberbird || m == moTameBomberbird) {
     pcount = 0;
-    playSound(c, "die-bomberbird");
+
     if(c->wall == waNone || c->wall == waMineUnknown || c->wall == waMineOpen ||
       c->wall == waCavefloor || c->wall == waDeadfloor || c->wall == waDeadfloor2 ||
       c->wall == waRubble || c->wall == waGargoyleFloor || 
@@ -1862,17 +1860,17 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
     }
   if(m == moVineSpirit) {
     pcount = 32;
-    playSound(c, "die-vinespirit");
+
     destroyHalfvine(c);
     if(!isFire(c)) c->wall = waNone;
     }
   if(m == moRedTroll) {
-    playSound(c, "die-troll");
+
     if(doesFall(c)) fallingFloorAnimation(c, waRed1, m), pcount = 0;
     else if(snakepile(c, m)) pcount = 0;
     }
   if(m == moDarkTroll) {
-    playSound(c, "die-troll");
+
     if(doesFall(c)) fallingFloorAnimation(c, waDeadwall, m), pcount = 0;
     else if(c->wall == waRed1 || c->wall == waRed2 || c->wall == waRed3)
       c->wall = waDeadwall, pcount = 0;
@@ -1894,7 +1892,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
       if(isReptile(c->wall)) kills[moReptile]++;
       c->wall = waPetrified;
       pcount = 0;
-      playSound(c, "die-troll");
+
       }
     else fallingFloorAnimation(c, waPetrified, m), pcount = 0;
     c->wparam = m;
@@ -1902,8 +1900,8 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
     }
   if(m == moFireFairy) {
     drawFireParticles(c, 16); pcount = 0;
-    playSound(c, "die-fairy");
-    playSound(c, "fire");
+
+
     makeflame(c, 50, false);
     }
   if(c->monst == moMetalBeast2 && !c->item && who == moLightningBolt && c->wall != waPetrified && c->wall != waChasm)
@@ -1935,7 +1933,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
   if(m == moSlime) { 
     pcount = 0;
     drawParticles(c, winf[c->wall].color, 80, 200);
-    playSound(c, "splash" + pick12());
+
     c->monst = moNone; 
     spill(c, c->wall, 2); 
     }
@@ -1995,7 +1993,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
 void fightmessage(eMonster victim, eMonster attacker, bool stun, int flags) {
 
   if(isBird(attacker)) {
-    playSound(NULL, "hit-axe"+pick123());
+
     addMessage(XLAT("%The1 claws %the2!", attacker, victim));
     }
 
@@ -2003,92 +2001,92 @@ void fightmessage(eMonster victim, eMonster attacker, bool stun, int flags) {
     addMessage(XLAT("%The1 scares %the2!", attacker, victim));
 
   else if(isSlimeMover(attacker) && !stun) {
-    playSound(NULL, "hit-crush"+pick123());
+
     addMessage(XLAT("%The1 eats %the2!", attacker, victim));
     }
 
   else if(flags & AF_EAT) {
-    playSound(NULL, "hit-crush"+pick123());
+
     addMessage(XLAT("%The1 eats %the2!", attacker, victim));
     }
 
   else if(attacker == moLancer) {
-    playSound(NULL, "hit-rose");
+
     addMessage(XLAT("%The1 pierces %the2!", attacker, victim));
     }
 
   else if(attacker == moEarthElemental) {
-    playSound(NULL, "hit-crush"+pick123());
+
     addMessage(XLAT("%The1 punches %the2!", attacker, victim));
     }
   
   else if(attacker == moPlayer) {
     if(flags & (AF_SWORD | AF_SWORD_INTO)) {
-      playSound(NULL, "hit-axe"+pick123());
+
       addMessage(XLAT("You slash %the1.", victim)); 
       if(victim == moGoblin) 
         achievement_gain("GOBLINSWORD");
       }
     else if(victim == moKrakenT || victim == moDragonTail || victim == moDragonHead) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("You hit %the1.", victim)); // normal
       }
     else if(stun && victim == moVizier) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("You hit %the1.", victim)); // normal
       }
     else if(stun) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("You stun %the1.", victim)); // normal
       }
     else if(isNonliving(victim)) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("You destroy %the1.", victim)); // normal
       }
     else if(flags & AF_STAB) {
-      playSound(NULL, "hit-axe"+pick123());
+
       addMessage(XLAT("You stab %the1.", victim)); // normal
       }
     else if(flags & AF_APPROACH) {
-      playSound(NULL, "hit-sword"+pick123());
+
       if(victim == moLancer)
         addMessage(XLAT("You trick %the1.", victim)); // normal
       else
         addMessage(XLAT("You pierce %the1.", victim)); // normal
       }
     else {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("You kill %the1.", victim)); // normal
       }
     }
 
   else {
     if(victim == moKrakenT || victim == moDragonTail || victim == moDragonHead) {
-      playSound(NULL, "hit-crush"+pick123());
+
       addMessage(XLAT("%The1 hits %the2.", attacker, victim)); // normal
       }
     else if(stun && victim == moVizier) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("%The1 hits %the2.", attacker, victim)); // normal
       }
     else if(stun) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("%The1 attacks %the2!", attacker, victim)); // normal
       }
     else if(isNonliving(victim)) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("%The1 destroys %the2!", attacker, victim)); // normal
       }
     else if(flags & AF_STAB) {
-      playSound(NULL, "hit-axe"+pick123());
+
       addMessage(XLAT("%The1 stabs %the2.", attacker, victim));
       }
     else if(flags & AF_APPROACH) {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("%The1 tricks %the2.", attacker, victim));
       }
     else {
-      playSound(NULL, "hit-sword"+pick123());
+
       addMessage(XLAT("%The1 kills %the2!", attacker, victim));
       }
     }
@@ -2135,7 +2133,7 @@ bool attackMonster(cell *c, flagtype flags, eMonster killer) {
     
   if(tkt < 20 && ntkt >= 20) {
     addMessage(XLAT("You hear a distant roar!"));
-    playSound(NULL, "message-roar");
+
     }
 
   if(tk == 0 && ntk > 0 && !tactic::on && !euclid && !sphere) {
@@ -2155,7 +2153,7 @@ bool attackMonster(cell *c, flagtype flags, eMonster killer) {
     addMessage(XLAT("You feel that the souls of slain enemies pull you to the Graveyard..."));
   
   if(!tu && trollUnlocked()) {
-    playSound(c, "message-troll");
+
     addMessage(XLAT("%The1 says, \"I die, but my clan in Trollheim will avenge me!\"", m));
     }
 
@@ -2803,7 +2801,7 @@ void toggleGates(cell *ct, eWall type, int rad) {
       ct->wall = waClosedGate, numgates++;
       if(rad<1) rad=1;
       if(ct->item) {
-        playSound(ct, "hit-crush"+pick123());
+
         addMessage(XLAT("%The1 is crushed!", ct->item));
         ct->item = itNone;
         }
@@ -2816,16 +2814,12 @@ void toggleGates(cell *ct, eWall type, int rad) {
   }
 
 void toggleGates(cell *ct, eWall type) {
-  playSound(ct, "click");
+
   numgates = 0;
   if(type == waClosePlate && purehepta)
     toggleGates(ct, type, 2);
   else
     toggleGates(ct, type, 3);
-  if(numgates && type == waClosePlate)
-    playSound(ct, "closegate");
-  if(numgates && type == waOpenPlate)
-    playSound(ct, "opengate");
   }
 
 void destroyWeakBranch(cell *cf, cell *ct, eMonster who) {
@@ -2833,14 +2827,14 @@ void destroyWeakBranch(cell *cf, cell *ct, eMonster who) {
     gravityLevel(ct) >= gravityLevel(cf) && !ignoresPlates(who)) {
     cf->wall = waCanopy;
     if(!cellEdgeUnstable(cf)) { cf->wall = waWeakBranch; return; }
-    playSound(cf, "trapdoor");
+
     drawParticles(cf, winf[waWeakBranch].color, 4);
     }
   if(cf && ct && cf->wall == waSmallBush && cellEdgeUnstable(ct) && 
     gravityLevel(ct) >= gravityLevel(cf) && !ignoresPlates(who)) {
     cf->wall = waNone;
     if(!cellEdgeUnstable(cf)) { cf->wall = waSmallBush; return; }
-    playSound(cf, "trapdoor");
+
     drawParticles(cf, winf[waWeakBranch].color, 4);
     }
   }
@@ -2884,7 +2878,7 @@ void updateHi(eItem it, int v) {
 void gainItem(eItem it) {
   int g = gold();
   items[it]++; if(it != itLotus) updateHi(it, items[it]);
-  achievement_collection(it, gold(), g);
+
   multi::treasures[multi::cpid]++;
   }
 
@@ -2936,7 +2930,7 @@ void playerMoveEffects(cell *c1, cell *c2) {
   if(c2->wall == waMirror && !markOrb(itOrbAether)) {
     drawParticles(c2, winf[c2->wall].color, 16);
     gainShard(c2, "The mirror shatters!");
-    playSound(c2, "pickup-mirror");
+
     cell *pc = multi::player[multi::cpid].c;
     multi::player[multi::cpid].c = c2;
     mirror::createMirrors(cwt.c, cwt.spin, moMirage);
@@ -2946,7 +2940,7 @@ void playerMoveEffects(cell *c1, cell *c2) {
   if(c2->wall == waCloud && !markOrb(itOrbAether)) {
     drawParticles(c2, winf[c2->wall].color, 16);
     gainShard(c2, "The cloud turns into a bunch of images!");  
-    playSound(c2, "pickup-mirror");
+
     mirror::createMirages(cwt.c, cwt.spin, moMirage);
     }
   
@@ -2962,7 +2956,7 @@ void playerMoveEffects(cell *c1, cell *c2) {
     hauntedWarning = true;
     addMessage(XLAT("You become a bit nervous..."));
     addMessage(XLAT("Better not to let your greed make you stray from your path."));
-    playSound(c2, "nervous");
+
     }
   }
 
@@ -2998,7 +2992,7 @@ void stayEffect(cell *c) {
   eMonster m = c->monst;
   if(m == moAirElemental) airmap.push_back(make_pair(c, 0));
   if(m == moRagingBull && c->mondir != NODIR) { 
-    playSound(NULL, "hit-axe"+pick123());
+
     forCellIdEx(c2, d, c) {
       bool opposite = angledist(c, d, c->mondir) >= 3;
       if(opposite) beastcrash(c2, c);
@@ -3175,7 +3169,7 @@ void moveMonster(cell *ct, cell *cf) {
     }
   if(isThorny(ct->wall) && !survivesThorns(ct->monst)) {
     addMessage(XLAT("%The1 is killed by thorns!", ct->monst));
-    playSound(ct, "hit-rose");
+
     if(isBull(ct->monst)) ct->wall = waNone;
     fallMonster(ct);
     }
@@ -3672,7 +3666,7 @@ void moveWorm(cell *c) {
         addMessage(XLAT("The sandworm explodes in a cloud of Spice!"));
       else
         addMessage(XLAT("The sandworm explodes!"));
-      playSound(NULL, "explosion");
+
       achievement_gain("ZEBRAWORM", 'q');
       }
     return;
@@ -4116,7 +4110,7 @@ void movehex(bool mounted) {
     if(c->monst == moHexSnake) {
       snakeAttack(c, mounted);
       kills[moHexSnake]++;
-      playSound(c, "die-troll");
+
       cell *c2 = c;
       while(c2->monst == moHexSnakeTail || c2->monst == moHexSnake) {
         if(c2->monst != moHexSnake && c2->mondir != NODIR)
@@ -4275,7 +4269,7 @@ bool swordAttack(cell *mt, eMonster who, cell *c, int bb) {
   if(c->wall == waCavewall) markOrb(bb ? itOrbSword2: itOrbSword);
   if(c->wall == waSmallTree || c->wall == waBigTree || c->wall == waRose || c->wall == waCTree || c->wall == waVinePlant ||
     thruVine(mt, c)) {
-    playSound(NULL, "hit-axe"+pick123());
+
     markOrb(bb ? itOrbSword2: itOrbSword);
     drawParticles(c, winf[c->wall].color, 16);
     addMessage(XLAT("You chop down %the1.", c->wall));
@@ -4283,13 +4277,13 @@ bool swordAttack(cell *mt, eMonster who, cell *c, int bb) {
     c->wall = waNone;
     }
   if(c->wall == waBarrowDig) {
-    playSound(NULL, "hit-axe"+pick123());
+
     markOrb(bb ? itOrbSword2: itOrbSword);
     drawParticles(c, winf[c->wall].color, 16);
     c->wall = waNone;
     }
   if(c->wall == waBarrowWall && items[itBarrow] >= 25) {
-    playSound(NULL, "hit-axe"+pick123());
+
     markOrb(bb ? itOrbSword2: itOrbSword);
     drawParticles(c, winf[c->wall].color, 16);
     c->wall = waNone;
@@ -4357,11 +4351,11 @@ void stabbingAttack(cell *mf, cell *mt, eMonster who, int bonuskill) {
       else {
         eMonster m = c->monst;
         if(c->monst != moFlailer) {
-          playSound(NULL, "hit-sword"+pick123());
+
           fightmessage(c->monst, who, false, AF_BACK);
           }
         else {
-          playSound(NULL, "hit-sword"+pick123());
+
           if(who != moPlayer)
             addMessage(XLAT("%The1 tricks %the2.", who, c->monst));
           else
@@ -4564,14 +4558,14 @@ void movegolems(flagtype flags) {
         bool jealous = (isPrincess(c->monst) && isPrincess(c2->monst));
         eMonster m2 = c2->monst;
         if(revenge) {
-          playSound(c2, princessgender() ? "dzia-princess" : "dzia-prince");
+
           addMessage(XLAT("%The1 takes %his1 revenge on %the2!", m, c2->monst));
           }
         attackMonster(c2, ((revenge||jealous)?0:AF_ORSTUN) | AF_MSG, m);
         produceGhost(c2, m2, m);
         if(revenge) c->monst = m = moPrincessArmed;
         if(jealous) {
-          playSound(c2, princessgender() ? "dzia-princess" : "dzia-prince");
+
           addMessage("\"That should teach you to take me seriously!\"");
           }
         }
@@ -4663,7 +4657,7 @@ void specialMoves() {
         if(celldistance(c, t) <= 2) wakeup = true;
         }
       if(wakeup) {
-        playSound(NULL, "bull");
+
         c->monst = m = moRagingBull;
         c->mondir = NODIR;
         }
@@ -4684,7 +4678,7 @@ void specialMoves() {
         gr->monst = moGhost;
         ztab[hrand(zombienum)]->monst = moZombie;
         addMessage(XLAT("%The1 raises some undead!", m));
-        playSound(c, "necromancy");
+
         }
       }
     
@@ -4741,7 +4735,7 @@ void specialMoves() {
           else
             addMessage(XLAT("%The1 throws fire at %the2!", m, t->monst));
           makeflame(t, 20, false);
-          playSound(t, "fire");
+
           c->monst = moCultist;
           shot = true;
           }
@@ -4818,7 +4812,7 @@ void moverefresh(bool turn = true) {
           if(dragon::target && celldistance(c, dragon::target) <= breathrange && makeflame(dragon::target, 5, true)) {
             addMessage(XLAT("%The1 breathes fire!", c->monst));
             makeflame(dragon::target, 5, false);
-            playSound(dragon::target, "fire");
+
             c->hitpoints = 0;
             }
           }
@@ -4832,7 +4826,7 @@ void moverefresh(bool turn = true) {
               else
                 addMessage(XLAT("%The1 breathes fire!", c->monst));
               makeflame(t, 5, false);
-              playSound(t, "fire");
+
               c->hitpoints = 0;
               }
             }
@@ -4850,14 +4844,14 @@ void moverefresh(bool turn = true) {
         c->monst = moNone;
         c->wall = waReptile;
         c->wparam = reptilemax();
-        playSound(c, "click");
+
         }
       else if(isChasmy(c) || isWatery(c)) {
         c->wall = waReptileBridge;
         c->item = itNone;
         c->wparam = reptilemax();
         c->monst = moNone;
-        playSound(c, "click");
+
         }
       }
         
@@ -4882,7 +4876,7 @@ void moverefresh(bool turn = true) {
           c->monst = moReptile;
           c->hitpoints = 3;
           c->stuntime = 0;
-          playSound(c, "click");
+
           }
         }
       }
@@ -4906,7 +4900,7 @@ void moverefresh(bool turn = true) {
       if(c->monst == moLesser || c->monst == moLesserM || c->monst == moGreater || c->monst == moGreaterM)
         c->monst = moGreaterShark;
       if(c->monst && !survivesWater(c->monst)) {
-        playSound(c, "splash"+pick12());
+
         if(isNonliving(c->monst))
           addMessage(XLAT("%The1 sinks!", c->monst));
         else 
@@ -4939,7 +4933,7 @@ void moverefresh(bool turn = true) {
     if(c->monst) mayExplodeMine(c, c->monst);
     
     if(c->monst && c->wall == waClosedGate && !survivesWall(c->monst)) {
-      playSound(c, "hit-crush"+pick123());
+
       addMessage(XLAT("%The1 is crushed!", c->monst));
       fallMonster(c);
       }
@@ -5465,7 +5459,7 @@ void collectMessage(cell *c2, eItem which) {
   else if(itemclass(which) != IC_TREASURE)
     addMessage(XLAT("You have found %the1!", which));
   else if(which == itBabyTortoise) {
-    playSound(c2, playergender() ? "speak-princess" : "speak-prince");
+
     addMessage(XLAT("Aww, poor %1... where is your family?", which));
     }
   else if(gold() == 0 && !specialmode)
@@ -5880,11 +5874,11 @@ bool canPushThumperOn(cell *tgt, cell *thumper, cell *player) {
 void activateActiv(cell *c, bool msg) {
   if(msg) addMessage(XLAT("You activate %the1.", c->wall));
   if(c->wall == waThumperOff) {
-    playSound(c, "click");
+
     c->wall = waThumperOn;
     }
   if(c->wall == waBonfireOff) {
-    playSound(c, "fire");
+
     c->wall = waFire;
     }
   c->wparam = 100;
@@ -6160,7 +6154,7 @@ bool movepcto(int d, int subdir, bool checkonly) {
       if(checkonly) return true;
       drawParticles(c2, winf[c2->wall].color, 4);
       addMessage(XLAT("You start chopping down the tree."));
-      playSound(c2, "hit-axe" + pick123());
+
       if(survivalist && isHaunted(c2->land))
         survivalist = false;
       mirror::spingo(origd, 0);
@@ -6177,7 +6171,7 @@ bool movepcto(int d, int subdir, bool checkonly) {
       if(checkonly) return true;
       drawParticles(c2, winf[c2->wall].color, 8);
       addMessage(XLAT("You chop down the tree."));
-      playSound(c2, "hit-axe" + pick123());
+
       if(survivalist && isHaunted(c2->land))
         survivalist = false;
       mirror::spingo(origd, 0);
@@ -6293,10 +6287,10 @@ bool movepcto(int d, int subdir, bool checkonly) {
         updateHi(itBabyTortoise, items[itBabyTortoise]);
         c2->item = itBabyTortoise;
         tortoise::babymap[c2] = tortoise::seekbits;
-        playSound(c2, playergender() ? "heal-princess" : "heal-prince");
+
         addMessage(XLAT(playergender() == GEN_F ? "You are now a tortoise heroine!" : "You are now a tortoise hero!"));
         c2->stuntime = 2;
-        achievement_collection(itBabyTortoise, 0, 0);
+
         }
       else if(isStunnable(c2->monst) && c2->hitpoints > 1) {
         attackMonster(c2, AF_ORSTUN | AF_MSG, moPlayer);
@@ -6466,7 +6460,7 @@ bool movepcto(int d, int subdir, bool checkonly) {
         }
       else if(isMimic(c2->monst)) {
         addMessage(XLAT("You rejoin %the1.", c2->monst));
-        playSound(c2, "click");
+
         killMonster(c2, moNone);
         }
       

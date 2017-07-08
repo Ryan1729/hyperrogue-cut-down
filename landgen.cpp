@@ -4144,7 +4144,7 @@ void setdist(cell *c, int d, cell *from) {
             c2->hitpoints = 1;
             c2->mondir = c->spn(i);
             }
-          playSound(c, "seen-kraken");
+
           }
         }
 
@@ -4616,7 +4616,7 @@ void setdist(cell *c, int d, cell *from) {
           (euclid || (princess::getPrisonInfo(c)->bestdist < 6 && princess::getPrisonInfo(c)->princess))) {
           c->monst = moMouse;
           addMessage(XLAT("You hear a distant squeak!"));
-          playSound(c, "mousesqueak");
+
           drawBigFlash(c);
 /*          {
   cell *c2= c;          
@@ -5073,7 +5073,7 @@ void setdist(cell *c, int d, cell *from) {
       }
     }
 
-  if(d == 7) playSeenSound(c);
+
   
   }
 
@@ -5212,14 +5212,14 @@ void wandering() {
       // wandering seeps & ghosts
       if(seepcount && c->wall == waCavewall && !c->monst && canReachPlayer(c, moSlime)) {
         c->monst = moSeep;
-        playSeenSound(c);
+
         seepcount--;
         continue;
         }
       
       if(ghostcount && !c->monst) {
         c->monst = moGhost;
-        playSeenSound(c);
+
         ghostcount--;
         continue;
         }
@@ -5228,26 +5228,26 @@ void wandering() {
     if((c->wall == waCavewall || c->wall == waDeadwall) && !c->monst &&
       wchance(items[treasureType(c->land)], 10) && canReachPlayer(c, moSlime)) {
       c->monst = moSeep;
-      playSeenSound(c);
+
       continue;
       }
     
     else if(c->wall == waCTree && !c->monst && wchance(items[itPirate], 15) && canReachPlayer(c, moSlime)) {
       c->monst = moParrot;
-      playSeenSound(c);
+
       continue;
       }
 
     else if(c->land == laEndorian && c->wall == waNone && wchance(items[itApple], 50)) {
       c->monst = moSparrowhawk;
-      playSeenSound(c);
+
       continue;
       }
     
     else if(c->wall == waSea && !c->monst) {
       if(c->land == laCaribbean && wchance(items[itPirate], 15) && canReachPlayer(c, moPirate)) {
         c->monst = moCShark;
-        playSeenSound(c);
+
         continue;
         }
       if(c->land == laWarpSea && avengers && canReachPlayer(c, moPirate)) {
@@ -5255,37 +5255,37 @@ void wandering() {
         c->wall = waBoat;
         avengers--;
         if(cheater) printf("avenger comes\n");
-        playSeenSound(c);
+
         continue;
         }
       if(c->land == laWarpSea && wchance(items[itCoral], 25) && canReachPlayer(c, moPirate)) {
         c->monst = moRatling;
         c->wall = waBoat;
-        playSeenSound(c);
+
         continue;
         }
       if(c->land == laOcean && (items[itCoast] > 50 || (cwt.c->landparam < 25 && c->landparam < 25)) && wchance(items[itCoast], 25) && canReachPlayer(c, moEagle)) {
         c->monst = moAlbatross;
-        playSeenSound(c);
+
         continue;
         }
       if(c->land == laLivefjord && wchance(items[itFjord], 80) && items[itFjord] >= 10 && canReachPlayer(c, moWaterElemental)) {
         c->monst = moWaterElemental;
-        playSeenSound(c);
+
         continue;
         }
       if(c->land == laKraken && ((sphere && !hrand(15)) || wchance(items[itKraken], 240)) && !pseudohept(c)) {
         bool b = canReachPlayer(c, moKrakenH);
         if(sphere && (haveKraken() || !items[itOrbFish])) { 
           c->monst = moViking; c->wall = waBoat; c->item = itOrbFish; 
-          playSeenSound(c);
+
           continue;
           }        
         if(b) forCellEx(c2, c) if((sphere || c2->cpdist > 7) && !pseudohept(c2)) {
           forCellCM(c3, c2) if(c3->monst || c3->wall != waSea) 
             goto notfound;
           c2->monst = moKrakenH;
-          playSeenSound(c2);
+
           for(int i=0; i<c2->type; i++) {
             c2->mov[i]->monst = moKrakenT;
             c2->mov[i]->hitpoints = 1;
@@ -5452,7 +5452,7 @@ void wandering() {
     
     else break;
       
-    playSeenSound(c);
+
     if(c->monst == moWorm || c->monst == moHexSnake) c->mondir = NODIR;
       
     // laMotion -> no respawn!
@@ -5626,7 +5626,7 @@ namespace halloween {
     cell *c = farempty();
     c->hitpoints = 3;
     c->monst = m;
-    playSeenSound(c);
+
     if(!kills[m]) switch(m) {
       case moGhost:
         addMessage(XLAT("Ghosts can move through chasms!"));
@@ -5768,7 +5768,7 @@ namespace halloween {
           dragoncells[i]->mondir = i==3 ? NODIR : neighborId(dragoncells[i], dragoncells[i+1]);
           dragoncells[i]->hitpoints = 1;
           dragoncells[i]->stuntime = 1;          
-          playSeenSound(dragoncells[i]);
+
           }
         monpower -= 200;
         mcount++;

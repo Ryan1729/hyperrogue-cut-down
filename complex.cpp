@@ -385,7 +385,7 @@ namespace elec {
   void fire() {
     if(havethunder) {
       addMessage(XLAT("There is a flash of thunder!"));
-      playSound(NULL, "storm");
+
       drawLightning();
       for(int i=2; i<int(charges.size()); i++) if(charges[i].fire)
         affect(charges[i].c);
@@ -558,7 +558,7 @@ namespace princess {
     c->stuntime = 0;
     c->hitpoints = palaceHP();
     drawFlash(c);
-    playSound(c, princessgender() ? "heal-princess" : "heal-prince");
+
 
     info *inf = NULL;
     for(int i=0; i<int(infos.size()); i++) 
@@ -590,7 +590,7 @@ namespace princess {
       if(newdist == OUT_OF_PRISON && princess::challenge) {
         addMessage(XLAT("Congratulations! Your score is %1.", its(i->value)));
         achievement_gain("PRINCESS2");
-        if(!cheater) achievement_score(36, i->value);
+
         showMissionScreen();
         }
       }
@@ -626,7 +626,7 @@ namespace princess {
     info *i = getPrisonInfo(c);
     int d = dist(c);
 
-    playSound(c, "mousesqueak", 40);
+
     if(!i)
        addMessage(XLAT("%The1 squeaks in a confused way.", m));
     else if(i->bestdist >= 6)
@@ -651,7 +651,7 @@ namespace princess {
   
     static int msgid = 0;
   
-    playSound(c, princessgender() ? "speak-princess" : "speak-prince");
+
     retry:
     if(msgid >= 32) msgid = 0;  
     
@@ -1137,12 +1137,12 @@ namespace mirror {
           }
         if(isPlayerOn(c2)) {
           addMessage(XLAT("You join %the1.", m));
-          playSound(c2, "click");
+
           continue;
           }
         if(isMimic(c2)) {
           addMessage(XLAT("Two of your images crash and disappear!"));
-          playSound(c2, "click");
+
           c2->monst = moNone;
           continue;
           }
@@ -1164,12 +1164,12 @@ namespace mirror {
       if(c->wall == waMirror) {
         addMessage(XLAT("%The1 breaks the mirror!", m));
         drawParticles(c, winf[c->wall].color, 16);
-        playSound(c, "pickup-mirror", 50);
+
         createMirrors(c, c->mondir, m);
         c->wall = waNone;
         }
       if(c->wall == waCloud) {
-        playSound(c, "pickup-mirror", 50);
+
         drawParticles(c, winf[c->wall].color, 16);
         addMessage(XLAT("%The1 disperses the cloud!", m));
         createMirages(c, c->mondir, m);
@@ -1719,7 +1719,7 @@ namespace heat {
         c->wall = waNone, kills[0]++;
       if(c->wall == waFrozenLake && HEAT(c) > (c->land == laCocytus ? .6 : .4)) 
         drawParticles(c, MELTCOLOR, 4, 60),
-        playSound(c, "trapdoor", 50),
+
         c->wall = waLake, kills[0]++;
   
       if(c->wall == waLake && HEAT(c) < (c->land == laCocytus ? -.4 : .4) && c->monst != moGreaterShark) {
@@ -2596,7 +2596,7 @@ namespace prairie {
           if(!cn->monst && !isPlayerOn(cn) && passable_for(cp->monst, cn, cp, P_DEADLY))
             moveMonster(cn, cp);
           else {
-            playSound(NULL, "hit-axe"+pick123());
+
             beastcrash(cn, cp);
             cp->monst = moRagingBull;
             cp->stuntime = 3;

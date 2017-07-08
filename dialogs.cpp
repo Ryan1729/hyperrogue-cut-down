@@ -1,16 +1,3 @@
-/* Missing.
-
-#ifndef MOBILE
-  dialog::addItemHelp(16, XLAT("use Shift to decrease and Ctrl to fine tune "));
-  dialog::addItemHelp(17, XLAT("(e.g. Shift+Ctrl+Z)"));
-#endif
-
-  if(xuni == 'i') {
-    }
-  
-
-*/
-
 namespace dialog {
 
   namespace zoom {
@@ -519,24 +506,6 @@ namespace dialog {
       if(kind == 'v') ne.s = fts(*ne.editwhat);
       }
 
-#ifndef NOAUDIO
-    if(ne.intval == &musicvolume) {
-      if(musicvolume < 0) 
-        *ne.editwhat = musicvolume = 0, affect('v');
-      else if(musicvolume > MIX_MAX_VOLUME) 
-        *ne.editwhat = musicvolume = MIX_MAX_VOLUME, affect('v');
-#ifdef SDLAUDIO
-      else Mix_VolumeMusic(musicvolume);
-#endif
-      }
-
-    if(ne.intval == &effvolume) {
-      if(effvolume < 0) 
-        *ne.editwhat = effvolume = 0, affect('v');
-      else if(effvolume > MIX_MAX_VOLUME) 
-        *ne.editwhat = effvolume = MIX_MAX_VOLUME, affect('v');
-      }
-#endif
 
     if(ne.intval == &vid.framelimit && vid.framelimit < 5) 
       *ne.editwhat = vid.framelimit = 5, affect('v');

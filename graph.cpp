@@ -26,9 +26,6 @@ int detaillevel = 0;
 
 #include <SDL/SDL.h>
 
-#ifdef SDLAUDIO
-#include <SDL/SDL_mixer.h>
-#endif
 
 #ifndef MAC
 #undef main
@@ -7571,9 +7568,6 @@ void initgraph() {
   
   initJoysticks();
 
-  #ifdef SDLAUDIO
-  initAudio();
-  #endif
     
   }
 
@@ -7941,9 +7935,6 @@ void mainloopiter() {
     targetclick = true;
     }
   
-#ifdef SDLAUDIO
-  if(audio) handlemusic();
-#endif
   SDL_Event ev;
   DEBB(DF_GRAPH, (debugfile,"polling for events\n"));
 
