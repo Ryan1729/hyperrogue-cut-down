@@ -130,9 +130,6 @@ namespace whirlwind {
       if(whirlline[i]->item)
         animateMovement(whirlline[i+1], whirlline[i], LAYER_BOAT);
       }
-    for(int i=0; i<z; i++) 
-      if(isPlayerOn(whirlline[i]) && whirlline[i]->item)
-        collectItem(whirlline[i], true);
     }
   
   void move() {
@@ -1916,8 +1913,6 @@ void livecaves() {
     else if(c->land == laLivefjord) {
       if(c->aitmp > 0 && c->wall == waStrandedBoat) c->wall = waBoat;
       if(c->aitmp > 0 && c->wall == waNone) {
-        if(c->item && c->cpdist == 1 && markOrb(itOrbWater))
-          collectItem(c);
         c->wall = waSea;
         }
       if(c->aitmp < 0 && c->wall == waBoat) c->wall = waStrandedBoat;

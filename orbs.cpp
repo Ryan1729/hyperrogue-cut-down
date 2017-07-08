@@ -576,7 +576,7 @@ void jumpTo(cell *dest, eItem byWhat, int bonuskill = 0, eMonster dashmon = moNo
   stabbingAttack(c1, dest, moPlayer, bonuskill);
   playerMoveEffects(c1, dest);
   if(cwt.c->item != itOrbYendor && cwt.c->item != itHolyGrail)
-    collectItem(cwt.c, true);
+
     
   if(byWhat == itOrbFrog) {
     useupOrb(itOrbFrog, 5);
@@ -636,7 +636,7 @@ void telekinesis(cell *dest) {
     }    
 
   moveItem(dest, cwt.c, true);
-  collectItem(cwt.c, true);
+
   useupOrb(itOrbSpace, cost);
 
   createNoise(3);

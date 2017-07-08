@@ -1490,7 +1490,7 @@ void movePlayer(monster *m, int delta) {
         toggleGates(c2, c2->wall);
   
       if(c2->item == itOrbYendor) yendor::check(c2);
-      collectItem(c2);
+
       }
     }
 
