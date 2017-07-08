@@ -185,7 +185,7 @@ void handleConfig(int sym, int uni) {
     else if(uni == '7') vid.scfg.subconfig = 8;
     else if(uni == 'j') vid.scfg.subconfig = SCJOY;
     else if(uni == 'a') multi::alwaysuse = !multi::alwaysuse;
-    else if(uni == 'b') cmode = emJoyConfig;
+
     else if(uni == 'r') 
       for(int i=0; i<MAXPLAYER; i++) 
         kills[i] = deaths[i] = treasures[i] = 0;
@@ -197,8 +197,8 @@ void handleConfig(int sym, int uni) {
       if(vid.scfg.players <= 0) vid.scfg.players += MAXPLAYER;
       }
     else if(sym == SDLK_F1 || uni == '?' || uni == 'h') {
-      lastmode = cmode;
-      cmode = emHelp;
+
+
 
       /* help = 
         "In the shmup (shoot'em up) mode, you can play a hyperbolic shoot'em up "
@@ -240,7 +240,7 @@ help += XLAT("This menu can be also used to configure keys.\n\n");
         
       }
     else if(uni || sym == SDLK_F10) {
-      cmode = emNormal;
+
       if(shmup::on != shmupcfg) { restartGame('s'); resetScores(); }
       else if(vid.scfg.players != players) { restartGame(); resetScores(); }
       }

@@ -359,28 +359,6 @@ struct videopar {
 
 extern videopar vid;
 
-enum emtype {emNormal, emHelp, 
-  emMenu,
-  emVisual1, emVisual2, 
-  emChangeMode, emCustomizeChar,
-  emQuit, emDraw, emScores, emPickEuclidean, 
-  emPickScores, 
-  emShmupConfig,
-  emMapEditor,
-  emPatternPicker,
-  emOverview,
-  emNetgen,
-  emYendor, emTactic, emRugConfig,
-  emConformal,
-  emProgress,
-  emCheatMenu, emLeader,
-  emJoyConfig,
-  emColor, emNumber,
-  em3D, emRogueviz
-  };
- 
-extern emtype cmode, lastmode;
-
 extern transmatrix View; // current rotation, relative to viewctr
 extern transmatrix cwtV; // player-relative view
 

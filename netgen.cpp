@@ -668,7 +668,7 @@ namespace netgen {
       loadData(); 
       if(!loaded) { 
         addMessage(XLAT("Failed to load the file 'papermodeldata.txt'"));
-        cmode = emNormal;
+
         return;
         }
       if(!created) {
@@ -699,8 +699,6 @@ namespace netgen {
       }
     else if(uni == 'd') designNet();
     else if(uni == 't') mode = 2;
-    else if(uni || sym == SDLK_F10)
-      cmode = emNormal;
     }
     
   }

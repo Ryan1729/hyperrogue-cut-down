@@ -505,22 +505,22 @@ namespace yendor {
       challenge = uni-'a' + 1;
       if(levelUnlocked(challenge) || autocheat) {
         restartGame(yendor::on ? 0 : 'y');
-        cmode = emNormal;
+
         }
       else 
         addMessage("Collect 10 treasures in various lands to unlock the challenges there");
       }
     else if(uni == '0') {
       if(yendor::on) restartGame('y');
-      cmode = emNormal;
+
       }
     else if(uni == '1') easy = !easy;
     else if(uni == '2' || sym == SDLK_F1) {
-      lastmode = cmode;
-      cmode = emHelp;
+
+
       help = chelp;
       }
-    else if(uni) cmode = emNormal;
+
     }
   };
 
@@ -701,16 +701,16 @@ namespace tactic {
     if(uni >= 1000 && uni < 1000 + LAND_TAC) {
       firstland = euclidland = getLandById(uni - 1000);
       restartGame(tactic::on ? 0 : 't');
-      cmode = emNormal;
+
       }
     else if(uni == '0') {
-      cmode = emNormal;
+
       firstland = laIce;
       if(tactic::on) restartGame('t');
       }
     else if(sym == SDLK_F1) {
-      lastmode = cmode;
-      cmode = emHelp;
+
+
       help = 
         "In the pure tactics mode, you concentrate on a specific land. "
         "Your goal to obtain as high score as possible, without using "
@@ -736,7 +736,7 @@ namespace tactic {
         
       }
     else if(dialog::handlePageButtons(uni)) ;
-    else if(uni || sym == SDLK_F10) cmode = emNormal;
+
     }
   };
 

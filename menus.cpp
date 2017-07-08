@@ -165,14 +165,9 @@ void showMainMenu() {
 void handleMenuKey(int sym, int uni) {
   dialog::handleNavigation(sym, uni);
   if(sym == SDLK_F1 || sym == 'h') {
-    lastmode = cmode;
-    cmode = emHelp;
+
+
     }
-  else if(sym == 'c' && cheater)
-    cmode = emCheatMenu;
-  else if(sym == 'b') cmode = emVisual1;
-  else if(sym == 'a') cmode = emVisual2;
-  else if(sym == 'm') cmode = emChangeMode;
 #ifndef NOSAVE
   else if(sym == 't') loadScores();
 #endif
@@ -182,31 +177,31 @@ void handleMenuKey(int sym, int uni) {
       restartGame('E');
       vid.alpha = 999;
       vid.scale = 998;
-      cmode = emNormal;
+
       }
     else {
       restartGame('E');
       vid.alpha = 1;
       vid.scale = 1;
-      cmode = emNormal;
+
       }
     }
   else if(sym == 'r' || sym == SDLK_F5) {
     restartGame();
-    cmode = emNormal;
+
     }
   else if(sym == 'q' || sym == SDLK_F10) 
     quitmainloop = true;
   else if(sym == 'o') {
     clearMessages();
-    cmode = emOverview;
+
     }
   else if(sym == SDLK_ESCAPE) {
-    cmode = emQuit;
+
 
     }
   else if(uni || sym == SDLK_F10) {
-    cmode = emNormal;
+
     msgs.clear();
     }
   }
@@ -322,15 +317,15 @@ void handleVisual1(int sym, int uni) {
     setvideomode();
     }
   
-  if(xuni == 'v') cmode = emNormal;
-  if(sym == SDLK_F2) cmode = emVisual2;
+
+
   
   if(xuni == '7') { vid.darkhepta = !vid.darkhepta; }
   if(xuni == 'w') { vid.wallmode += 60 + (shiftmul > 0 ? 1 : -1); vid.wallmode %= 6; }
   if(xuni == 'm') { vid.monmode += 60 + (shiftmul > 0 ? 1 : -1); vid.monmode %= 6; }
   if(xuni == 'c') { vid.axes += 60 + (shiftmul > 0 ? 1 : -1); vid.axes %= 5; }
   
-  if(sym == SDLK_ESCAPE) cmode = emNormal;
+
   
 #ifndef NOTRANS
   if(xuni == 'l') {
@@ -340,7 +335,7 @@ void handleVisual1(int sym, int uni) {
     }
 #endif
   
-  if(xuni == 'g') cmode = emCustomizeChar;
+
 
   }
 
@@ -362,26 +357,6 @@ void showJoystickConfig() {
 
   dialog::addItem(XLAT("back"), 'v');
   dialog::display();
-  }
-
-void handleJoystickConfig(int sym, int uni) {
-  dialog::handleNavigation(sym, uni);
-  char xuni = uni | 96;
-  if(xuni == 'p') autojoy = !autojoy;
-  if(xuni == 'a') 
-    dialog::editNumber(vid.joyvalue, 0, 32768, 100, 4800, XLAT("first joystick: movement threshold"), "");
-  if(xuni == 'b') 
-    dialog::editNumber(vid.joyvalue2, 0, 32768, 100, 5600, XLAT("first joystick: execute movement threshold"), "");
-  if(xuni == 'c')
-    dialog::editNumber(vid.joypanthreshold, 0, 32768, 100, 2500, XLAT("second joystick: pan threshold"), "");
-  if(xuni == 'd') 
-    dialog::editNumber(vid.joypanspeed, 0, 1e-2, 1e-5, 1e-4, XLAT("second joystick: panning speed"), "");
-
-  if(xuni == 'v') 
-    cmode = emShmupConfig;
-  
-  if(sym == SDLK_F10) cmode = emNormal;
-  if(uni) cmode = emShmupConfig;
   }
 
 void show3D() {
@@ -551,9 +526,9 @@ void handle3D(int sym, int uni) {
   else if(uni == 'M') 
     pmodel = (pmodel == mdHyperboloid ? mdDisk : mdHyperboloid);
 
-  else if(uni) cmode = emVisual2;
+
   
-  if(cmode == emNumber) dialog::sidedialog = true;
+
   }
 
 void showVisual2() {
@@ -593,15 +568,15 @@ void handleVisual2(int sym, int uni) {
   char xuni = uni;
   if((xuni >= 'A' && xuni <= 'Z') || (xuni >= 1 && xuni <= 26)) xuni |= 32;
   
-  if(xuni == 'v' || sym == SDLK_F2 || sym == SDLK_ESCAPE) cmode = emNormal;
+
   
-  if(xuni == '3') cmode = em3D;
+
   
   if(xuni == 'c') 
     dialog::editNumber(vid.mobilecompasssize, 0, 100, 10, 20, XLAT("compass size"), "");
   
   if(sym == SDLK_F1 || sym == 'h')
-    lastmode = cmode, cmode = emHelp;
+
 
 #ifndef ONEGRAPH
   if(xuni == 'o' && shiftmul > 0) {
@@ -622,7 +597,7 @@ void handleVisual2(int sym, int uni) {
 #endif
 
   if(xuni == 'p') {
-    cmode = emShmupConfig; 
+
     multi::shmupcfg = shmup::on;
     }
   
@@ -693,105 +668,6 @@ void showChangeMode() {
   dialog::display();
   }
 
-void handleChangeMode(int sym, int uni) {
-  dialog::handleNavigation(sym, uni);    
-  char xuni = uni;
-  
-  if(xuni == 'v' || sym == SDLK_F2 || sym == SDLK_ESCAPE) cmode = emNormal;
-  
-  else if(uni == 'c') {
-    if(tactic::on && gold()) {
-      addMessage(XLAT("Not available in the pure tactics mode!"));
-      }
-    else if(!cheater) {
-      cheater++;
-      addMessage(XLAT("You activate your demonic powers!"));
-      addMessage(XLAT("Shift+F, Shift+O, Shift+T, Shift+L, Shift+U, etc."));
-      cmode = emNormal;
-      }
-    else {
-      cmode = emNormal;
-      firstland = princess::challenge ? laPalace : laIce;
-      restartGame();
-      }
-    }
-  
-  else if(xuni == 'e') {
-    cmode = emPickEuclidean;
-  }
-  else if(xuni == 'x') {
-    viewdists = !viewdists;
-    cmode = emNormal;
-    }
-  else if(xuni == 't') {
-    clearMessages();
-    cmode = emTactic;
-  }
-  else if(xuni == 'y') {
-    clearMessages();
-    if(yendor::everwon || autocheat)
-        cmode = emYendor;
-    else {
-      cmode = emHelp;
-      help = yendor::chelp;
-      lastmode = emChangeMode;
-      }
-    }
-  else if(xuni == '7')
-      restartGame('7');
-  else if(uni == 'a')
-      cmode = emConformal;
-  else if(uni == 'C') {
-    if(!chaosmode) {
-      cmode = emHelp;
-      help =
-      "In the Chaos mode, lands change very often, and "
-      "there are no walls between them. "
-      "Some lands are incompatible with this."
-      "\n\nYou need to reach Crossroads IV to unlock the Chaos mode.";
-      lastmode = chaosUnlocked ? emNormal : emChangeMode;
-      }
-    if(chaosUnlocked) restartGame('C');
-    }
-  else if(xuni == 'p') {
-    if(!princess::everSaved)
-      addMessage(XLAT("Save %the1 first to unlock this challenge!", moPrincess));
-    else {
-      restartGame('p');
-      cmode = emNormal;
-      }
-    }
-  else if(xuni == 's') {
-    multi::shmupcfg = shmup::on;
-    cmode = emShmupConfig;
-    }
-#ifndef NOMODEL
-  else if(xuni == 'n')
-    cmode = emNetgen;
-#endif
-  else if(xuni == 'h' && !shmup::on) {
-    if(hardcore && !canmove) { 
-      restartGame();
-      hardcore = false;
-      cmode = emNormal;
-      }
-    else if(hardcore && canmove) { hardcore = false; }
-    else { hardcore = true; canmove = true; hardcoreAt = turncount; }
-    if(hardcore)
-        addMessage("One wrong move, and it is game over!");
-    else
-        addMessage("Not so hardcore?");
-    if(pureHardcore()) cmode = emNormal;
-    }
-  else if(xuni == 'r') {
-    firstland = laIce;
-    restartGame('r');
-    cmode = emNormal;
-    }
-  else if(uni || sym == SDLK_F10)
-    cmode = emMenu;
-  }
-
 void showCheatMenu() {
   dialog::init("cheat menu");
   dialog::addItem(XLAT("return to the game"), ' ');
@@ -821,22 +697,6 @@ void showCheatMenu() {
   dialog::addItem(XLAT("switch ghost timer"), 'G'-64);
   dialog::addItem(XLAT("switch web display"), 'W'-64);
   dialog::display();
-  }
-
-void handleCheatMenu(int sym, int uni) {
-  dialog::handleNavigation(sym, uni);
-  if(uni != 0) {
-    applyCheat(uni);
-    if(uni == 'F' || uni == 'C' || uni == 'O' ||
-      uni == 'S' || uni == 'U' || uni == 'G' ||
-      uni == 'W' || uni == 'I' || uni == 'E' ||
-      uni == 'H' || uni == 'B' || uni == 'M' ||
-      uni == 'P' || uni == 'Y'-64 || uni == 'G'-64 ||
-      uni == ' ' || uni == 8 || uni == 13 ||
-      uni == SDLK_ESCAPE || uni == 'q' || uni == 'v' || sym == SDLK_ESCAPE ||
-      sym == SDLK_F10) 
-      cmode = emNormal;
-    }
   }
 
 void showCustomizeChar() {
@@ -890,7 +750,7 @@ void handleCustomizeChar(int sym, int uni) {
   if(xuni == 'd') switchcolor(cs.dresscolor, cat ? haircolors : dresscolors);
   if(xuni == 'f') switchcolor(cs.dresscolor2, dresscolors2);
   if(xuni == 'u') switchcolor(cs.uicolor, eyecolors);
-  if(xuni == 'v' || sym == SDLK_F2 || sym == SDLK_ESCAPE) cmode = emNormal;
+
   }
 
 int eupage = 0;
@@ -961,7 +821,7 @@ void handleEuclidean(int sym, int uni) {
   if(uni == '0') {
     targetgeometry = geometry;
     restartGame('g');
-    cmode = emNormal;
+
     }
   else if(uni == '5') {
     targetgeometry = eGeometry(1+targetgeometry);
@@ -978,7 +838,7 @@ void handleEuclidean(int sym, int uni) {
         restartGame('g');
       // disable PTM if chosen a land from the Euclidean menu
       if(tactic::on) restartGame('t');
-      cmode = emNormal;
+
       }
     else euclidland = laIce;
     }
@@ -994,10 +854,10 @@ void handleEuclidean(int sym, int uni) {
     "faithfully represented in Euclidean, so yo get more "
     "or less simplified versions of them. Choose Crossroads to play a game "
     "where many different lands appear.";
-    cmode = emHelp;
-    lastmode = emPickEuclidean;
+
+
     }
-  else if(uni || sym == SDLK_F10) cmode = emNormal;
+
   }
 
 
@@ -1088,7 +948,7 @@ void handleScoreKeys(int sym) {
     shiftScoreDisplay(-1);
   else if(sym == SDLK_RIGHT || sym == SDLK_KP6 || sym == 'l' || sym == 'd')
     shiftScoreDisplay(1);
-  else if(sym == 't') { mapeditor::infix = ""; cmode = emPickScores; }
+
   else if(sym == SDLK_UP || sym == 'k' || sym == 'w')
     scorefrom -= 5;
   else if(sym == SDLK_DOWN || sym == 'j' || sym == 'x')
@@ -1099,7 +959,7 @@ void handleScoreKeys(int sym) {
     scorefrom++;
   else if(sym == 's') sortScores(); 
   else if(sym == 'm') { scoremode++; scoremode %= 3; }
-  else if(sym != 0) cmode = emNormal;
+
   }
         
 bool monsterpage = false;
@@ -1110,11 +970,11 @@ void handlePickScoreKeys(int uni) {
   if(uni == 'm') monsterpage = !monsterpage; else
   if(uni >= '1' && uni <= '9') uni = uni + 1000 - '1';
   else if(uni >= 1000 && uni < 1000 + int(pickscore_options.size())) { 
-    cmode = emScores; 
+
     scoredisplay = pickscore_options[uni - 1000].second;
     }
   else if(mapeditor::editInfix(uni)) ;
-  else if(uni) cmode = emScores;
+
   }
         
 void showPickScores() {
@@ -1182,24 +1042,11 @@ void showHelp() {
     dialog::display();
     }
 
-void handleHelp(int sym, int uni) {
-  dialog::handleNavigation(sym, uni);
-  if(sym == SDLK_F1 && help != "@") 
-    help = "@";
-  else if(uni == 'c')
-    help = buildCredits();
-  else if(sym != 0 && sym != SDLK_F12)
-    cmode = lastmode;
-  }
-
 void handleQuit(int sym, int uni) {
   if(uni == 'r' || sym == SDLK_F5) {
-    restartGame(), cmode = emNormal;
+    restartGame();
     msgs.clear();
     }
-  else if(uni == 'v') cmode = emMenu;
-  else if(uni == SDLK_ESCAPE) cmode = canmove ? emNormal : emQuit;
-  else if(uni == 'o') setAppropriateOverview();
 #ifndef NOSAVE
   else if(uni == 't') {
     if(!canmove) restartGame();
@@ -1212,29 +1059,5 @@ void handleQuit(int sym, int uni) {
 
 
 void displayMenus() {
-  if(cmode == emJoyConfig) showJoystickConfig();
-  if(cmode == emOverview) showOverview();
-  if(cmode == emYendor) yendor::showMenu();
-  if(cmode == emChangeMode) showChangeMode();
-  if(cmode == emCustomizeChar) showCustomizeChar();
-  if(cmode == emConformal) conformal::show();
-  if(cmode == emTactic) tactic::showMenu();
-  if(cmode == emPickEuclidean) showEuclideanMenu();
-  if(cmode == emMenu) showMainMenu();
-  if(cmode == emCheatMenu) showCheatMenu();
-  if(cmode == emVisual1) showVisual1();
-  if(cmode == emVisual2) showVisual2();
-  if(cmode == emColor) dialog::drawColorDialog(*dialog::colorPointer);
-  if(cmode == emNumber) dialog::drawNumberDialog();
 
-#ifndef NOMODEL
-  if(cmode == emNetgen) netgen::show();
-#endif
-
-#ifndef NOSAVE
-  if(cmode == emScores) showScores();
-  if(cmode == emPickScores) showPickScores();
-#endif
-  if(cmode == emHelp) showHelp();
-  if(cmode == em3D) show3D();
   }

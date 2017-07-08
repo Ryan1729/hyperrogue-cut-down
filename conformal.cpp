@@ -418,9 +418,9 @@ namespace conformal {
       int siz = int(v.size());
       for(int j=1; j<siz-1; j++) {
         SDL_Surface *buffer = s;
-        emtype cm = cmode;
+
         s = sav; 
-        cmode = emProgress;
+
 
         char buf[128];
         sprintf(buf, "#%03d", segid);
@@ -429,7 +429,7 @@ namespace conformal {
         calcparam();
         vid.radius = bandhalf;
 
-        cmode = cm;
+
         s = buffer;
         viewctr.h = v[j]->base->master;
         viewctr.spin = 0; 
@@ -638,7 +638,7 @@ namespace conformal {
       dialog::editNumber(bandsegment, 500, 32000, 500, 16000, XLAT("band segment"), "");
     else if(sym == 'g') { dospiral = !dospiral; }
     else if(uni == 'f' && pmodel == mdBand && on) createImage(dospiral);
-    else if(sym == 'q' || sym == SDLK_ESCAPE || sym == '0') { cmode = emNormal; }
+
     else if(sym == 'i') { 
       if(canmove && !cheater) {
         addMessage("Enable cheat mode or GAME OVER to use this");

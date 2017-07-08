@@ -1715,7 +1715,7 @@ void killMonster(cell *c, eMonster who, flagtype deathflags) {
           princess::reviveAt = gold() + 20;
           }
         }
-      if(princess::challenge) showMissionScreen();
+
       }
     }
 

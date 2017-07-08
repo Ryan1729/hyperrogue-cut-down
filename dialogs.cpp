@@ -7,7 +7,7 @@ namespace dialog {
 
   void handleZooming(SDL_Event &ev) {
     using namespace zoom;
-    if(zoomoff || (cmode != emOverview && cmode != emTactic)) { 
+    if (zoomoff){
       zoomf = 1; shiftx = shifty = 0; zoomoff = false; return; 
       }
     if(ev.type == SDL_MOUSEBUTTONDOWN) {
@@ -422,16 +422,16 @@ namespace dialog {
     }
   
   int *colorPointer;
-  emtype lastmode;
+
   
   void openColorDialog(int& col, unsigned int *pal) {
     colorPointer = &col; palette = pal;
-    lastmode = cmode; cmode = emColor;
+
     }
   
   void handleColor(int sym, int uni) {
     int ret = handleKeyColor(sym, uni, *colorPointer);
-    if(ret) cmode = lastmode;
+
     }
   
   struct numberEditor {
@@ -471,7 +471,7 @@ namespace dialog {
     ne.dft = dft;
     ne.title = title;
     ne.help = help;
-    lastmode = cmode; cmode = emNumber;
+
     ne.scale = ne.inverse_scale = identity;
     ne.intval = NULL;
     ne.positive = false;
@@ -544,7 +544,7 @@ namespace dialog {
     if(ne.editwhat == &geom3::middetail && geom3::highdetail > geom3::middetail)
       geom3::highdetail = geom3::middetail;
     
-    if(lastmode == em3D) buildpolys(), resetGL();
+
     }
   
   void drawNumberDialog() {
@@ -560,7 +560,7 @@ namespace dialog {
 
     addBreak(100);
     
-    if(lastmode == em3D) ne.help = explain3D(ne.editwhat);
+
 
     if(ne.help != "") {
       addHelp(ne.help);
@@ -634,7 +634,7 @@ namespace dialog {
       ne.s = fts(vid.alpha);
       }
     else if(uni) {
-      cmode = lastmode;
+
       }
     }
 

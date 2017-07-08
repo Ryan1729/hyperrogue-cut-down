@@ -591,7 +591,7 @@ namespace princess {
         addMessage(XLAT("Congratulations! Your score is %1.", its(i->value)));
         achievement_gain("PRINCESS2");
 
-        showMissionScreen();
+
         }
       }
     }

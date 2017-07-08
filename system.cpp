@@ -1149,7 +1149,7 @@ bool applyCheat(char u, cell *c = NULL) {
       items[itOrbShield] += 1;
       cheater++; addMessage(XLAT("Orb power gained!"));
       canmove = true;
-      if(cmode == emQuit) cmode = emNormal;
+
       }
     return true;
     }

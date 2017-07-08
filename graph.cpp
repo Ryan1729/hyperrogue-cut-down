@@ -63,8 +63,6 @@ bool mousepressed = false;
 bool mousemoved = false;
 bool actonrelease = false;
 
-emtype cmode = emNormal, lastmode = emNormal; // last mode in Help
-
 // 
 int axestate;
 
@@ -3231,7 +3229,7 @@ void setcolors(cell *c, int& wcol, int &fcol) {
   if(c->wall == waAncientGrave || c->wall == waFreshGrave || c->wall == waThumperOn || c->wall == waThumperOff || c->wall == waBonfireOff)
     fcol = wcol;
     
-  if(c->land == laMinefield && c->wall == waMineMine && (cmode == emMapEditor || !canmove))
+  if(c->land == laMinefield && c->wall == waMineMine && !canmove)
     fcol = wcol = 0xFF4040;
 
   if(mightBeMine(c) && mineMarkedSafe(c))
@@ -3421,7 +3419,6 @@ bool openorsafe(cell *c) {
 #define Dark(x) darkena(x,0,0xFF)
 
 int gridcolor(cell *c1, cell *c2) {
-  if(cmode == emDraw) return Dark(0xFFFFFF);
   if(!c2)
     return 0x202020 >> darken;
   int rd1 = rosedist(c1), rd2 = rosedist(c2);
@@ -3592,12 +3589,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
   if(isPlayerOn(c)) {
     playerfound = true;
 
-/*   if(euclid)
-    return d * S84 / c->type;
-  else
-    return S42 - d * S84 / c->type;
-    cwtV = V * spin(-cwt.spin * 2*M_PI/c->type) * pispin; */
-
     if(multi::players > 1) {
       for(int i=0; i<numplayers(); i++) 
         if(playerpos(i) == c) {
@@ -3615,13 +3606,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       }
     }
   
-  /* if(cwt.c->land == laEdge) {   
-    if(c == chosenDown(cwt.c, 1, 0)) 
-      playerfoundL = c, cwtVL = V;
-    if(c == chosenDown(cwt.c, -1, 0)) 
-      playerfoundR = c, cwtVR = V;
-    } */
-
   if(1) {
   
     hyperpoint VC0 = tC0(V);
@@ -3654,11 +3638,9 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
         }
       }
 
-    // int col = 0xFFFFFF - 0x20 * c->maxdist - 0x2000 * c->cpdist;
-
     if(!buggyGeneration && c->mpdist > 8 && !cheater) return; // not yet generated
     
-    if(c->land == laNone && cmode == emMapEditor) {
+    if(c->land == laNone) {
       queuepoly(V, shTriangle, 0xFF0000FF);
       }
   
@@ -3694,12 +3676,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
         }
       }
   
-    // bool dothept = false;
 
-    /* if(pseudohept(c) && vid.darkhepta) {
-      col = gradient(0, col, 0, 0.75, 1);
-      } */
-      
     eItem it = c->item;
     
     bool hidden = itemHidden(c);
@@ -3710,7 +3687,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       hiddens = false;
       }
     
-    if(hiddens && cmode != emMapEditor)
+    if(hiddens)
       it = itNone;
 
     int icol = 0, moncol = 0xFF00FF;
@@ -4097,23 +4074,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
         qfloor(c, Vf, shFloor[ct6], darkena(fcol, fd, 0xFF));
         }
       // walls
-
-
-      if(cmode == emNumber && (dialog::editingDetail())) {
-        int col = 
-          dist0 < geom3::highdetail ? 0xFF80FF80 :
-          dist0 >= geom3::middetail ? 0xFFFF8080 :
-          0XFFFFFF80;
-#if 1
-        queuepoly(V, shHeptaMarker, darkena(col & 0xFFFFFF, 0, 0xFF));
-#else
-        char buf[64];
-        sprintf(buf, "%3.1f", float(dist0));
-        
-
-        queuestr(V, .6, buf, col);
-#endif
-        }
 
       if(realred(c->wall) && !wmspatial) {
         int s = snakelevel(c);
@@ -4736,14 +4696,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       }
     
     if(vid.grid) {
-      // sphere: 0.3948
-      // sphere heptagonal: 0.5739
-      // sphere trihepta: 0.3467
-      
-      // hyper trihepta: 0.2849
-      // hyper heptagonal: 0.6150
-      // hyper: 0.3798
-      
       if(purehepta) {
         double x = sphere?.645:.6150;
         for(int t=0; t<S7; t++) 
@@ -4820,11 +4772,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
         downspin = downspin * min(spd, (double)1);
         }
       }
-      
-  if(!inHighQual) {
-    
-    
-    }
     
     if(c->bardir != NODIR && c->bardir != NOBARRIERS && c->land != laHauntedWall &&
       c->barleft != NOWALLSEP_USED) {
@@ -4916,9 +4863,6 @@ void queuecircleat(cell *c, double rad, int col) {
 #define MOBON true
 
 void drawMarkers() {
-
-  if(darken || cmode == emNumber) return;
-
   if(!inHighQual) {
 
 #ifdef PANDORA
@@ -4996,7 +4940,7 @@ void drawMarkers() {
   monsterToSummon = moNone;
   orbToTarget = itNone;
 
-  if(mouseover && targetclick && cmode == emNormal) {
+  if(mouseover && targetclick) {
     orbToTarget = targetRangedOrb(mouseover, roCheck);
     if(orbToTarget == itOrbSummon) {
       monsterToSummon = summonedAt(mouseover);
@@ -5497,7 +5441,7 @@ void describeMouseover() {
   cell *c = mousing ? mouseover : playermoved ? NULL : centerover;
   string out = mouseovers;
   if(!c || instat || getcstat) { }
-  else if(cmode == emNormal || cmode == emQuit || cmode == emMapEditor) {
+  else {
     out = XLAT1(linf[c->land].name);
     help = generateHelpForLand(c->land);
         
@@ -5530,21 +5474,6 @@ void describeMouseover() {
       char buf[20]; sprintf(buf, " H=%d M=%d", c->landparam, c->mpdist); out += buf;
       }
     
-//  if(c->land == laBarrier)
-//    out += "(" + string(linf[c->barleft].name) + " / " + string(linf[c->barright].name) + ")";
-
-    // out += "(" + its(c->bardir) + ":" + string(linf[c->barleft].name) + " / " + string(linf[c->barright].name) + ")";
-    
-    // out += " MD"+its(c->mpdist);
-
-    // out += " WP:" + its(c->wparam);
-    // out += " rose:" + its(rosemap[c]/4) + "." + its(rosemap[c]%4);
-    // out += " MP:" + its(c->mpdist);
-    // out += " cda:" + its(celldistAlt(c));
-    
-    /* out += " DP=" + its(celldistance(c, cwt.c));
-    out += " DO=" + its(celldist(c));
-    out += " PD=" + its(c->pathdist); */
     if(webdisplay & 8) {
 
       out += " LP:" + itsh(c->landparam)+"/"+its(turncount);
@@ -5554,32 +5483,17 @@ void describeMouseover() {
       out += " D:" + its(c->mpdist);
       
       char zz[64]; sprintf(zz, " P%p", c); out += zz;
-      // out += " rv" + its(rosedist(c));
-  //  if(rosemap.count(c))
-  //    out += " rv " + its(rosemap[c]/8) + "." + its(rosemap[c]%8);
-  //  out += " ai" + its(c->aitmp);
+
       if(euclid) {
         for(int i=0; i<4; i++) out += " " + its(getEuclidCdata(c->master)->val[i]);
         out += " " + itsh(getBits(c));
         }
       else {
         for(int i=0; i<4; i++) out += " " + its(getHeptagonCdata(c->master)->val[i]);
-  //  out += " " + itsh(getHeptagonCdata(c->master)->bits);
+
         out += " " + fts(tortoise::getScent(getBits(c)));
         }
-      // itsh(getHeptagonCdata(c->master)->bits);
-  //  out += " barleft: " + s0 + dnameof(c->barleft);
-  //  out += " barright: " + s0 + dnameof(c->barright);
       }
-    
-    // char zz[64]; sprintf(zz, " P%p", c); out += zz;
-    
-    /* whirlwind::calcdirs(c);
-    for(int i=0; i<whirlwind::qdirs; i++) 
-      out += " " + its(whirlwind::dfrom[i]) + ":" + its(whirlwind::dto[i]); */
-    // out += " : " + its(whirlwinddir(c));
-    
-    
 
     if(randomPatternsMode)
       out += " " + describeRPM(c->land);
@@ -5590,26 +5504,6 @@ void describeMouseover() {
       out += " ("+its(short(x))+","+its(short(y))+")";
       }
       
-    // char zz[64]; sprintf(zz, " P%d", princess::dist(c)); out += zz;
-    // out += " MD"+its(c->mpdist);
-    // out += " H "+its(c->heat);
-    // if(c->type != 6) out += " Z"+its(c->master->zebraval);
-    // out += " H"+its(c->heat);
-    
-/*  // Hive debug
-    if(c->land == laHive) {
-      out += " [" + its(c->tmp) + " H" + its(int(c->heat));
-      if(c->tmp >= 0 && c->tmp < int(buginfo.size()) && buginfo[c->tmp].where == c) {
-        buginfo_t b(buginfo[c->tmp]);
-        for(int k=0; k<3; k++) out += ":" + its(b.dist[k]);
-        for(int k=0; k<3; k++) 
-        for(int i=0; i<int(bugqueue[k].size()); i++)
-          if(bugqueue[k][i] == c->tmp)
-            out += " B"+its(k)+":"+its(i);
-        }
-      out += "]";
-      } */
-  
     if(c->wall && 
       !((c->wall == waFloorA || c->wall == waFloorB || c->wall == waFloorC || c->wall == waFloorD) && c->item)) { 
       out += ", "; out += XLAT1(winf[c->wall].name); 
@@ -5675,52 +5569,7 @@ void describeMouseover() {
       help += s0 + "\n\n" + warpdesc;
 
     }
-  else if(cmode == emVisual1) {
-    if(getcstat == 'p') {
-      out = XLAT("0 = Klein model, 1 = Poincaré model");
-      if(vid.alpha < -0.5)
-        out = XLAT("you are looking through it!");
-      if(vid.alpha > 5)
-        out = XLAT("(press 'i' to approach infinity (Gans model)");
-      }
-    else if(getcstat == 'r') {
-      out = XLAT("simply resize the window to change resolution");
-      }
-    /* else if(getcstat == 'f') {
-      out = XLAT("[+] keep the window size, [-] use the screen resolution");
-      } */
-    else if(getcstat == 'a' && vid.sspeed > -4.99)
-      out = XLAT("+5 = center instantly, -5 = do not center the map");
-    else if(getcstat == 'a')
-      out = XLAT("press Space or Home to center on the PC");
-    else if(getcstat == 'w')
-      out = XLAT("also hold Alt during the game to toggle high contrast");
-    else if(getcstat == 'w' || getcstat == 'm')
-      out = XLAT("You can choose one of the several modes");
-    else if(getcstat == 'c')
-      out = XLAT("The axes help with keyboard movement");
-    else if(getcstat == 'g')
-      out = XLAT("Affects looks and grammar");
-    else if(getcstat == 's')
-      out = XLAT("Config file: %1", conffile);
-    else out = "";
-    }
-  else if(cmode == emVisual2) {
-    if(getcstat == 'p') {
-      if(autojoy) 
-        out = XLAT("joystick mode: automatic (release the joystick to move)");
-      if(!autojoy) 
-        out = XLAT("joystick mode: manual (press a button to move)");
-      }
-    else if(getcstat == 'e')
-      out = XLAT("You need special glasses to view the game in 3D");
-    else if(getcstat == 'f')
-      out = XLAT("Reduce the framerate limit to conserve CPU energy");
-    }
-  else if(cmode == emChangeMode) {
-    if(getcstat == 'h')
-      out = XLAT("One wrong move and it is game over!");
-    }
+
     
   mouseovers = out;
   
@@ -5940,7 +5789,7 @@ void drawthemap() {
   Uint8 *keystate = SDL_GetKeyState(NULL);
   lmouseover = mouseover;
   bool useRangedOrb = (!(vid.shifttarget & 1) && haveRangedOrb() && lmouseover && lmouseover->cpdist > 1) || (keystate[SDLK_RSHIFT] | keystate[SDLK_LSHIFT]);
-  if(!useRangedOrb && cmode != emMapEditor && DEFAULTCONTROL && !outofmap(mouseh)) {
+  if(!useRangedOrb && DEFAULTCONTROL && !outofmap(mouseh)) {
     void calcMousedest();
     calcMousedest();
     cellwalker cw = cwt; bool f = flipplayer;
@@ -6220,9 +6069,7 @@ void calcparam() {
     vid.ycenter = vid.yres - realradius - vid.fsize - (ISIOS ? 10 : 0);
     }
   else {
-    if(vid.xres >= vid.yres * 5/4-16 && dialog::sidedialog && cmode == emNumber) 
-      sidescreen = true;
-    if(viewdists && cmode == emNormal && vid.xres > vid.yres) sidescreen = true;
+    if(viewdists && vid.xres > vid.yres) sidescreen = true;
     if(sidescreen) vid.xcenter = vid.yres/2;
     }
 
@@ -6493,7 +6340,6 @@ void loadScores() {
     }
   fclose(f);
   addMessage(its(int(scores.size()))+" games have been recorded in "+scorefile);
-  cmode = emScores;
   boxid = 0; applyBoxes();
   scoresort = 2; reverse(scores.begin(), scores.end());
   scoremode = 0;
@@ -6506,18 +6352,6 @@ vector<pair<string, int> > pickscore_options;
 
 bool notgl = false;
 #endif
-
-void setAppropriateOverview() {
-  clearMessages();
-  if(tactic::on)
-    cmode = emTactic;
-  else if(yendor::on)
-    cmode = emYendor;
-  else if(geometry != gNormal)
-    cmode = emPickEuclidean;
-  else 
-    cmode = emOverview;
-  }
 
 ld textscale() { 
   return vid.fsize / (vid.radius * crossf) * (1+vid.alphax) * 2;
@@ -7018,7 +6852,7 @@ void drawscreen() {
 #ifdef GL
   if(vid.usingGL) setGLProjection();
 #endif
-  if(cmode != emHelp) help = "@";
+  help = "@";
   
   // SDL_LockSurface(s);
   // unsigned char *b = (unsigned char*) s->pixels;
@@ -7028,25 +6862,21 @@ void drawscreen() {
   if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
   
   if(!canmove) darken = 1;
-  if(cmode != emNormal && cmode != emDraw && cmode != emCustomizeChar) darken = 2;
-  if(cmode == emQuit && !canmove) darken = 0;
-  if(cmode == emOverview) darken = 16;
   
   if(sidescreen) darken = 0;
 
   if(hiliteclick && darken == 0 && mmmon) darken = 1;
-  if(cmode == emProgress) darken = 0;
 
-  if(conformal::includeHistory && cmode != emProgress) conformal::restore();
+  if(conformal::includeHistory) conformal::restore();
   
   if(darken >= 8) ;
   else drawfullmap();
 
-  if(conformal::includeHistory && cmode != emProgress) conformal::restoreBack();
+  if(conformal::includeHistory) conformal::restoreBack();
   
   getcstat = 0; inslider = false;
   
-  if(cmode == emNormal || cmode == emQuit) drawStats();
+  drawStats();
 
  
   // displaynum(vx,100, 0, 24, 0xc0c0c0, celldist(cwt.c), ":");
@@ -7054,17 +6884,14 @@ void drawscreen() {
   darken = 0;
   drawmessages();
   
-  if(cmode == emNormal) {
-    if(!canmove) showGameover();
-    }
   
-  if(cmode == emProgress) mouseovers = "";
+    if(!canmove) showGameover();
   
   displayMenus();
   
   describeMouseover();
 
-  if((havewhat&HF_BUG) && darken == 0 && (cmode == emNormal || cmode == emQuit)) for(int k=0; k<3; k++)
+  if((havewhat&HF_BUG) && darken == 0) for(int k=0; k<3; k++)
     displayfr(vid.xres/2 + vid.fsize * 5 * (k-1), vid.fsize*2,   2, vid.fsize, 
       its(hive::bugcount[k]), minf[moBug0+k].color, 8);
     
@@ -7084,7 +6911,7 @@ void drawscreen() {
       }
     }
 
-  if((minefieldNearby || tmines) && canmove && !items[itOrbAether] && darken == 0 && cmode == emNormal) {
+  if((minefieldNearby || tmines) && canmove && !items[itOrbAether] && darken == 0) {
     string s;
     if(tmines > 7) tmines = 7;
     int col = minecolors[tmines];
@@ -7105,16 +6932,11 @@ void drawscreen() {
       }
     }
 
-  if(cmode == emNormal || cmode == emVisual1 || cmode == emVisual2 || cmode == emChangeMode ) {
+
     if(tour::on) 
       displayButton(vid.xres-8, vid.yres-vid.fsize, XLAT("(ESC) tour menu"), SDLK_ESCAPE, 16);
     else
       displayButton(vid.xres-8, vid.yres-vid.fsize, XLAT("(v) menu"), 'v', 16);
-    }
-
-  if(cmode == emQuit) {
-    if(canmove) showGameover();
-    }
 
   // SDL_UnlockSurface(s);
 
@@ -7380,17 +7202,15 @@ void handleKeyQuit(int sym, int uni) {
 
   if(sym == SDLK_RETURN || sym == SDLK_F10) quitmainloop = true;
   else if(uni == 'r' || sym == SDLK_F5) {
-    restartGame(), cmode = emNormal;
+    restartGame();
     msgs.clear();
     }
   else if(sym == SDLK_UP || sym == SDLK_KP8) msgscroll++;
   else if(sym == SDLK_DOWN || sym == SDLK_KP2) msgscroll--;
   else if(sym == SDLK_PAGEUP || sym == SDLK_KP9) msgscroll+=5;
   else if(sym == SDLK_PAGEDOWN || sym == SDLK_KP3) msgscroll-=5;
-  else if(uni == 'v') cmode = emMenu;
   else if(sym == SDLK_HOME || sym == SDLK_F3 || (sym == ' ' && DEFAULTCONTROL)) 
     fullcenter();
-  else if(uni == 'o') setAppropriateOverview();
 #ifndef NOSAVE
   else if(uni == 't') {
     if(!canmove) restartGame();
@@ -7400,7 +7220,6 @@ void handleKeyQuit(int sym, int uni) {
   #endif
   
   else if((sym != 0 && sym != SDLK_F12) && !didsomething) {
-    cmode = emNormal;
     msgscroll = 0;
     msgs.clear();
     }
@@ -7476,9 +7295,9 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
       }
     if((sym == SDLK_DELETE || sym == SDLK_KP_PERIOD || sym == 'g') && uni != 'G' && uni != 'G'-64) 
       movepcto(MD_DROP, 1);
-    if(sym == 'm' && canmove && cmode == emNormal && (centerover == cwt.c ? mouseover : centerover))
+    if(sym == 'm' && canmove && (centerover == cwt.c ? mouseover : centerover))
       performMarkCommand(mouseover);
-    if(sym == 't' && uni != 'T' && uni != 'T'-64 && canmove && cmode == emNormal) {
+    if(sym == 't' && uni != 'T' && uni != 'T'-64 && canmove) {
       if(playermoved && items[itStrongWind]) {
         cell *c = whirlwind::jumpDestination(cwt.c);
         if(c) centerover = c;
@@ -7491,13 +7310,10 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
   if(sym == SDLK_KP5 && DEFAULTCONTROL) movepcto(-1, 1);
 
   if(sym == SDLK_F5) {
-    if(needConfirmation()) cmode = emQuit;
-    else restartGame();
+    restartGame();
     }
 
   if(sym == SDLK_ESCAPE) {
-    cmode = emQuit;
-
     if(!canmove) {
       addMessage(XLAT("GAME OVER"));
       addMessage(timeline());
@@ -7505,8 +7321,7 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     msgscroll = 0;
     }
   if(sym == SDLK_F10) {
-    if(needConfirmation()) cmode = emQuit;
-    else quitmainloop = true;
+    quitmainloop = true;
     }
   
   if(!canmove) {
@@ -7524,18 +7339,8 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     else if(sym == SDLK_PAGEDOWN || sym == SDLK_KP3) msgscroll-=5;
     }
   
-  if(uni == 'o') setAppropriateOverview();
-  
   if(sym == SDLK_HOME || sym == SDLK_F3 || (sym == ' ' && DEFAULTCONTROL)) 
     fullcenter();
-
-  if(sym == 'v') {
-    cmode = emMenu;
-    }
-
-  if(sym == SDLK_F2) {
-    cmode = emVisual1;
-    }
 
 #ifdef PANDORA
   if(ev.type == SDL_MOUSEBUTTONUP && sym == 0 && !rightclick) 
@@ -7558,18 +7363,12 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     else mousemovement();
     }
 
-  if(sym == SDLK_F1) {
-    lastmode = cmode;
-    cmode = emHelp;
-    }
-
-
   }
 
 void handlekey(int sym, int uni, extra& ev) {
 
 
-  if(((cmode == emNormal && canmove) || (cmode == emQuit && !canmove) || cmode == emDraw || cmode == emMapEditor) && DEFAULTCONTROL && !rug::rugged) {
+{
 #ifndef PANDORA
     if(sym == SDLK_RIGHT) { 
       if(conformal::on)
@@ -7648,15 +7447,11 @@ void mainloopiter() {
   ticks = SDL_GetTicks();
     
   int cframelimit = vid.framelimit;
-  if((cmode == emVisual1 || cmode == emVisual2 || cmode == emHelp || cmode == emQuit ||
-    cmode == emCustomizeChar || cmode == emMenu || cmode == emPickEuclidean ||
-    cmode == emScores || cmode == emPickScores) && cframelimit > 15)
-    cframelimit = 15;
   if(outoffocus && cframelimit > 10) cframelimit = 10;
   
   int timetowait = lastt + 1000 / cframelimit - ticks;
     
-  if((multi::alwaysuse || multi::players > 1) && cmode == emNormal)
+  if((multi::alwaysuse || multi::players > 1) )
     timetowait = 0, multi::handleMulti(ticks - lastt);
 
   if(vid.sspeed >= 5 && gmatrix.count(cwt.c) && !elliptic) {
@@ -7667,12 +7462,12 @@ void mainloopiter() {
   if(timetowait > 0)
     SDL_Delay(timetowait);
   else {
-    if(cmode != emOverview) {
+    
       if(playermoved && vid.sspeed > -4.99 && !outoffocus)
         centerpc((ticks - lastt) / 1000.0 * exp(vid.sspeed));
       if(panjoyx || panjoyy) 
         checkpanjoy((ticks - lastt) / 1000.0);
-      }
+    
     tortoise::updateVals(ticks - lastt);
     frames++;
     if(!outoffocus) {
@@ -7754,11 +7549,10 @@ void mainloopiter() {
     
     dialog::handleZooming(ev);
     
-    if(sym == SDLK_F1 && cmode == emNormal && playermoved)
+    if(sym == SDLK_F1 && playermoved)
       help = "@";
     
-    bool rollchange = 
-     cmode == emOverview && getcstat >= 2000 && cheater;
+    
 
     if(ev.type == SDL_MOUSEBUTTONDOWN) {
       flashMessages();
@@ -7766,31 +7560,11 @@ void mainloopiter() {
       mousing = true;
       actonrelease = true;
       if(ev.button.button==SDL_BUTTON_WHEELDOWN) {
-        if(cmode == (canmove ? emQuit : emNormal)) {
+
           sym = 1; msgscroll--; didsomething = true;
-          }
-        else 
-          if(cmode == emTactic || cmode == emYendor || cmode == emPickEuclidean ||
-            cmode == emLeader || cmode == emScores || cmode == emOverview)
-          if(!rollchange)
-            sym = uni = PSEUDOKEY_WHEELDOWN;
         }
       if(ev.button.button==SDL_BUTTON_WHEELUP) {
-        if(cmode == (canmove ? emQuit : emNormal)) {
           sym = 1; msgscroll++; didsomething = true;
-          }
-        else if(cmode == (canmove ? emNormal : emQuit) || cmode == emMapEditor || cmode == emDraw) {
-          ld jx = (mousex - vid.xcenter - .0) / vid.radius / 10;
-          ld jy = (mousey - vid.ycenter - .0) / vid.radius / 10;
-          playermoved = false;
-          View = gpushxto0(hpxy(jx, jy)) * View;
-          sym = 1;
-          }
-        else 
-          if(cmode == emTactic || cmode == emYendor || cmode == emPickEuclidean ||
-            cmode == emLeader || cmode == emScores || cmode == emOverview)
-          if(getcstat < 2000 || !cheater)
-            sym = uni = PSEUDOKEY_WHEELUP;
         }
       else if(ev.button.button == SDL_BUTTON_RIGHT) {
         sym = 1; didsomething = true;
@@ -7809,12 +7583,6 @@ void mainloopiter() {
         sym = 1, didsomething = true;
       else if(ev.button.button == SDL_BUTTON_LEFT && actonrelease) {
         sym = getcstat, uni = getcstat, shiftmul = getcshift;
-        }
-      else if(ev.button.button == SDL_BUTTON_WHEELUP && rollchange) {
-        sym = getcstat, uni = getcstat, shiftmul = getcshift, wheelclick = true;
-        }
-      else if(ev.button.button == SDL_BUTTON_WHEELDOWN && rollchange) {
-        sym = getcstat, uni = getcstat, shiftmul = -getcshift, wheelclick = true;
         }
       }
 
@@ -7842,16 +7610,13 @@ void mainloopiter() {
     handlekey(sym, uni, ev);
     
     if(ev.type == SDL_QUIT) {
-      if(needConfirmation() && cmode !=emQuit) cmode = emQuit;
-      else quitmainloop = true;
-      }
-
+       quitmainloop = true;
+       }
     }
   }
 
 void mainloop() {
   lastt = 0;
-  cmode = emNormal;
   while(!quitmainloop) mainloopiter();
   }
 
@@ -7870,11 +7635,6 @@ void cleargraphmemory() {
   mouseover = centerover = lmouseover = NULL;  
   for(int i=0; i<ANIMLAYERS; i++) animations[i].clear();
   gmatrix.clear(); gmatrix0.clear();
-  }
-
-void showMissionScreen() {
-  cmode = emQuit;
-  msgscroll = 0;
   }
 
 void resetGeometry() {
