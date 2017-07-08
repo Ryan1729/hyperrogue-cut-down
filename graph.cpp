@@ -7730,7 +7730,7 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
 
   if(sym == SDLK_ESCAPE) {
     cmode = emQuit;
-    achievement_final(false);
+
     if(!canmove) {
       addMessage(XLAT("GAME OVER"));
       addMessage(timeline());
@@ -7946,8 +7946,7 @@ void mainloopiter() {
 #endif
   SDL_Event ev;
   DEBB(DF_GRAPH, (debugfile,"polling for events\n"));
-  
-  achievement_pump();
+
   while(SDL_PollEvent(&ev)) {
     DEBB(DF_GRAPH, (debugfile,"got event type #%d\n", ev.type));
     int sym = 0;

@@ -124,7 +124,7 @@ void initAll() {
   }
 
 void finishAll() {
-  achievement_final(!items[itOrbSafety]);
+
   
 #ifndef NOSAVE
   saveStats();

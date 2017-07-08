@@ -266,7 +266,7 @@ void handleMenuKey(int sym, int uni) {
     }
   else if(sym == SDLK_ESCAPE) {
     cmode = emQuit;
-    achievement_final(false);
+
     }
   else if(uni || sym == SDLK_F10) {
     cmode = emNormal;

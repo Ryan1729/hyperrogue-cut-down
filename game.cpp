@@ -3537,7 +3537,7 @@ void killThePlayer(eMonster m, int id, flagtype flags) {
       multi::leaveGame(id);
     else {
       canmove = false;
-      achievement_final(true);
+
       msgscroll = 0;
       }
     }
@@ -5153,7 +5153,7 @@ bool checkNeedMove(bool checkonly, bool attacking) {
   else return false;
   if(hardcore) { 
     canmove = false;
-    achievement_final(true);
+
     msgscroll = 0;
     return false;
     }
@@ -5317,7 +5317,7 @@ void checkmove() {
         canmove = legalmoves[cwt.spin] = true;
   if(kills[moPlayer]) canmove = false;
   if(!canmove)
-    achievement_final(true);
+
   if(canmove && timerstopped) {
     timerstart = time(NULL);
     timerstopped = false;
@@ -5403,7 +5403,7 @@ void movecost(cell* from, cell *to) {
     if(items[itLotus] >= 10) achievement_gain("LOTUS2");
     if(items[itLotus] >= 25) achievement_gain("LOTUS3");
     if(items[itLotus] >= 50) achievement_gain("LOTUS4");
-    achievement_final(false);
+
     }
   
   if(celldist(to) == 0 && !usedSafety && gold() >= 100)

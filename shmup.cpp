@@ -2642,7 +2642,7 @@ void turn(int delta) {
     
       if(pc[i]->dead && !lastdead) {
         multi::deaths[i]++;
-        achievement_final(true);
+
         }
       lastdead = pc[i]->dead;
         

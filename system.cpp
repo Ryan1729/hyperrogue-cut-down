@@ -891,7 +891,7 @@ void restartGame(char switchWhat, bool push) {
     return;
     }
   else {
-    achievement_final(true);
+
   #ifndef NOSAVE
     saveStats();
   #endif
