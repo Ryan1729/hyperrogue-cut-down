@@ -357,7 +357,7 @@ inline int next_p2 (int a )
 void glError(const char* GLcall, const char* file, const int line) {
   GLenum errCode = glGetError();
   if(errCode!=GL_NO_ERROR) {
-    // fprintf(stderr, "OPENGL ERROR #%i: in file %s on line %i :: %s\n",errCode,file, line, GLcall);
+    fprintf(stderr, "OPENGL ERROR #%i: in file %s on line %i :: %s\n",errCode,file, line, GLcall);
     }
   }
 #define GLERR(call) glError(call, __FILE__, __LINE__)
@@ -7640,7 +7640,6 @@ void mainloopiter() {
   vid.monmode = 0;
   #endif
   #endif
-
   
   optimizeview();
 
