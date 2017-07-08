@@ -7723,8 +7723,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
 
   if(sym == SDLK_KP5 && DEFAULTCONTROL) movepcto(-1, 1);
 
-  // if(sym == SDLK_F4)  restartGameSwitchEuclid();
-
   if(sym == SDLK_F5) {
     if(needConfirmation()) cmode = emQuit;
     else restartGame();
@@ -7763,12 +7761,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
   
   if(sym == SDLK_HOME || sym == SDLK_F3 || (sym == ' ' && DEFAULTCONTROL)) 
     fullcenter();
-  
-/*      if(sym == SDLK_F6) {
-    View = spin(M_PI/2) * inverse(cwtV) * View;
-    if(flipplayer) View = pispin * View;
-    cmode = emDraw;
-    } */
 
   if(sym == 'v') {
     cmode = emMenu;
@@ -7863,34 +7855,8 @@ void handlekey(int sym, int uni, extra& ev) {
     IMAGESAVE(s, buf);
     addMessage(XLAT("Screenshot saved to %1", buf));
     }
-
-
-  if(cmode == emNormal) handleKeyNormal(sym, uni, ev);
-  else if(cmode == emMenu) handleMenuKey(sym, uni);
-  else if(cmode == emCheatMenu) handleCheatMenu(sym, uni);
-  else if(cmode == emVisual1) handleVisual1(sym, uni);
-  else if(cmode == emJoyConfig) handleJoystickConfig(sym, uni);
-  else if(cmode == emCustomizeChar) handleCustomizeChar(sym, uni);
-  else if(cmode == emVisual2) handleVisual2(sym, uni);
-  else if(cmode == emChangeMode) handleChangeMode(sym, uni);
-  else if(cmode == emShmupConfig) shmup::handleConfig(sym, uni);
-#ifndef NOMODEL
-  else if(cmode == emNetgen) netgen::handleKey(sym, uni);
-#endif
-#ifndef NOSAVE
-  else if(cmode == emScores) handleScoreKeys(sym);
-  else if(cmode == emPickScores) handlePickScoreKeys(uni);
-#endif
-  else if(cmode == emConformal) conformal::handleKey(sym, uni);
-  else if(cmode == emYendor) yendor::handleKey(sym, uni);
-  else if(cmode == emTactic) tactic::handleKey(sym, uni);
-  else if(cmode == emOverview) handleOverview(sym, uni);
-  else if(cmode == emPickEuclidean) handleEuclidean(sym, uni);
-  else if(cmode == emColor) dialog::handleColor(sym, uni);
-  else if(cmode == emNumber) dialog::handleNumber(sym, uni);      
-  else if(cmode == emHelp) handleHelp(sym, uni);    
-  else if(cmode == em3D) handle3D(sym, uni);
-  else if(cmode == emQuit) handleKeyQuit(sym, uni);
+    
+    handleKeyNormal(sym, uni, ev);
   }
 
 
