@@ -167,12 +167,6 @@ bool doesnotFall(cell *c) {
 
 bool doesFall(cell *c) { return !doesnotFall(c); }
 
-bool doesFallSound(cell *c) { 
-  if(c->land != laMotion && c->land != laZebra)
-
-  return !doesnotFall(c); 
-  }
-
 bool itemHidden(cell *c) {
   return isWatery(c) && !(shmup::on && shmup::boatAt(c));
   }
@@ -2944,7 +2938,7 @@ void playerMoveEffects(cell *c1, cell *c2) {
     mirror::createMirages(cwt.c, cwt.spin, moMirage);
     }
   
-  if(cellUnstable(c2) && !markOrb(itOrbAether)) doesFallSound(c2);
+
 
   if(c2->wall == waStrandedBoat && markOrb(itOrbWater))
     c2->wall = waBoat;
@@ -4938,8 +4932,8 @@ void moverefresh(bool turn = true) {
       fallMonster(c);
       }
 
-    if(c->monst && cellUnstable(c) && !ignoresPlates(c->monst) && !shmup::on) 
-      doesFallSound(c);
+    
+
     }
   }
 
@@ -5844,7 +5838,7 @@ void pushThumper(cell *th, cell *cto) {
     }
   if(cellUnstable(cto) && cto->land == laMotion) {
     addMessage(XLAT("%The1 falls!", waThumperOn));
-    doesFallSound(cto);
+
     }
   else if(cellUnstable(cto)) {
     addMessage(XLAT("%The1 fills the hole!", waThumperOn));
@@ -6011,11 +6005,7 @@ bool movepcto(int d, int subdir, bool checkonly) {
       cwstep(push);
       cwspin(push, 3 * -subdir);
       cwstep(push);
-/*    if(w == waBigStatue && push.c->type == 7) {
-        if(checkonly) return false;
-        addMessage(XLAT("%The1 is too heavy to put it back on the pedestal.", c2->wall));
-        return false;
-        } */
+
       if((!canPushThumperOn(push.c, c2, cwt.c) && c2->type == 7)) {
         cwstep(push);
         cwspin(push, 1 * -subdir);
@@ -6036,33 +6026,6 @@ bool movepcto(int d, int subdir, bool checkonly) {
       lastmovetype = lmPush; lastmove = cwt.c;
       pushThumper(c2, push.c);
       }
-
-/*  if((c2->wall == waBigStatue) && c2->type == 7 && !monstersnear(c2)) {
-      int q = 0;
-      for(int i=3; i<=4; i++) {
-        cellwalker push = cwt;
-        cwstep(push);
-        cwspin(push, i);
-        cwstep(push);
-        if(passable(push.c, c2, false, true)) q++;
-        }
-      if(!q) {
-        if(checkonly) return false;
-        addMessage(XLAT("No room to push %the1.", c2->wall));
-        return false;
-        }
-      if(checkonly) return true;
-      addMessage(XLAT("You push %the1.", c2->wall));
-      c2->wall = waNone;
-      for(int i=3; i<=4; i++) {
-        cellwalker push = cwt;
-        cwstep(push);
-        cwspin(push, i);
-        cwstep(push);
-        if(passable(push.c, c2, false, true)) 
-          push.c->wall = waBigStatue;
-        }
-      } */
 
     if(c2->item == itHolyGrail && roundTableRadius(c2) < newRoundTableRadius()) {
       if(checkonly) return false;
@@ -6499,8 +6462,7 @@ bool movepcto(int d, int subdir, bool checkonly) {
     swordAttackStatic();
     if(d == -2) 
       dropGreenStone(cwt.c);
-    if(cellUnstable(cwt.c) && !markOrb(itOrbAether))
-      doesFallSound(cwt.c);
+
     }
 
   invisfish = false;
