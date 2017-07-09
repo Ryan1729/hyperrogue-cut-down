@@ -515,50 +515,6 @@ namespace conformal {
     "ball model", "hyperboloid"
     };
   
-  void show() {
-    dialog::init(XLAT("conformal/history mode"));
-
-    dialog::addBoolItem(XLAT("include history"), (includeHistory), 'i');
-    
-    bool notconformal = (pmodel >= 5 && pmodel <= 6) || abs(vid.alpha-1) > 1e-3;
-
-    dialog::addSelItem(notconformal ? XLAT("model used (not conformal!)") : XLAT("model used"), XLAT(modelnames[pmodel]), 'm');
-    dialog::addSelItem(XLAT("rotation"), directions[pmodel][rotation&3], 'r');
-
-    if(pmodel == 4) {
-      dialog::addSelItem(XLAT("coefficient"), 
-        fts4(real(polygonal::coef[polygonal::coefid])), 'x');
-      dialog::addSelItem(XLAT("coefficient (imaginary)"), 
-        fts4(imag(polygonal::coef[polygonal::coefid])), 'y');
-      dialog::addSelItem(XLAT("which coefficient"), its(polygonal::coefid), 'n');
-      }
-
-    if(pmodel == 3) {
-      dialog::addSelItem(XLAT("polygon sides"), its(polygonal::SI), 'x');
-      dialog::addSelItem(XLAT("star factor"), fts(polygonal::STAR), 'y');
-      dialog::addSelItem(XLAT("degree of the approximation"), its(polygonal::deg), 'n');
-      }
-    
-    dialog::addBoolItem(XLAT("prepare the line animation"), (on), 'e');
-    if(on) dialog::addSelItem(XLAT("animation speed"), fts(lvspeed), 'a');
-    
-    dialog::addBoolItem(XLAT("render bands automatically"), (autoband), 'o');
-    if(autoband)
-      dialog::addBoolItem(XLAT("include history when auto-rendering"), (autobandhistory), 'j');
-    
-    bool renderable = on && pmodel == 2;
-    if(renderable || autoband) {
-      dialog::addSelItem(XLAT("band width"), "2*"+its(bandhalf), 'd');
-      dialog::addSelItem(XLAT("length of a segment"), its(bandsegment), 's');
-      dialog::addBoolItem(XLAT("spiral on rendering"), (dospiral), 'g');
-      if(renderable)
-        dialog::addItem(XLAT("render now (length: %1)", its(measureLength())), 'f');
-      }
-      
-    dialog::addItem(XLAT("exit this menu"), 'q');
-    dialog::display();
-    mouseovers = XLAT("see http://www.roguetemple.com/z/hyper/conformal.php");
-    }
 
   int ib = 0;
   ld compbuf;
@@ -570,7 +526,7 @@ namespace conformal {
     }
     
   void handleKey(int sym, int uni) {
-    dialog::handleNavigation(sym, uni);
+
     ib = 0;
   
     if(uni == 'e') {
@@ -602,40 +558,32 @@ namespace conformal {
         } */
       }
     else if(sym == 'x' && pmodel == mdPolygonal) {
-      dialog::editNumber(polygonal::SI, 3, 10, 1, 4, XLAT("polygon sides"), "");
-      dialog::sidedialog = true;
+
+
       }
     else if(sym == 'y' && pmodel == mdPolygonal) {
-      dialog::editNumber(polygonal::STAR, -1, 1, .1, 0, XLAT("star factor"), "");
-      dialog::sidedialog = true;
+
+
       }
     else if(sym == 'n' && pmodel == mdPolygonal) {
-      dialog::editNumber(polygonal::deg, 2, MSI-1, 1, 2, XLAT("degree of the approximation"), "");
-      dialog::sidedialog = true;
+
+
       }
     else if(sym == 'x' && pmodel == mdPolynomial)  {
       polygonal::maxcoef = max(polygonal::maxcoef, polygonal::coefid);
       int ci = polygonal::coefid + 1;
       compbuf = real(polygonal::coef[polygonal::coefid]);
-      dialog::editNumber(compbuf, -10, 10, .01/ci/ci, 0, XLAT("coefficient"), "");
+
       ib = 1;
       }
     else if(sym == 'y' && pmodel == mdPolynomial) {
       polygonal::maxcoef = max(polygonal::maxcoef, polygonal::coefid);
       int ci = polygonal::coefid + 1;
       compbuf = imag(polygonal::coef[polygonal::coefid]);
-      dialog::editNumber(compbuf, -10, 10, .01/ci/ci, 0, XLAT("coefficient (imaginary)"), "");
+
       ib = 2;
       }
-    else if(sym == 'n' && pmodel == mdPolynomial)
-      dialog::editNumber(polygonal::coefid, 0, MSI-1, 1, 0, XLAT("which coefficient"), "");
     else if(sym == 'r') rotation += (shiftmul > 0 ? 1:3);
-    else if(sym == 'a') 
-      dialog::editNumber(lvspeed, -5, 5, .1, 1, XLAT("animation speed"), "");
-    else if(sym == 'd') 
-      dialog::editNumber(bandhalf, 5, 1000, 5, 200, XLAT("band width"), "");
-    else if(sym == 's') 
-      dialog::editNumber(bandsegment, 500, 32000, 500, 16000, XLAT("band segment"), "");
     else if(sym == 'g') { dospiral = !dospiral; }
     else if(uni == 'f' && pmodel == mdBand && on) createImage(dospiral);
 

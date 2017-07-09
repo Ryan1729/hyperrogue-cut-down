@@ -649,20 +649,20 @@ namespace netgen {
         }
       }
     if(mode != 2) {
-      dialog::init("paper model creator");
 
-      dialog::addItem(XLAT("synchronize net and map"), 's');
-      dialog::addItem(XLAT("display the scope"), 't');  
-      dialog::addItem(XLAT("create the model"), 'c');
-      dialog::addItem(XLAT("back to HyperRogue"), 'q');
-      dialog::addItem(XLAT("design the net"), 'd');
+
+
+
+
+
+
       
-      dialog::display();
+
       }
     }
   
   void handleKey(int sym, int uni) {
-    dialog::handleNavigation(sym, uni);
+
 
     if(!loaded) { 
       loadData(); 

@@ -754,67 +754,6 @@ bool againstCurrent(cell *w, cell *from);
 
 extern bool timerghost;
 
-#ifdef PANDORA
-#define MENU_SCALING
-#endif
-
-#ifdef MOBILE
-#define MENU_SCALING
-#endif
-
-#ifdef MENU_SCALING
-#define displayfrZ dialog::displayzoom
-#else
-#define displayfrZ displayfr
-#endif
-
-namespace dialog {
-
-  enum tDialogItem {diTitle, diItem, diBreak, diHelp, diInfo, diSlider};
-
-  struct item {
-    tDialogItem type;
-    string body;
-    string value;
-    string keycaption;
-    int key;
-    int color, colorv, colork, colors, colorc;
-    int scale;
-    double param;
-    };
-
-  item& lastItem();
-  
-  void addSelItem(string body, string value, int key);
-  void addBoolItem(string body, bool value, int key);
-  void addColorItem(string body, int value, int key);
-  void addHelp(string body);
-  void addInfo(string body, int color = 0xC0C0C0);
-  void addItem(string body, int key);
-  void addBreak(int val);  
-  void addTitle(string body, int color, int scale);
-  
-  void init();
-  void init(string title, int color = 0xE8E8E8, int scale = 150, int brk = 60);
-  void display();
-
-  void drawColorDialog(int color);
-  int handleKeyColor(int sym, int uni, int& color);
-
-  void editNumber(ld& x, ld vmin, ld vmax, ld step, ld dft, string title, string help);
-  void editNumber(int& x, int vmin, int vmax, int step, int dft, string title, string help);
-  void scaleLog();
-  void scaleSinh();
-  void handleNavigation(int &sym, int &uni);
-  bool displayzoom(int x, int y, int b, int size, const string &s, int color, int align);
-  bool editingDetail();
-
-  int handlePage(int& nl, int& nlm, int perpage);
-  void displayPageButtons(int i, bool pages);
-  bool handlePageButtons(int uni);
-  extern bool sidedialog;
-  }
-
 void checkStunKill(cell *dest);
 
 void clearMessages();

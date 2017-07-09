@@ -409,71 +409,7 @@ namespace yendor {
     };
   vector<scoredata> scoreboard;
 
-  void showMenu() {
-    int s = vid.fsize;
-    vid.fsize = vid.fsize * 4/5;
-    dialog::init(XLAT("Yendor Challenge"), iinf[itOrbYendor].color, 150, 100);
 
-    for(int i=1; i<YENDORLEVELS; i++) {
-      string s;
-      yendorlevel& ylev(levels[i]);
-      
-      if(autocheat || levelUnlocked(i)) {
-      
-        s = XLATT1(ylev.l);
-        
-        if(!euclid) {  
-          if(ylev.flags & YF_CHAOS) { s = "Chaos mode"; }
-          if(ylev.flags & YF_NEAR_IVY) { s += "+"; s += XLATT1(laJungle); }
-          if(ylev.flags & YF_NEAR_TENT) { s += "+"; s += XLATT1(laRlyeh); }
-          if(ylev.flags & YF_NEAR_ELEM) { s += "+"; s += XLATT1(laElementalWall); }
-          if(ylev.flags & YF_NEAR_OVER) { s += "+"; s += XLATT1(laOvergrown); }
-          if(ylev.flags & YF_NEAR_RED) { s += "+"; s += XLATT1(laRedRock); }
-          if(ylev.flags & YF_START_AL) { s += "+"; s += XLATT1(laAlchemist); }
-          if(ylev.flags & YF_DEAD) { s += "+"; s += XLATT1(itGreenStone); }
-          if(ylev.flags & YF_RECALL) { s += "+"; s += XLATT1(itOrbRecall); }
-          }
-        }
-
-      else {
-        s = "(locked)";
-        }
-      
-      string v;
-      if(bestscore[modecode()][i] == 1)
-        v = XLAT(" (won!)");
-      else if(bestscore[modecode()][i])
-        v = XLAT(" (won at level %1!)", its(bestscore[modecode()][i]));
-      
-      dialog::addSelItem(s, v, 'a' + i-1);
-      }
-
-    dialog::addBreak(60);
-    dialog::addItem(XLAT("Return to the normal game"), '0');
-    dialog::addSelItem(XLAT(
-      easy ? "Challenges do not get harder" : "Each challenge gets harder after each victory"),
-      " " + XLAT(easy ? "easy" : "challenge"), '1');
-    
-    dialog::display();
-    
-    int yc = getcstat - 'a' + 1;
-    if(yc > 0 && yc < YENDORLEVELS) {
-      subscoreboard scorehere;
-
-      for(int i=0; i<int(scoreboard.size()); i++) {
-        int sc = scoreboard[i].scores[yc];
-        if(sc > 0) 
-          scorehere.push_back(
-            make_pair(-sc, scoreboard[i].username));
-        }
-      
-      displayScore(scorehere, vid.xres / 4);
-      }
-
-    yendor::uploadScore();
-    vid.fsize = s;
-    }
-    
   const char *chelp = 
     "There are many possible solutions to the Yendor Quest. In the Yendor "
     "Challenge, you will try many of them!\n\n"    
@@ -500,7 +436,7 @@ namespace yendor {
     "each extra difficulty level.";
 
   void handleKey(int sym, int uni) {
-    dialog::handleNavigation(sym, uni);
+
     if(uni >= 'a' && uni < 'a'+YENDORLEVELS-1) {
       challenge = uni-'a' + 1;
       if(levelUnlocked(challenge) || autocheat) {
@@ -622,81 +558,6 @@ namespace tactic {
       land_tac[i].l;
     }
 
-  void showMenu() {
-    mouseovers = XLAT("pure tactics mode") + " - " + mouseovers;
-
-    nl = LAND_TAC; 
-    
-    if(euclid) nl = LAND_EUC;
-    if(sphere) nl = LAND_SPH;
-
-    int nlm;
-    int ofs = dialog::handlePage(nl, nlm, nl/2);
-        
-    int vf = min((vid.yres-64-vid.fsize) / nlm, vid.xres/40);
-    
-    int xr = vid.xres / 64;
-    
-    if(on) record(firstland, items[treasureType(firstland)]);
-    
-    int xc = modecode();
-    
-    getcstat = SDLK_ESCAPE;
-
-    for(int i=0; i<nl; i++) {
-      int i1 = i + ofs;
-      eLand l = getLandById(i1);
-
-      int i0 = 56 + i * vf;
-      int col;
-      
-      int ch = chances(l);
-
-      if(!ch) continue;
-      
-      bool unlocked = tacticUnlocked(i1);
-      
-      if(unlocked) col = linf[l].color; else col = 0x202020;
-      
-      if(displayfrZ(xr*1, i0, 1, vf-4, XLAT1(linf[l].name), col, 0) && unlocked) {
-        getcstat = 1000 + i1;
-        }
-        
-      if(unlocked || autocheat) {
-        for(int ii=0; ii<ch; ii++)
-          if(displayfrZ(xr*(24+2*ii), i0, 1, (vf-4)*4/5, lsc[xc][l][ii] >= 0 ? its(lsc[xc][l][ii]) : "-", col, 16)) 
-            getcstat = 1000 + i1;
-
-        if(displayfrZ(xr*(24+2*10), i0, 1, (vf-4)*4/5, 
-          its(recordsum[xc][l]) + " x" + its(tacmultiplier(l)), col, 0)) 
-            getcstat = 1000 + i1;
-        }
-      else {
-        int m = landMultiplier(l);
-        displayfrZ(xr*26, i0, 1, (vf-4)*4/5, 
-          XLAT("Collect %1x %2 to unlock", its((20+m-1)/m), treasureType(l)), 
-          col, 0);
-        }
-      }
-    
-    dialog::displayPageButtons(3, true);
-
-    uploadScore();
-    if(on) unrecord(firstland);
-    
-    if(getcstat >= 1000) {
-      int ld = land_tac[getcstat-1000].l;      
-      subscoreboard scorehere;
-      for(int i=0; i<int(scoreboard[xc].size()); i++) {
-        int sc = scoreboard[xc][i].scores[ld];
-        if(sc > 0) 
-          scorehere.push_back(
-            make_pair(-sc, scoreboard[xc][i].username));
-        }      
-      displayScore(scorehere, xr * 50);
-      }
-    }
-
   void handleKey(int sym, int uni) {
     if(uni >= 1000 && uni < 1000 + LAND_TAC) {
       firstland = euclidland = getLandById(uni - 1000);
@@ -735,7 +596,7 @@ namespace tactic {
         "Good luck, and have fun!";
         
       }
-    else if(dialog::handlePageButtons(uni)) ;
+
 
     }
   };

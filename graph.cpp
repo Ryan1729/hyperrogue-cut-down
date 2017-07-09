@@ -6135,138 +6135,6 @@ string timeline() {
   return XLAT("%1 turns (%2)", its(turncount), buf);
   }
 
-void showGameover() {
-
-  dialog::init(
-    cheater ? XLAT("It is a shame to cheat!") : 
-    showoff ? XLAT("Showoff mode") :
-    canmove && princess::challenge ? XLAT("%1 Challenge", moPrincess) :
-    canmove ? XLAT("Quest status") : 
-    XLAT("GAME OVER"), 
-    0xC00000, 200, 100
-    );
-  dialog::addInfo(XLAT("Your score: %1", its(gold())));
-  dialog::addInfo(XLAT("Enemies killed: %1", its(tkills())));
-
-  if(tour::on) ;
-  else if(items[itOrbYendor]) {
-    dialog::addInfo(XLAT("Orbs of Yendor found: %1", its(items[itOrbYendor])), iinf[itOrbYendor].color);
-    dialog::addInfo(XLAT("CONGRATULATIONS!"), iinf[itOrbYendor].color);
-    }
-  else {
-    if(princess::challenge) 
-      dialog::addInfo(XLAT("Follow the Mouse and escape with %the1!", moPrincess));
-    else if(gold() < 30)
-      dialog::addInfo(XLAT("Collect 30 $$$ to access more worlds"));
-    else if(gold() < 60)
-      dialog::addInfo(XLAT("Collect 60 $$$ to access even more lands"));
-    else if(!hellUnlocked())
-      dialog::addInfo(XLAT("Collect at least 10 treasures in each of 9 types to access Hell"));
-    else if(items[itHell] < 10)
-      dialog::addInfo(XLAT("Collect at least 10 Demon Daisies to find the Orbs of Yendor"));
-    else if(int(yendor::yi.size()) == 0)
-      dialog::addInfo(XLAT("Look for the Orbs of Yendor in Hell or in the Crossroads!"));
-    else 
-      dialog::addInfo(XLAT("Unlock the Orb of Yendor!"));
-    }
-  
-  if(!timerstopped && !canmove) {
-    savetime += time(NULL) - timerstart;
-    timerstopped = true;
-    }
-  if(canmove && !timerstart)
-    timerstart = time(NULL);
-  
-  if(princess::challenge) ;
-  else if(tkills() < 100)
-    dialog::addInfo(XLAT("Defeat 100 enemies to access the Graveyard"));
-  else if(kills[moVizier] == 0 && (items[itFernFlower] < 5 || items[itGold] < 5))
-    dialog::addInfo(XLAT("Kill a Vizier in the Palace to access Emerald Mine"));
-  else if(items[itEmerald] < 5)
-    dialog::addInfo(XLAT("Collect 5 Emeralds to access Camelot"));
-  else if(hellUnlocked() && !chaosmode) {
-    bool b = true;
-    for(int i=0; i<LAND_HYP; i++)
-      if(b && items[treasureType(land_hyp[i])] < 10) {
-        dialog::addInfo(
-          XLAT(
-            land_hyp[i] == laTortoise ? "Hyperstone Quest: collect at least 10 points in %the2" :
-            "Hyperstone Quest: collect at least 10 %1 in %the2", 
-            treasureType(land_hyp[i]), land_hyp[i]));
-        b = false;
-        }
-    if(b) 
-      dialog::addInfo(XLAT("Hyperstone Quest completed!"), iinf[itHyperstone].color);
-    }
-  else dialog::addInfo(XLAT("Some lands unlock at specific treasures or kills"));
-  if(cheater) {
-    dialog::addInfo(XLAT("you have cheated %1 times", its(cheater)), 0xFF2020);
-    }
-  if(!cheater) {
-    dialog::addInfo(timeline(), 0xC0C0C0);
-    }
-  
-  msgs.clear();
-  if(msgscroll < 0) msgscroll = 0;
-  int gls = int(gamelog.size()) - msgscroll;
-  int mnum = 0;
-  for(int i=gls-5; i<gls; i++) 
-    if(i>=0) {
-      msginfo m;
-      m.spamtype = 0;
-      m.flashout = true;
-      m.stamp = ticks-128*vid.flashtime-128*(gls-i);
-      m.msg = gamelog[i].msg;
-      m.quantity = gamelog[i].quantity;
-      mnum++,
-      msgs.push_back(m);
-      }
-
-  dialog::addBreak(100);
-  
-  bool intour = false;
-  
-
-  if(intour) {
-    if(canmove) {
-      dialog::addItem("spherical geometry", '1');
-      dialog::addItem("Euclidean geometry", '2');
-      dialog::addItem("more curved hyperbolic geometry", '3');
-      }
-    if(!items[itOrbTeleport])
-      dialog::addItem("teleport away", '4');
-    else if(!items[itOrbAether])
-      dialog::addItem("move through walls", '4');
-    else
-      dialog::addItem("flash", '4');
-    if(canmove) {
-      dialog::addItem("slide-specific command", '5');
-      dialog::addItem("static mode", '6');
-      dialog::addItem("enable/disable texts", '7');
-      dialog::addItem("next slide", SDLK_RETURN);
-      dialog::addItem("previous slide", SDLK_BACKSPACE);
-      }
-    else
-      dialog::addBreak(200);
-    dialog::addItem("main menu", 'v');
-    }
-  else {
-    dialog::addItem(canmove ? "continue" : "see how it ended", SDLK_ESCAPE);
-    dialog::addItem("main menu", 'v');
-    dialog::addItem("restart", SDLK_F5);
-    dialog::addItem(quitsaves() ? "save" : "quit", SDLK_F10);
-    #ifdef ANDROIDSHARE
-    dialog::addItem("SHARE", 's'-96);
-    #endif
-    }
-  
-  dialog::display();
-
-  if(mnum)
-    displayfr(vid.xres/2, vid.yres-vid.fsize*(mnum+1), 2, vid.fsize/2,  XLAT("last messages:"), 0xC0C0C0, 8);  
-  }
-
-
 #ifndef NOSAVE
 vector<score> scores;
 
@@ -6534,7 +6402,7 @@ bool displayglyph(int cx, int cy, int buttonsize, char glyph, int color, int qty
 
 void drawStats() {
   if(viewdists && sidescreen) {
-    dialog::init("");
+
     int qty[64];
     vector<cell*>& ac = currentmap->allcells();
     for(int i=0; i<64; i++) qty[i] = 0;
@@ -6551,22 +6419,22 @@ void drawStats() {
     if(geometry == gEuclid)
       for(int i=8; i<=15; i++) qty[i] = 6*i;
     for(int i=0; i<64; i++) if(qty[i])
-      dialog::addInfo(its(qty[i]), distcolors[i&7]);
+
     if(geometry == gNormal && !purehepta) {
-      dialog::addBreak(200);
-      dialog::addHelp("a(d+4) = a(d+3) + a(d+2) + a(d+1) - a(d)");
-      dialog::addInfo("a(d) ~ 1.72208^d", 0xFFFFFF);
+
+
+
       }
     if(geometry == gNormal && purehepta) {
-      dialog::addBreak(200);
-      dialog::addHelp("a(d+2) = 3a(d+1) - a(d+2)");
-      dialog::addInfo("a(d) ~ 2.61803^d", 0xFFFFFF);
+
+
+
       }
     if(geometry == gEuclid) {
-      dialog::addBreak(300);
-      dialog::addInfo("a(n) = 6n", 0xFFFFFF);
+
+
       }
-    dialog::display();
+
     }
   if(sidescreen) return;
   instat = false;
@@ -6840,8 +6708,6 @@ void drawfullmap() {
   profile_stop(2);
   }
 
-#include "menus.cpp"
-
 void drawscreen() {
 
   if(vid.xres == 0 || vid.yres == 0) return;
@@ -6883,11 +6749,6 @@ void drawscreen() {
 
   darken = 0;
   drawmessages();
-  
-  
-    if(!canmove) showGameover();
-  
-  displayMenus();
   
   describeMouseover();
 
@@ -7196,7 +7057,7 @@ bool didsomething;
 bool quitmainloop = false;
 
 void handleKeyQuit(int sym, int uni) {
-  dialog::handleNavigation(sym, uni);
+
   // ignore the camera movement keys
 
 
@@ -7450,9 +7311,6 @@ void mainloopiter() {
   if(outoffocus && cframelimit > 10) cframelimit = 10;
   
   int timetowait = lastt + 1000 / cframelimit - ticks;
-    
-  if((multi::alwaysuse || multi::players > 1) )
-    timetowait = 0, multi::handleMulti(ticks - lastt);
 
   if(vid.sspeed >= 5 && gmatrix.count(cwt.c) && !elliptic) {
     cwtV = gmatrix[cwt.c] * ddspin(cwt.c, cwt.spin);
@@ -7546,8 +7404,6 @@ void mainloopiter() {
       if(ev.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT)) shiftmul = -1;
       if(ev.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL)) shiftmul /= 10;
       }
-    
-    dialog::handleZooming(ev);
     
     if(sym == SDLK_F1 && playermoved)
       help = "@";
