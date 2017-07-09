@@ -6704,7 +6704,6 @@ void drawfullmap() {
   }
 
 void drawscreen() {
-
   if(vid.xres == 0 || vid.yres == 0) return;
 
   DEBB(DF_GRAPH, (debugfile,"drawscreen\n"));
@@ -6717,83 +6716,18 @@ void drawscreen() {
   
   if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
   
-
-  
-
-
-
-
   if(conformal::includeHistory) conformal::restore();
-  
-
   else drawfullmap();
 
   if(conformal::includeHistory) conformal::restoreBack();
   
   getcstat = 0; inslider = false;
 
-
-  drawmessages();
-  
-  describeMouseover();
-
-  if((havewhat&HF_BUG)) for(int k=0; k<3; k++)
-    displayfr(vid.xres/2 + vid.fsize * 5 * (k-1), vid.fsize*2,   2, vid.fsize, 
-      its(hive::bugcount[k]), minf[moBug0+k].color, 8);
-    
-  bool minefieldNearby = false;
-  int mines[4], tmines=0;
-  for(int p=0; p<numplayers(); p++) {
-    mines[p] = 0;
-    cell *c = playerpos(p);
-    if(!c) continue;
-    for(int i=0; i<c->type; i++) if(c->mov[i]) {
-      if(c->mov[i]->land == laMinefield) 
-        minefieldNearby = true;
-      if(c->mov[i]->wall == waMineMine) {
-        bool ep = false;
-        if(!ep) mines[p]++, tmines++;
-        }
-      }
-    }
-
-  if((minefieldNearby || tmines) && canmove && !items[itOrbAether]) {
-    string s;
-    if(tmines > 7) tmines = 7;
-    int col = minecolors[tmines];
-    
-    if(tmines == 7) seenSevenMines = true;
-    
-    for(int p=0; p<numplayers(); p++) if(multi::playerActive(p))
-      displayfr(vid.xres * (p+.5) / numplayers(),
-        vid.ycenter - vid.radius * 3/4, 2,
-        vid.fsize, 
-        XLAT(minetexts[mines[p]]), minecolors[mines[p]], 8);
-
-    if(minefieldNearby && cwt.c->land != laMinefield && cwt.c->mov[cwt.spin]->land != laMinefield) {
-      displayfr(vid.xres/2, vid.ycenter - vid.radius * 3/4 - vid.fsize*3/2, 2,
-        vid.fsize, 
-        XLAT("WARNING: you are entering a minefield!"), 
-        col, 8);
-      }
-    }
-
-
-    if(tour::on) 
-      displayButton(vid.xres-8, vid.yres-vid.fsize, XLAT("(ESC) tour menu"), SDLK_ESCAPE, 16);
-    else
-      displayButton(vid.xres-8, vid.yres-vid.fsize, XLAT("(v) menu"), 'v', 16);
-
-  // SDL_UnlockSurface(s);
-
   DEBT("swapbuffers");
 #ifdef GL
   if(vid.usingGL) SDL_GL_SwapBuffers(); else
 #endif
   SDL_UpdateRect(s, 0, 0, vid.xres, vid.yres);
-  
-//printf("\ec");
-
   }
 
 bool setfsize = true;
