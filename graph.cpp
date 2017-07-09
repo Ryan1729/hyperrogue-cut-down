@@ -6720,11 +6720,6 @@ void drawscreen() {
 #endif
   help = "@";
   
-  // SDL_LockSurface(s);
-  // unsigned char *b = (unsigned char*) s->pixels;
-  // int n = vid.xres * vid.yres * 4;
-  // while(n) *b >>= 1, b++, n--;
-  // memset(s->pixels, 0, vid.xres * vid.yres * 4);
   if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
   
   if(!canmove) darken = 1;
@@ -6741,11 +6736,6 @@ void drawscreen() {
   if(conformal::includeHistory) conformal::restoreBack();
   
   getcstat = 0; inslider = false;
-  
-  drawStats();
-
- 
-  // displaynum(vx,100, 0, 24, 0xc0c0c0, celldist(cwt.c), ":");
 
   darken = 0;
   drawmessages();
