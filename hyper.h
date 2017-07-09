@@ -289,7 +289,6 @@ void drawthemap();
 void drawfullmap();
 bool displaystr(int x, int y, int shift, int size, const char *str, int color, int align);
 
-extern int darken;
 void setvideomode();
 void calcparam();
 

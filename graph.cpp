@@ -125,8 +125,6 @@ string help;
 
 int andmode = 0;
 
-int darken = 0;
-
 struct fallanim {
   int t_mon, t_floor;
   eWall walltype;
@@ -137,7 +135,7 @@ struct fallanim {
 map<cell*, fallanim> fallanims;
 
 bool doHighlight() {
-  return (hiliteclick && darken < 2) ? !mmhigh : mmhigh;
+  return (hiliteclick) ? !mmhigh : mmhigh;
   }
 
 int& qpixel(SDL_Surface *surf, int x, int y) {
@@ -194,9 +192,6 @@ int gradient(int c0, int c1, ld v0, ld v, ld v1);
 
 
 int darkened(int c) {
-  // c = ((c & 0xFFFF) << 8) | ((c & 0xFF0000) >> 16);
-  // c = ((c & 0xFFFF) << 8) | ((c & 0xFF0000) >> 16);
-  for(int i=0; i<darken; i++) c &= 0xFEFEFE, c >>= 1;
   return c;
   }
 
@@ -636,7 +631,7 @@ bool displaystr(int x, int y, int shift, int size, const char *str, int color, i
   col.g = (color >> 8 ) & 255;
   col.b = (color >> 0 ) & 255;
   
-  col.r >>= darken; col.g >>= darken; col.b >>= darken;
+
 
   loadfont(size);
 
@@ -2231,12 +2226,12 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
 bool drawMonsterTypeDH(eMonster m, cell *where, const transmatrix& V, int col, bool dh, ld footphase) {
   if(dh) {
     poly_outline = OUTLINE_DEAD;
-    darken++;
+
     }
   bool b = drawMonsterType(m,where,V,col, footphase);
   if(dh) {
     poly_outline = OUTLINE_NONE;
-    darken--;
+
     }
   return b;
   }
@@ -3420,7 +3415,7 @@ bool openorsafe(cell *c) {
 
 int gridcolor(cell *c1, cell *c2) {
   if(!c2)
-    return 0x202020 >> darken;
+    return 0x202020;
   int rd1 = rosedist(c1), rd2 = rosedist(c2);
   if(rd1 != rd2) {
     int r = rd1+rd2;
@@ -5891,7 +5886,7 @@ void drawmovestar(double dx, double dy) {
     if(euclid)
       queueline(tC0(Centered), Centered * ddi0(d * 10.5, 0.5) , col, 0);
     else
-//    queueline(tC0(Centered), Centered * spin(M_PI*d/4)* xpush(d==0?.7:d==2?.6:.5) * C0, col >> darken);
+
       queueline(tC0(Centered), Centered * xspinpush0(M_PI*d/4, d==0?.7:d==2?.5:.2), col, 3);
     }
   }
@@ -6618,7 +6613,7 @@ void saveHighQualityShot(const char *fname) {
 
   dynamicval<SDL_Surface*> v5(s, SDL_CreateRGBSurface(SDL_SWSURFACE,vid.xres,vid.yres,32,0,0,0,0));
 
-  darken = 0;
+
 
   for(int i=0; i<(fname?1:2); i++) {
     SDL_FillRect(s, NULL, fname ? backcolor : i ? 0xFFFFFF : 0);
@@ -6699,7 +6694,7 @@ void drawfullmap() {
   /* if(vid.wallmode < 2 && !euclid && !mapeditor::whichShape) {
     int ls = int(lines.size());
     if(ISMOBILE) ls /= 10;
-    for(int t=0; t<ls; t++) queueline(View * lines[t].P1, View * lines[t].P2, lines[t].col >> (darken+1));
+
     } */
 
   drawthemap();
@@ -6722,27 +6717,27 @@ void drawscreen() {
   
   if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
   
-  if(!canmove) darken = 1;
-  
-  if(sidescreen) darken = 0;
 
-  if(hiliteclick && darken == 0 && mmmon) darken = 1;
+  
+
+
+
 
   if(conformal::includeHistory) conformal::restore();
   
-  if(darken >= 8) ;
+
   else drawfullmap();
 
   if(conformal::includeHistory) conformal::restoreBack();
   
   getcstat = 0; inslider = false;
 
-  darken = 0;
+
   drawmessages();
   
   describeMouseover();
 
-  if((havewhat&HF_BUG) && darken == 0) for(int k=0; k<3; k++)
+  if((havewhat&HF_BUG)) for(int k=0; k<3; k++)
     displayfr(vid.xres/2 + vid.fsize * 5 * (k-1), vid.fsize*2,   2, vid.fsize, 
       its(hive::bugcount[k]), minf[moBug0+k].color, 8);
     
@@ -6762,7 +6757,7 @@ void drawscreen() {
       }
     }
 
-  if((minefieldNearby || tmines) && canmove && !items[itOrbAether] && darken == 0) {
+  if((minefieldNearby || tmines) && canmove && !items[itOrbAether]) {
     string s;
     if(tmines > 7) tmines = 7;
     int col = minecolors[tmines];

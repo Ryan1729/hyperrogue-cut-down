@@ -315,7 +315,7 @@ namespace netgen {
     
     mode = 2;
 
-    darken = 0;
+
     SDL_FillRect(s, NULL, 0);
     drawfullmap();
 

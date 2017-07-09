@@ -1871,7 +1871,7 @@ namespace svg {
     vid.xres = vid.yres = svgsize ? svgsize : min(1 << (sightrange+7), 16384);
     calcparam();
     inHighQual = true; 
-    darken = 0;
+
     
     time_t timer;
     timer = time(NULL);
