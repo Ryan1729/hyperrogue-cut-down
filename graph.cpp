@@ -3632,8 +3632,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     
     if(c->land == laNone && c->wall == waNone) 
       queuepoly(V, shTriangle, 0xFFFF0000);
-
-    eItem it = c->item;
     
     bool hidden = itemHidden(c);
     bool hiddens = itemHiddenFromSight(c);
@@ -3642,14 +3640,8 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       hidden = true;
       hiddens = false;
       }
-    
-    if(hiddens)
-      it = itNone;
 
     int icol = 0, moncol = 0xFF00FF;
-    
-    if(it) 
-      ch = iinf[it].glyph, asciicol = icol = iinf[it].color;
     
     if(c->monst) {
       ch = minf[c->monst].glyph, moncol = minf[c->monst].color;
@@ -4311,7 +4303,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       else if(xch != '.' && xch != '+' && xch != '>' && xch != ':'&& xch != '-' && xch != ';' && c->wall != waSulphur && xch != ',')
         error = true;
       }
-    else if(!(it || c->monst || c->cpdist == 0)) error = true;
+    else if(!(c->monst || c->cpdist == 0)) error = true;
     
     int sha = shallow(c);
 
@@ -4405,27 +4397,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       else if(mines > 0)
         queuepoly(V, shMineMark[ct6], (minecolors[mines] << 8) | 0xFF);
       }
-    
-    // treasure
-    
-    char xch = iinf[it].glyph;
-    hpcshape *xsh = 
-      (it == itPirate || it == itKraken) ? &shPirateX :
-      (it == itBuggy || it == itBuggy2) ? &shPirateX :
-      it == itHolyGrail ? &shGrail :
-      isElementalShard(it) ? &shElementalShard :
-      (it == itBombEgg || it == itTrollEgg) ? &shEgg :
-      it == itDodeca ? &shDodeca :
-      xch == '*' ? &shGem[ct6] : 
-      it == itTreat ? &shTreat :
-      it == itSlime ? &shEgg :
-      xch == '%' ? &shDaisy : xch == '$' ? &shStar : xch == ';' ? &shTriangle :
-      xch == '!' ? &shTriangle : it == itBone ? &shNecro : it == itStatue ? &shStatue :
-      it == itIvory ? &shFigurine : 
-      xch == '?' ? &shBookCover : 
-      it == itKey ? &shKey : 
-      it == itRevolver ? &shGun :
-      NULL;
 
     if(c->land == laWhirlwind && c->wall != waBoat) {
       double footphase = 0;
@@ -4433,109 +4404,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       applyAnimation(c, Vboat0, footphase, LAYER_BOAT);
       }
     
-    if(it && cellHalfvine(c)) {
-      int i =-1;
-      for(int t=0;t<6; t++) if(c->mov[t] && c->mov[t]->wall == c->wall)
-        i = t;
-
-      Vboat = &(Vboat0 = *Vboat * ddspin(c, i) * xpush(-.13));
-      }
-    
-    if(doHighlight()) {
-      int k = itemclass(it);
-      if(k == IC_TREASURE)
-        poly_outline = OUTLINE_TREASURE;
-      else if(k == IC_ORB)
-        poly_outline = OUTLINE_ORB;
-      else
-        poly_outline = OUTLINE_OTHER;
-      }
-    
     if(conformal::includeHistory && eq(c->aitmp, sval)) poly_outline = OUTLINE_DEAD;
-      
-      
-    if(!mmitem && it)
-      error = true;
-    
-    else if(it == itBabyTortoise) {
-      int bits = tortoise::babymap[c];
-      int over = c->monst == moTortoise;
-      tortoise::draw(*Vboat * spin(ticks / 5000.) * ypush(crossf*.15), bits, over ? 4 : 2, 0);
-      }
-    
-    else if(it == itCompass) {
-      if(euclid) Vboat0 = (*Vdp) * spin(M_PI/2); // todo incorrect
-      else Vboat0 = *Vboat * rspintox(inverse(*Vboat) * pirateCoords);
-      Vboat0 = Vboat0 * spin(M_PI * sin(ticks/100.) / 30);
-      queuepoly(Vboat0, shCompass1, 0xFF8080FF);
-      queuepoly(Vboat0, shCompass2, 0xFFFFFFFF);
-      queuepoly(Vboat0, shCompass3, 0xFF0000FF);
-      queuepoly(Vboat0 * pispin, shCompass3, 0x000000FF);
-      xsh = NULL;
-      }
-
-    else if(it == itPalace) {
-      Vboat0 = *Vboat * spin(ticks / 1500.);
-      queuepoly(Vboat0, shMFloor3[ct6], 0xFFD500FF);
-      queuepoly(Vboat0, shMFloor4[ct6], darkena(icol, 0, 0xFF));
-      queuepoly(Vboat0, shGem[ct6], 0xFFD500FF);
-      xsh = NULL;
-      }
-    
-    else if(drawUserShape(*Vboat, 2, it, darkena(icol, 0, 0xFF))) ;
-    
-    else if(it == itRose) {
-      for(int u=0; u<4; u++)
-        queuepoly(*Vboat * spin(ticks / 1500.) * spin(2*M_PI / 3 / 4 * u), shRose, darkena(icol, 0, hidden ? 0x30 : 0xA0));
-      }
-
-    else if(it == itBarrow) {
-      for(int i = 0; i<c->landparam; i++)
-        queuepolyat(*Vboat * spin(2 * M_PI * i / c->landparam) * xpush(.15) * spin(ticks / 1500.), *xsh, darkena(icol, 0, hidden ? 0x40 : 
-          (highwall(c) && wmspatial) ? 0x60 : 0xFF),
-          PPR_HIDDEN);
-
-//      queuepoly(V*spin(M_PI+(1-2*ang)*2*M_PI/S84), shMagicSword, darkena(0xC00000, 0, 0x80 + 0x70 * sin(ticks / 200.0)));
-      }
-      
-    else if(xsh) {
-      if(it == itFireShard) icol = firecolor(100);
-      if(it == itWaterShard) icol = watercolor(100) >> 8;
-      
-      if(it == itZebra) icol = 0xFFFFFF;
-      if(it == itLotus) icol = 0x101010;
-    
-      queuepoly(*Vboat * spin(ticks / 1500.), *xsh, darkena(icol, 0, hidden ? (it == itKraken ? 0xC0 : 0x40) : 0xF0));
-
-      if(xsh == &shBookCover && mmitem)
-        queuepoly(*Vboat * spin(ticks / 1500.), shBook, 0x805020FF);
-      if(it == itZebra)
-        queuepolyat(*Vboat * spin(ticks / 1500. + M_PI/c->type), *xsh, darkena(0x202020, 0, hidden ? 0x40 : 0xF0), PPR_ITEMb);
-      }
-    
-    else if(xch == 'o') {
-      if(it == itOrbFire) icol = firecolor(100);
-      queuepoly(*Vboat, shDisk, darkena(icol, 0, hidden ? 0x20 : 0xC0));
-      if(it == itOrbFire) icol = firecolor(200);
-      if(it == itOrbFriend || it == itOrbDiscord) icol = 0xC0C0C0;
-      if(it == itOrbFrog) icol = 0xFF0000;
-      if(it == itOrbDash) icol = 0xFF0000;
-      if(it == itOrbFreedom) icol = 0xC0FF00;
-      if(it == itOrbAir) icol = 0xFFFFFF;
-      if(it == itOrbUndeath) icol = minf[moFriendlyGhost].color;
-      if(it == itOrbRecall) icol = 0x101010;
-      hpcshape& sh = 
-        isRangedOrb(it) ? shTargetRing :
-        isOffensiveOrb(it) ? shSawRing :
-        isFriendOrb(it) ? shPeaceRing :
-        isUtilityOrb(it) ? shGearRing :
-        isDirectionalOrb(it) ? shSpearRing :
-        it == itOrb37 ? shHeptaRing :
-        shRing;
-      queuepoly(*Vboat * spin(ticks / 1500.), sh, darkena(icol, 0, int(0x80 + 0x70 * sin(ticks / 300.))));
-      }
-
-    else if(it) error = true;
 
     if(true) {
       int q = ptds.size();
