@@ -3675,17 +3675,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       if(!mmitem) asciicol = moncol = cheater ? 0xFF3030 : 0xD0D0D0; 
       }
     
-    if(c->ligon) {
-      int tim = ticks - lightat;
-      if(tim > 1000) tim = 800;
-      if(elec::havecharge && tim > 400) tim = 400;
-      for(int t=0; t<c->type; t++) if(c->mov[t] && c->mov[t]->ligon) {
-        int hdir = displaydir(c, t);
-        int lcol = darkena(gradient(iinf[itOrbLightning].color, 0, 0, tim, 1100), 0, 0xFF);
-        queueline(V*ddi0(ticks, hexf/2), V*ddi0(hdir, crossf), lcol, 2);
-        }
-      }
-    
     int ct = c->type;
     int ct6 = K(c);
 
@@ -4472,7 +4461,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       int bits = tortoise::babymap[c];
       int over = c->monst == moTortoise;
       tortoise::draw(*Vboat * spin(ticks / 5000.) * ypush(crossf*.15), bits, over ? 4 : 2, 0);
-      // queuepoly(V, shHeptaMarker, darkena(tortoise::getMatchColor(bits), 0, 0xC0));
       }
     
     else if(it == itCompass) {
