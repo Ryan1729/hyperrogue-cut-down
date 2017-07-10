@@ -3668,15 +3668,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
         }
       
       asciicol = moncol;
-
-      if(isDragon(c->monst) || isKraken(c->monst)) if(!c->hitpoints)
-        asciicol = 0x505050;
-      
-      if(c->monst == moTortoise)
-        asciicol =  tortoise::getMatchColor(tortoise::getb(c));
-      
-      if(c->monst != moMutant) for(int k=0; k<c->stuntime; k++) 
-        asciicol = ((asciicol & 0xFEFEFE) >> 1) + 0x101010;
       }
     
     if(c->cpdist == 0 && mapeditor::drawplayer) { 
