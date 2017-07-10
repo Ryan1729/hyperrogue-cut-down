@@ -7024,16 +7024,7 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     if(sym == 'k' || sym == 'w' || sym == SDLK_KP8) movepckeydir(6);
     if(sym == 'u' || sym == 'e' || sym == SDLK_KP9) movepckeydir(7);
     }
-
-#ifdef PANDORA
-  if(DEFAULTCONTROL) {
-    if(sym == SDLK_RIGHT) movepckeydir(0);
-    if(sym == SDLK_LEFT) movepckeydir(4);
-    if(sym == SDLK_DOWN) movepckeydir(2 + (leftclick?1:0) - (rightclick?1:0));
-    if(sym == SDLK_UP) movepckeydir(6 - (leftclick?1:0) + (rightclick?1:0));
-    }
-#endif
-
+    
   if(DEFAULTCONTROL) {
     if(sym == '.' || sym == 's') movepcto(-1, 1);
     if(uni == '%' && sym == '5') { 
@@ -7069,8 +7060,6 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
         }
       if(uni == '9') {
         pmodel = eModel(8 - pmodel);
-        // vid.yshift = 1 - vid.yshift;
-        // vid.drawmousecircle = true;
         }
       }
     if((sym == SDLK_DELETE || sym == SDLK_KP_PERIOD || sym == 'g') && uni != 'G' && uni != 'G'-64) 
@@ -7104,45 +7093,15 @@ void handleKeyNormal(int sym, int uni, extra& ev) {
     quitmainloop = true;
     }
   
-  if(!canmove) {
-    if(sym == SDLK_RETURN) quitmainloop = true;
-    else if(uni == 'r') restartGame();
-#ifndef NOSAVE
-    else if(uni == 't') {
-      restartGame();
-      loadScores();
-      }
-#endif
-    else if(sym == SDLK_UP || sym == SDLK_KP8) msgscroll++;
-    else if(sym == SDLK_DOWN || sym == SDLK_KP2) msgscroll--;
-    else if(sym == SDLK_PAGEUP || sym == SDLK_KP9) msgscroll+=5;
-    else if(sym == SDLK_PAGEDOWN || sym == SDLK_KP3) msgscroll-=5;
-    }
-  
   if(sym == SDLK_HOME || sym == SDLK_F3 || (sym == ' ' && DEFAULTCONTROL)) 
     fullcenter();
-
-#ifdef PANDORA
-  if(ev.type == SDL_MOUSEBUTTONUP && sym == 0 && !rightclick) 
-#else
-  if(ev.type == SDL_MOUSEBUTTONDOWN && sym == 0 && !rightclick) 
-#endif
-  if(canmove && getcstat != 'v' && getcstat != 'g' && getcstat != SDLK_F1)
+    
+  if(ev.type == SDL_MOUSEBUTTONDOWN && sym == 0 && !rightclick && 
+    canmove && getcstat != 'v' && getcstat != 'g' && getcstat != SDLK_F1)
     {
     actonrelease = false;
-    
-    shmup::cpid = 0;
-    if(mouseover && 
-      targetclick && targetRangedOrb(mouseover, forcetarget ? roMouseForce : roMouse)) {
-      }
-    else if(forcetarget)
-      ;
-    else if(!DEFAULTCONTROL) {
-        multi::mousemovement(mouseover);
-      }
-    else mousemovement();
+    mousemovement();
     }
-
   }
 
 void handlekey(int sym, int uni, extra& ev) {
