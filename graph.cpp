@@ -3582,22 +3582,9 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
   // save the player's view center
   if(isPlayerOn(c)) {
     playerfound = true;
-
-    if(multi::players > 1) {
-      for(int i=0; i<numplayers(); i++) 
-        if(playerpos(i) == c) {
-          playerV = V * ddspin(c, multi::player[i].spin);
-          if(multi::player[i].mirrored) playerV = playerV * Mirror;
-          if(multi::player[i].mirrored == mirrored)
-            multi::whereis[i] = playerV;
-          }
-      }
-    else {
       playerV = V * ddspin(c, cwt.spin);
-      //  playerV = V * spin(displaydir(c, cwt.spin) * M_PI/S42);
       if(cwt.mirrored) playerV = playerV * Mirror;
       if(orig) cwtV = playerV;
-      }
     }
   
   if(1) {
@@ -3621,17 +3608,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       centerover = c;
       }
     
-    int orbrange = (items[itRevolver] ? 3 : 2);
-    
-    if(c->cpdist <= orbrange) if(multi::players > 1 || multi::alwaysuse) 
-    for(int i=0; i<multi::players; i++) if(multi::playerActive(i)) {
-      double dfc = intval(VC0, tC0(multi::crosscenter[i]));
-      if(dfc < multi::ccdist[i] && celldistance(playerpos(i), c) <= orbrange) {
-        multi::ccdist[i] = dfc;
-        multi::ccat[i] = c;
-        }
-      }
-
     if(!buggyGeneration && c->mpdist > 8 && !cheater) return; // not yet generated
     
     if(c->land == laNone) {
@@ -3646,12 +3622,9 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     if(viewdists) {
       int cd = celldistance(c, cwt.c);
       string label = its(cd);
-      // string label = its(fieldpattern::getriverdistleft(c)) + its(fieldpattern::getriverdistright(c));
       int dc = distcolors[cd&7];
       wcol = gradient(wcol, dc, 0, .4, 1);
       fcol = gradient(fcol, dc, 0, .4, 1);
-      /* queuepolyat(V, shFloor[ct6], darkena(gradient(0, distcolors[cd&7], 0, .25, 1), fd, 0xC0),
-        PPR_TEXT); */
       queuestr(V, (cd > 9 ? .6 : 1) * .2, label, 0xFF000000 + distcolors[cd&7], 1);
       }
 
@@ -3659,17 +3632,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     
     if(c->land == laNone && c->wall == waNone) 
       queuepoly(V, shTriangle, 0xFFFF0000);
-
-    if(c->wall == waThumperOn) {
-      int ds = ticks;
-      for(int u=0; u<5; u++) {
-        ld rad = hexf * (.3 * u + (ds%1000) * .0003);
-        int tcol = darkena(gradient(0xFFFFFF, 0, 0, rad, 1.5 * hexf), 0, 0xFF);
-        for(int a=0; a<S84; a++)
-          queueline(V*ddi0(a, rad), V*ddi0(a+1, rad), tcol, 0);
-        }
-      }
-  
 
     eItem it = c->item;
     
@@ -5688,74 +5650,28 @@ void drawthemap() {
   fanframe = ticks / (purehepta ? 300 : 150.0) / M_PI;
 
   keycell = NULL;
-    
-  using namespace yendor;
-  
-  if(yii < int(yi.size())) {
-    if(!yi[yii].found) 
-      for(int i=0; i<YDIST; i++) 
-        if(yi[yii].path[i]->cpdist <= sightrange) {
-      keycell = yi[yii].path[i];
-      keycelldist = YDIST - i;
-      }                                                                
-    }
   
   modist = 1e20; mouseover = NULL; 
   modist2 = 1e20; mouseover2 = NULL; 
   mouseovers = XLAT("Press F1 or right click for help");
   centdist = 1e20; centerover = NULL; 
 
-  for(int i=0; i<multi::players; i++) {
-    multi::ccdist[i] = 1e20; multi::ccat[i] = NULL;
-    }
-
   if(outofmap(mouseh)) 
     modist = -5;
   playerfound = false;
-  // playerfoundL = false;
-  // playerfoundR = false;
 
   sphereflip = Id;
-  profile_start(1);
-  if(euclid)
-    drawEuclidean();
-  else {
+
     if(sphere && vid.alpha > 1) sphereflip[2][2] = -1;
     maxreclevel = 
       conformal::on ? sightrange + 2:
       (!playermoved) ? sightrange+1 : sightrange + 4;
-    
+
     drawrec(viewctr, 
       maxreclevel,
-      hsOrigin, ypush(vid.yshift) * sphereflip * View);
-    }
-  
-
-  
-  profile_stop(1);
-  profile_start(4);
-  drawMarkers();
-  profile_stop(4);
-  drawFlashes();
+      hsOrigin, ypush(vid.yshift) * sphereflip * View);  
   
   lmouseover = mouseover;
-  
-  if(DEFAULTCONTROL && !outofmap(mouseh)) {
-    void calcMousedest();
-    calcMousedest();
-    cellwalker cw = cwt; bool f = flipplayer;
-    items[itWarning]+=2;
-    
-    bool recorduse[ittypes];
-    for(int i=0; i<ittypes; i++) recorduse[i] = orbused[i];
-    movepcto(mousedest.d, mousedest.subdir, true);
-    for(int i=0; i<ittypes; i++) orbused[i] = recorduse[i];
-    items[itWarning] -= 2;
-    if(multi::players == 1 && cw.spin != cwt.spin) mirror::spin(-mousedest.d);
-    cwt = cw; flipplayer = f;
-    lmouseover = mousedest.d >= 0 ? cwt.c->mov[(cwt.spin + mousedest.d) % cwt.c->type] : cwt.c;
-    }
-  profile_stop(0);
   }
 
 void spinEdge(ld aspd) { 
