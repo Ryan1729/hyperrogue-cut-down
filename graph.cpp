@@ -67,7 +67,6 @@ bool actonrelease = false;
 int axestate;
 
 int ticks;
-int frameid;
 
 videopar vid;
 int default_language;
@@ -5670,17 +5669,7 @@ void drawEuclidean() {
     }
   }
 
-void drawthemap() {
-
-  frameid++;
-
-  if(!cheater && !svg::in && !inHighQual) {
-    if(sightrange > 7) sightrange = 7;
-    overgenerate = false;
-    }
-  
-  profile_frame();
-  profile_start(0);
+void drawthemap() {  
   swap(gmatrix0, gmatrix);
   gmatrix.clear();
 
@@ -5697,27 +5686,8 @@ void drawthemap() {
 
   DEBB(DF_GRAPH, (debugfile,"draw the map\n"));
   fanframe = ticks / (purehepta ? 300 : 150.0) / M_PI;
-  
-  for(int m=0; m<motypes; m++) if(isPrincess(eMonster(m))) 
-    minf[m].name = princessgender() ? "Princess" : "Prince";
-    
-  iinf[itSavedPrincess].name = minf[moPrincess].name;
-
-  for(int i=0; i<NUM_GS; i++) {
-    genderswitch_t& g = genderswitch[i];
-    if(g.gender != princessgender()) continue;
-    minf[g.m].help = g.desc;
-    minf[g.m].name = g.name;
-    }
 
   keycell = NULL;
-
-  pirateTreasureFound = pirateTreasureSeek;
-  pirateTreasureSeek = NULL;
-  straightDownSeek = NULL; downspin = 0;
-  showPirateX = false;
-  for(int i=0; i<numplayers(); i++) if(multi::playerActive(i))
-    if(playerpos(i)->item == itCompass) showPirateX = true;
     
   using namespace yendor;
   
@@ -5768,23 +5738,9 @@ void drawthemap() {
   profile_stop(4);
   drawFlashes();
   
-  if(multi::players > 1) {
-
-      hyperpoint h;
-      for(int i=0; i<3; i++) h[i] = 0;
-      for(int p=0; p<multi::players; p++) if(multi::playerActive(p)) {
-        hyperpoint h1 = tC0(multi::whereis[p]);
-        for(int i=0; i<3; i++) h[i] += h1[i];
-        }
-      h = mid(h, h);
-      cwtV = rgpushxto0(h);
-      
-    }
-
-  Uint8 *keystate = SDL_GetKeyState(NULL);
   lmouseover = mouseover;
-  bool useRangedOrb = (!(vid.shifttarget & 1) && haveRangedOrb() && lmouseover && lmouseover->cpdist > 1) || (keystate[SDLK_RSHIFT] | keystate[SDLK_LSHIFT]);
-  if(!useRangedOrb && DEFAULTCONTROL && !outofmap(mouseh)) {
+  
+  if(DEFAULTCONTROL && !outofmap(mouseh)) {
     void calcMousedest();
     calcMousedest();
     cellwalker cw = cwt; bool f = flipplayer;
