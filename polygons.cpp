@@ -312,24 +312,10 @@ void glapplymatrix(const transmatrix& V) {
   glMultMatrixf(mat);
   }
 
-void gldraw(int useV, const transmatrix& V, int ps, int pq, int col, int outline) {    
-    if(useV == 1) {
+void gldraw(const transmatrix& V, int ps, int pq, int col, int outline) {    
       glMatrixMode(GL_MODELVIEW);
       glPushMatrix();
       glapplymatrix(V);
-      }
-      
-    if(useV == 2) {
-      glMatrixMode(GL_MODELVIEW);
-      glPushMatrix();
-      GLfloat mat[16] = {
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-        };
-      glMultMatrixf(mat);
-      }
       
     if(col) {
       glEnable(GL_STENCIL_TEST);
@@ -353,26 +339,17 @@ void gldraw(int useV, const transmatrix& V, int ps, int pq, int col, int outline
       glDrawArrays(GL_LINE_STRIP, ps, pq);
       }
  
-    if(useV) glPopMatrix();
-    
+    glPopMatrix();
   }
 
 void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outline) {
 #ifdef GL
   if(vid.usingGL) {
-    if(pmodel == mdDisk) {    
       const int pq = cnt;
       if(currentvertices != tab)
         activateVertexArray(tab, pq);
       const int ps=0;
-      gldraw(1, V, ps, pq, col, outline);    
-      }
-    else {
-      qglcoords = 0;
-      addpoly(V, tab, cnt);
-      activateGlcoords();    
-      gldraw(2, Id, 0, qglcoords, col, outline);
-      }
+      gldraw(V, ps, pq, col, outline);    
     return;
     }
 #endif
