@@ -36,7 +36,6 @@ bool first;
 bool fatborder;
 
 #define PSHIFT 0
-// #define STLSORT
 
 #define NEWSHAPE (-13.5)
 #define WOLF (-15.5)
@@ -387,23 +386,6 @@ void drawqueue() {
   for(int i = 0; i<siz; i++) ptds2[qp[ptds[i].prio]++] = &ptds[i];
 
 #endif
-  profile_stop(3);
-
-  if(vid.goteyes && !vid.usingGL) {
-
-    if(aux && (aux->w != s->w || aux->h != s->h))
-      SDL_FreeSurface(aux);
-  
-    if(!aux) {
-      aux = SDL_CreateRGBSurface(SDL_SWSURFACE,s->w,s->h,32,0,0,0,0);
-      }
-
-    // SDL_LockSurface(aux);
-    // memset(aux->pixels, 0, vid.xres * vid.yres * 4);
-    // SDL_UnlockSurface(aux);
-    SDL_BlitSurface(s, NULL, aux, NULL);
-    }
-  
   for(int i=0; i<siz; i++) {
 
 #ifdef STLSORT
@@ -411,9 +393,6 @@ void drawqueue() {
 #else
     polytodraw& ptd (*ptds2[i]);
 #endif
-
-
-    // if(ptd.prio == 46) printf("eye size %d\n", polyi);
     
     if(ptd.kind == pkResetModel) {
       pmodel = eModel(ptd.col);
@@ -444,21 +423,6 @@ void drawqueue() {
       drawCircle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
       }
     }
-
-  if(vid.goteyes && !vid.usingGL) {
-    int qty = s->w * s->h;
-    int *a = (int*) s->pixels;
-    int *b = (int*) aux->pixels;
-    SDL_LockSurface(aux);
-    while(qty) {
-      *a = ((*a) & 0xFF0000) | ((*b) & 0x00FFFF);
-      a++; b++; qty--;
-      }
-    SDL_UnlockSurface(aux);
-    }
-
-
-
 #endif
 
   setcameraangle(false);
@@ -687,7 +651,6 @@ void buildpolys() {
   geom3::compute();
   DEBB(DF_INIT, (debugfile,"buildpolys\n"));
 
-  // printf("crossf = %f euclid = %d sphere = %d\n", float(crossf), euclid, sphere);
   qhpc = 0;
 
   bshape(shMovestar, PPR_MOVESTAR);
