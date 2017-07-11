@@ -950,7 +950,6 @@ int dlit;
 
 transmatrix View; // current rotation, relative to viewctr
 transmatrix cwtV; // player-relative view
-transmatrix sphereflip; // on the sphere, flip
 heptspin viewctr; // heptagon and rotation where the view is centered at
 bool playerfound; // has player been found in the last drawing?
 
@@ -5424,16 +5423,7 @@ void drawthemap() {
     modist = -5;
   playerfound = false;
 
-  sphereflip = Id;
-
-    if(sphere && vid.alpha > 1) sphereflip[2][2] = -1;
-    maxreclevel = 
-      conformal::on ? sightrange + 2:
-      (!playermoved) ? sightrange+1 : sightrange + 4;
-
-    drawrec(viewctr, 
-      maxreclevel,
-      hsOrigin, ypush(vid.yshift) * sphereflip * View);  
+  drawrec(viewctr, 11, hsOrigin, ypush(vid.yshift) * Id * View);  
   
   lmouseover = mouseover;
   }
@@ -5447,7 +5437,7 @@ void spinEdge(ld aspd) {
 void centerpc(ld aspd) { 
   if(vid.sspeed >= 4.99) aspd = 1000;
   DEBB(DF_GRAPH, (debugfile,"center pc\n"));
-  hyperpoint H = ypush(-vid.yshift) * sphereflip * tC0(cwtV);
+  hyperpoint H = ypush(-vid.yshift) *  tC0(cwtV);
   if(H[0] == 0 && H[1] == 0) return; // either already centered or direction unknown
   ld R = hdist0(H); // = sqrt(H[0] * H[0] + H[1] * H[1]);
   if(R < 1e-9) {
@@ -5553,9 +5543,9 @@ void optimizeview() {
 
 movedir vectodir(const hyperpoint& P) {
 
-  hyperpoint H = sphereflip * tC0(cwtV);
+  hyperpoint H =  tC0(cwtV);
   ld R = sqrt(H[0] * H[0] + H[1] * H[1]);
-  transmatrix Centered = sphereflip * cwtV;
+  transmatrix Centered =  cwtV;
   if(!euclid)
     Centered = gpushxto0(H) * Centered;
   else if(R > 1e-9)
