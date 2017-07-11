@@ -1566,21 +1566,8 @@ void queuepolyat(const transmatrix& V, const hpcshape& h, int col, int prio) {
   ptd.u.poly.cnt = h.e-h.s;
   ptd.u.poly.tab = &ourshape[3*h.s];
   ptd.u.poly.curveindex = -1;
-  if(cblind) {
-    // protanopia
-    /* int r = (56 * part(col,3) + 43 * part(col,2)) / 100;
-    int g = (58 * part(col,3) + 42 * part(col,2)) / 100;
-    int b = (24 * part(col,2) + 75 * part(col,1)) / 100; */
-    // deuteranopia
-    /* int r = (625 * part(col,3) + 375 * part(col,2)) / 1000;
-    int g = (700 * part(col,3) + 300 * part(col,2)) / 1000;
-    int b = (300 * part(col,2) + 700 * part(col,1)) / 1000; 
-    part(col,3) = r;
-    part(col,2) = g;
-    part(col,1) = b; */
-    part(col,2) = part(col,3) = (part(col,2) * 2 + part(col,3) + 1)/3;
-    }
-  ptd.col = (darkened(col >> 8) << 8) + (col & 0xFF);
+
+  ptd.col = col;
   ptd.prio = prio << PSHIFT;
   ptd.u.poly.outline = poly_outline;
   }
