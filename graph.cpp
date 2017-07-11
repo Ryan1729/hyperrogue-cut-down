@@ -6289,47 +6289,7 @@ void ballgeometry() {
   }
 
 void drawfullmap() {
-
-  DEBB(DF_GRAPH, (debugfile,"draw full map\n"));
-    
   ptds.clear();
-
-  if(!vid.goteyes && !euclid && (pmodel == mdDisk || pmodel == mdBall)) {
-    double rad = vid.radius;
-    if(sphere) {
-      if(!vid.grid && !elliptic)
-        rad = 0; 
-      else if(vid.alphax <= 0)
-        ;
-      else if(vid.alphax <= 1 && (vid.grid || elliptic)) // mark the equator
-        rad = rad * 1 / vid.alphax;
-      else if(vid.grid) // mark the edge
-        rad /= sqrt(vid.alphax*vid.alphax - 1);
-      }
-    queuecircle(vid.xcenter, vid.ycenter, rad, 
-      darkena(0xFF, 0, 0xFF), 
-      vid.usingGL ? PPR_CIRCLE : PPR_OUTCIRCLE);
-    if(pmodel == mdBall) ballgeometry();
-    }
-  
-  if(pmodel == mdHyperboloid) {
-    int col = darkena(0x80, 0, 0x80);
-    queueline(hpxyz(0,0,1), hpxyz(0,0,-vid.alpha), col, 0, PPR_CIRCLE);
-    queueline(xpush(+4)*C0, hpxyz(0,0,0), col, 0, PPR_CIRCLE);
-    queueline(xpush(+4)*C0, hpxyz(0,0,-vid.alpha), col, 0, PPR_CIRCLE);
-    queueline(xpush(-4)*C0, hpxyz(0,0,0), col, 0, PPR_CIRCLE);
-    queueline(xpush(-4)*C0, hpxyz(0,0,-vid.alpha), col, 0, PPR_CIRCLE);
-    queueline(hpxyz(-1,0,0), hpxyz(1,0,0), col, 0, PPR_CIRCLE);
-    }
-  
-  if(pmodel == mdPolygonal || pmodel == mdPolynomial) 
-    polygonal::drawBoundary(darkena(0xFF, 0, 0xFF));
-  
-  /* if(vid.wallmode < 2 && !euclid && !mapeditor::whichShape) {
-    int ls = int(lines.size());
-    if(ISMOBILE) ls /= 10;
-
-    } */
 
   drawthemap();
   
