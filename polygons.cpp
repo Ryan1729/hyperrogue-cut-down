@@ -373,8 +373,8 @@ void prettyline(hyperpoint h1, hyperpoint h2, int col, int lev) {
   drawpolyline(Id, &prettylinepoints[0], int(prettylinepoints.size())/3, 0, col);
   }
 
-vector<GLfloat> curvedata;
-int curvestart = 0;
+
+
 
 void drawqueue() {
 #ifdef USEPOLY
@@ -430,8 +430,6 @@ void drawqueue() {
       }
 
     if(ptd.kind == pkPoly) {
-      if(ptd.u.poly.curveindex >= 0)
-        ptd.u.poly.tab = &curvedata[ptd.u.poly.curveindex];
       drawpolyline(ptd.u.poly.V, ptd.u.poly.tab, ptd.u.poly.cnt, ptd.col, ptd.u.poly.outline);
       }
     else if(ptd.kind == pkLine) {
@@ -456,7 +454,7 @@ void drawqueue() {
 #endif
 
   setcameraangle(false);
-  curvedata.clear(); curvestart = 0;
+
   }
 
 hpcshape 
@@ -1547,18 +1545,6 @@ void qfloor(cell *c, const transmatrix& V, const transmatrix& Vspin, const hpcsh
   qfloor0(c, V*Vspin, h, col);  
   qfi.special = isSpecial(h);
   qfi.shape = &h, qfi.spin = Vspin;
-  }
-
-void curvepoint(const hyperpoint& H1) {
-  curvedata.push_back(H1[0]);
-  curvedata.push_back(H1[1]);
-  curvedata.push_back(H1[2]);
-  }
-
-void queuecurve(int linecol, int fillcol, int prio) {
-  queuetable(Id, &curvedata[curvestart], (int(curvedata.size())-curvestart)/3, linecol, fillcol, prio);
-  lastptd().u.poly.curveindex = curvestart;
-  curvestart = int(curvedata.size());
   }
 
 void queueline(const hyperpoint& H1, const hyperpoint& H2, int col, int prf = 0, int prio = PPR_LINE) {

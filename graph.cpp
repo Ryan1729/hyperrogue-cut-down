@@ -1070,30 +1070,6 @@ bool outofmap(hyperpoint h) {
     return h[2] < .5;
   }
 
-void drawShield(const transmatrix& V, eItem it) {
-  float ds = ticks / 300.;
-  int col = iinf[it].color;
-  if(it == itOrbShield && items[itOrbTime] && !orbused[it])
-    col = (col & 0xFEFEFE) / 2;
-  if(sphere && cwt.c->land == laHalloween && !wmblack && !wmascii)
-    col = 0;
-  double d = it == itOrbShield ? hexf : hexf - .1;
-  int mt = sphere ? 7 : 5;
-  for(int a=0; a<=S84*mt; a++)
-    curvepoint(V*ddi0(a, d + sin(ds + M_PI*2*a/4/mt)*.1));
-  queuecurve(darkena(col, 0, 0xFF), 0x8080808, PPR_LINE);
-  }
-
-void drawSpeed(const transmatrix& V) {
-  ld ds = ticks / 10.;
-  int col = darkena(iinf[itOrbSpeed].color, 0, 0xFF);
-  for(int b=0; b<S84; b+=S14) {
-    for(int a=0; a<=S84; a++)
-      curvepoint(V*ddi0(ds+b+a, hexf*a/S84));
-    queuecurve(col, 0x8080808, PPR_LINE);
-    }
-  }
-
 void drawSafety(const transmatrix& V, int ct) {
   ld ds = ticks / 50.;
   int col = darkena(iinf[itOrbSafety].color, 0, 0xFF);
@@ -1107,8 +1083,8 @@ void drawFlash(const transmatrix& V) {
   col &= ~1;
   for(int u=0; u<5; u++) {
     ld rad = hexf * (2.5 + .5 * sin(ds+u*.3));
-    for(int a=0; a<=S84; a++) curvepoint(V*ddi0(a, rad));
-    queuecurve(col, 0x8080808, PPR_LINE);
+
+
     }
   }
 
@@ -1123,9 +1099,9 @@ void drawLove(const transmatrix& V, int hdir) {
       if(z <= 10) d += (10-z) * (10-z) * (10-z) / 3000.;
 
       ld rad = hexf * (2.5 + .5 * sin(ds+u*.3)) * d;
-      curvepoint(V*ddi0(S42+hdir+a-1, rad));
+
       }
-    queuecurve(col, 0x8080808, PPR_LINE);
+
     }
   }
 
@@ -1166,10 +1142,10 @@ transmatrix ddspin(cell *c, int d, int bonus = 0) {
 
 void drawPlayerEffects(const transmatrix& V, cell *c, bool onplayer) {
   if(!onplayer && !items[itOrbEmpathy]) return;
-  if(items[itOrbShield] > ORBBASE) drawShield(V, itOrbShield);
-  if(items[itOrbShell] > ORBBASE) drawShield(V, itOrbShell);
 
-  if(items[itOrbSpeed]) drawSpeed(V); 
+
+
+
 
   int ct = c->type;
   
@@ -2191,7 +2167,7 @@ bool drawMonsterType(eMonster m, cell *where, const transmatrix& V, int col, dou
     if(m == moWitchGhost) c = 0x85 + 120 * sin(ticks / 160.0);
     if(m == moWitchWinter) drawWinter(V, 0);
     if(m == moWitchFlash) drawFlash(V);
-    if(m == moWitchSpeed) drawSpeed(V);
+
     if(m == moWitchFire) col = firecolor(0);
     ShadowV(V, shFemaleBody);
     queuepoly(VBODY, shFemaleBody, darkena(col, 0, c));
@@ -4766,8 +4742,8 @@ void drawFlashes() {
         int flashcol = f.color;
         if(u > 500) flashcol = gradient(flashcol, 0, 500, u, 1100);
         flashcol = darkena(flashcol, 0, 0xFF);
-        for(int a=0; a<=S84; a++) curvepoint(V*ddi0(a, rad));
-        queuecurve(flashcol, 0x8080808, PPR_LINE);
+
+
         }
       }
     else if(f.size == 2000) {
@@ -4780,8 +4756,8 @@ void drawFlashes() {
         int flashcol = f.color;
         if(u > 1000) flashcol = gradient(flashcol, 0, 1000, u, 2200);
         flashcol = darkena(flashcol, 0, 0xFF);
-        for(int a=0; a<=S84; a++) curvepoint(V*ddi0(a, rad));
-        queuecurve(flashcol, 0x8080808, PPR_LINE);
+
+
         }
       }
 
@@ -6324,7 +6300,7 @@ void addball(ld a, ld b, ld c) {
   hyperpoint h;
   ballmodel(h, a, b, c);
   for(int i=0; i<3; i++) h[i] *= vid.radius;
-  curvepoint(h);
+
   }
 
 void ballgeometry() {
@@ -6340,7 +6316,7 @@ void ballgeometry() {
   addball(0, 0, -geom3::camera);
   addball(0, -10, 0);
   addball(0, 0, -geom3::camera);
-  queuecurve(darkena(0xFF, 0, 0x80), 0, PPR_CIRCLE);
+
   queuereset(pmodel, PPR_CIRCLE);
   }
 

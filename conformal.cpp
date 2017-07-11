@@ -86,10 +86,10 @@ namespace polygonal {
       h[0] = z2.first * vid.radius;
       h[1] = z2.second * vid.radius;
       h[2] = vid.scrdist;
-      curvepoint(h);
+
       }
     
-    queuecurve(color, 0, PPR_CIRCLE);
+
     queuereset(pmodel, PPR_CIRCLE);
     }
 
