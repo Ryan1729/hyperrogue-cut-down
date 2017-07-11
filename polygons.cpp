@@ -284,7 +284,7 @@ void glapplymatrix(const transmatrix& V) {
   glMultMatrixf(mat);
   }
 
-void gldraw(const transmatrix& V, int ps, int pq, int col, int outline) {    
+void gldraw(const transmatrix& V, int pq, int col, int outline) {    
       glMatrixMode(GL_MODELVIEW);
       glPushMatrix();
       glapplymatrix(V);
@@ -296,19 +296,19 @@ void gldraw(const transmatrix& V, int ps, int pq, int col, int outline) {
       glStencilOp( GL_INVERT, GL_INVERT, GL_INVERT);
       glStencilFunc( GL_ALWAYS, 0x1, 0x1 );
       glColor4f(1,1,1,1);
-      glDrawArrays(GL_TRIANGLE_FAN, ps, pq);
+      glDrawArrays(GL_TRIANGLE_FAN, 0, pq);
  
       glColorMask( GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE );
       glcolor2(col);
       glStencilOp( GL_ZERO, GL_ZERO, GL_ZERO);
       glStencilFunc( GL_EQUAL, 1, 1);
-      glDrawArrays(GL_TRIANGLE_FAN, ps, pq);
+      glDrawArrays(GL_TRIANGLE_FAN, 0, pq);
       glDisable(GL_STENCIL_TEST);
       }
     
     if(outline) {
       glcolor2(outline);
-      glDrawArrays(GL_LINE_STRIP, ps, pq);
+      glDrawArrays(GL_LINE_STRIP, 0, pq);
       }
  
     glPopMatrix();
@@ -318,7 +318,7 @@ void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outl
     if(currentvertices != tab)
        activateVertexArray(tab, cnt);
       
-    gldraw(V, 0, cnt, col, outline);    
+    gldraw(V, cnt, col, outline);    
   }
 
 vector<float> prettylinepoints;
