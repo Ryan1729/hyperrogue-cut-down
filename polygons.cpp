@@ -315,10 +315,40 @@ void gldraw(const transmatrix& V, int pq, int col, int outline) {
   }
 
 void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outline) {
-    if(currentvertices != tab)
-       activateVertexArray(tab, cnt);
+    if(currentvertices != tab) {
+        currentvertices = tab;
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, tab);
+    }
       
-    gldraw(V, cnt, col, outline);    
+    gldraw(V, cnt, col, outline);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glapplymatrix(V);
+      
+    if(col) {
+      glEnable(GL_STENCIL_TEST);
+ 
+      glColorMask( GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE );
+      glStencilOp( GL_INVERT, GL_INVERT, GL_INVERT);
+      glStencilFunc( GL_ALWAYS, 0x1, 0x1 );
+      glColor4f(1,1,1,1);
+      glDrawArrays(GL_TRIANGLE_FAN, 0, cnt);
+ 
+      glColorMask( GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE );
+      glcolor2(col);
+      glStencilOp( GL_ZERO, GL_ZERO, GL_ZERO);
+      glStencilFunc( GL_EQUAL, 1, 1);
+      glDrawArrays(GL_TRIANGLE_FAN, 0, cnt);
+      glDisable(GL_STENCIL_TEST);
+      }
+    
+    if(outline) {
+      glcolor2(outline);
+      glDrawArrays(GL_LINE_STRIP, 0, cnt);
+      }
+ 
+    glPopMatrix();
   }
 
 vector<float> prettylinepoints;
