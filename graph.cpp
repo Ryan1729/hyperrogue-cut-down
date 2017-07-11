@@ -284,18 +284,6 @@ void selectEyeGL(int ed) {
   cameraangle_on = false;
   }
 
-void selectEyeMask(int ed) {
-  if(ed == 0) {    
-    glColorMask( GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE );
-    }
-  else if(ed == 1) {
-    glColorMask( GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE );
-    }
-  else if(ed == -1) {
-    glColorMask( GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE );
-    }
-  }
-
 void setGLProjection() {
   DEBB(DF_GRAPH, (debugfile,"setGLProjection\n"));
 
@@ -556,7 +544,7 @@ bool gl_print(int x, int y, int shift, int size, const char *s, int color, int a
     for(int ed = (vid.goteyes && shift)?-1:0; ed<2; ed+=2) {
       glPushMatrix();
       glTranslatef(x-ed*shift-vid.xcenter,y-vid.ycenter, vid.scrdist);
-      selectEyeMask(ed);
+
       glBindTexture(GL_TEXTURE_2D, f.textures[tabid]);
 
 #if 1
@@ -580,7 +568,7 @@ bool gl_print(int x, int y, int shift, int size, const char *s, int color, int a
       glPopMatrix();
       }
     
-    if(vid.goteyes) selectEyeMask(0);
+
     
     GLERR("print");
     

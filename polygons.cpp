@@ -312,10 +312,7 @@ void glapplymatrix(const transmatrix& V) {
   glMultMatrixf(mat);
   }
 
-void gldraw(int useV, const transmatrix& V, int ps, int pq, int col, int outline) {
-  for(int ed = vid.goteyes ? -1 : 0; ed<2; ed+=2) {
-    if(ed) selectEyeGL(ed);
-    
+void gldraw(int useV, const transmatrix& V, int ps, int pq, int col, int outline) {    
     if(useV == 1) {
       glMatrixMode(GL_MODELVIEW);
       glPushMatrix();
@@ -331,7 +328,6 @@ void gldraw(int useV, const transmatrix& V, int ps, int pq, int col, int outline
         0, 0, 1, 0,
         0, 0, 0, 1
         };
-      mat[8] += ed * vid.eye;
       glMultMatrixf(mat);
       }
       
@@ -344,8 +340,7 @@ void gldraw(int useV, const transmatrix& V, int ps, int pq, int col, int outline
       glColor4f(1,1,1,1);
       glDrawArrays(GL_TRIANGLE_FAN, ps, pq);
  
-      selectEyeMask(ed);
- 
+      glColorMask( GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE );
       glcolor2(col);
       glStencilOp( GL_ZERO, GL_ZERO, GL_ZERO);
       glStencilFunc( GL_EQUAL, 1, 1);
@@ -359,7 +354,7 @@ void gldraw(int useV, const transmatrix& V, int ps, int pq, int col, int outline
       }
  
     if(useV) glPopMatrix();
-    }
+    
   }
 
 void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outline) {
@@ -547,7 +542,7 @@ void drawqueue() {
     SDL_UnlockSurface(aux);
     }
 
-  if(vid.goteyes && vid.usingGL) selectEyeGL(0), selectEyeMask(0);
+
 
 #endif
 
