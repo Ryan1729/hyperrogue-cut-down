@@ -204,7 +204,6 @@ int darkena(int c, int lev, int a) {
   return (c << 8) + a;
   }
 
-#ifdef GL
 
 bool cameraangle_on;
 
@@ -598,7 +597,6 @@ void resetGL() {
   buildpolys();
   }
 
-#endif
 
 bool displaystr(int x, int y, int shift, int size, const char *str, int color, int align) {
   if(strlen(str) == 0) return false;
@@ -609,9 +607,7 @@ bool displaystr(int x, int y, int shift, int size, const char *str, int color, i
     }
   
   
-#ifdef GL
   if(vid.usingGL) return gl_print(x, y, shift, size, str, color, align);
-#endif
   
   SDL_Color col;
   col.r = (color >> 16) & 255;
@@ -2542,7 +2538,6 @@ int keycelldist;
 
 void drawCircle(int x, int y, int size, int color) {
   if(size < 0) size = -size;
-  #ifdef GL
   if(vid.usingGL) {
     qglcoords = 0;
     glcolor2(color);
@@ -2562,7 +2557,6 @@ void drawCircle(int x, int y, int size, int color) {
     glDrawArrays(GL_LINE_LOOP, 0, pts);
     return;
     }
-  #endif
 
   int pts = size * 4;
   if(pts > 1500) pts = 1500;
@@ -6375,9 +6369,7 @@ void drawscreen() {
   DEBB(DF_GRAPH, (debugfile,"drawscreen\n"));
 
   calcparam();
-#ifdef GL
   if(vid.usingGL) setGLProjection();
-#endif
   help = "@";
   
   if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
@@ -6390,9 +6382,7 @@ void drawscreen() {
   getcstat = 0; inslider = false;
 
   DEBT("swapbuffers");
-#ifdef GL
   if(vid.usingGL) SDL_GL_SwapBuffers(); else
-#endif
   SDL_UpdateRect(s, 0, 0, vid.xres, vid.yres);
   }
 
@@ -6411,12 +6401,10 @@ void setvideomode() {
 
   int flags = 0;
   
-#ifdef GL
   if(vid.usingGL) {
     flags = SDL_OPENGL | SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER;
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
     }
-#endif
 
   int sizeflag = (vid.full ? SDL_FULLSCREEN : SDL_RESIZABLE);
   
@@ -6436,12 +6424,10 @@ void setvideomode() {
     s = SDL_SetVideoMode(vid.xres, vid.yres, 32, flags | SDL_RESIZABLE);
     }
 
-#ifdef GL
   if(vid.usingGL) {
     glViewport(0, 0, vid.xres, vid.yres);
     resetGL();
     }
-#endif
   }
 
 void restartGraph() {
@@ -6838,10 +6824,6 @@ void mainloopiter() {
 
   DEBB(DF_GRAPH, (debugfile,"main loop\n"));
 
-  #ifndef GL
-  vid.wallmode = 0;
-  vid.monmode = 0;
-  #endif
   
   optimizeview();
 
@@ -6929,9 +6911,7 @@ void mainloopiter() {
       extern bool setfsize;
       setfsize = true;
       setvideomode();
-#ifdef GL
       if(vid.usingGL) glViewport(0, 0, vid.xres, vid.yres);
-#endif
       }
     
     if(ev.type == SDL_VIDEOEXPOSE) {

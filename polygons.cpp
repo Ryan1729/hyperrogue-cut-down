@@ -7,7 +7,6 @@
 #else
 
 #define GL_GLEXT_PROTOTYPES 1
-#ifdef GL
 #ifdef MAC
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
@@ -20,7 +19,6 @@
 #include <OpenGL/glext.h>
 #else
 #include <GL/glext.h>
-#endif
 #endif
 
 #endif
@@ -139,7 +137,6 @@ SDL_Surface *aux;
 
 vector<polytodraw*> ptds2;
 
-#ifdef GL
 #define USEPOLY
 
 GLuint shapebuffer;
@@ -149,7 +146,6 @@ GLfloat glcoords[POLYMAX][3];
 int qglcoords;
 
 extern void glcolor(int color);
-#endif
 
 GLfloat *currentvertices;
 
@@ -377,16 +373,13 @@ void prettyline(hyperpoint h1, hyperpoint h2, int col, int lev) {
 
 
 void drawqueue() {
-#ifdef USEPOLY
 
   int siz = int(ptds.size());
 
   setcameraangle(true);
 
-#ifdef GL
   if(vid.usingGL) 
     glClear(GL_STENCIL_BUFFER_BIT);
-#endif
 
   for(int i=0; i<siz; i++) {
 
@@ -419,7 +412,6 @@ void drawqueue() {
       drawCircle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
       }
     }
-#endif
 
   setcameraangle(false);
 
