@@ -6,8 +6,8 @@
 
 bool quitsaves() { return (items[itOrbSafety] && havesave); }
 
-bool wmspatial, wmescher, wmplain, wmblack, wmascii;
-bool mmspatial, mmhigh, mmmon, mmitem;
+bool wmspatial = true, wmescher = true, wmplain, wmblack, wmascii;
+bool mmspatial = true, mmhigh, mmmon = true, mmitem = true;
 int maxreclevel, reclevel;
 
 int lastt;
@@ -5398,17 +5398,6 @@ void drawthemap() {
   swap(gmatrix0, gmatrix);
   gmatrix.clear();
 
-  wmspatial = vid.wallmode == 4 || vid.wallmode == 5;
-  wmescher = vid.wallmode == 3 || vid.wallmode == 5;
-  wmplain = vid.wallmode == 2 || vid.wallmode == 4;
-  wmascii = vid.wallmode == 0;
-  wmblack = vid.wallmode == 1;
-  
-  mmitem = vid.monmode >= 1;
-  mmmon = vid.monmode >= 2;
-  mmhigh = vid.monmode == 3 || vid.monmode == 5;
-  mmspatial = vid.monmode == 4 || vid.monmode == 5;
-
   drawrec(viewctr, 11, hsOrigin, ypush(vid.yshift) * Id * View);  
   }
 
@@ -6378,13 +6367,8 @@ void initgraph() {
   vid.camera_angle = 0;
   vid.ballproj = 1;
 
-#ifdef PANDORA
-  vid.monmode = 2;
-  vid.wallmode = 3;
-#else
   vid.monmode = 4;
   vid.wallmode = 5;
-#endif
 
   vid.particles = 1;
   vid.mobilecompasssize = 30;
