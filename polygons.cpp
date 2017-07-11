@@ -71,17 +71,9 @@ struct qcir {
       int x, y, size;
       };
 
-enum eKind { pkPoly, pkLine, pkString, pkCircle, pkShape, pkResetModel };
-
 struct polytodraw {
-  eKind kind;
   int prio, col;
-  union {
-    qpoly  poly;
-    qline  line;
-    qchr   chr;
-    qcir   cir;
-    } u;
+  qpoly  poly;
   };
 
 vector<polytodraw> ptds;
@@ -376,35 +368,8 @@ void drawqueue() {
     glClear(GL_STENCIL_BUFFER_BIT);
 
   for(int i=0; i<siz; i++) {
-
     polytodraw& ptd (ptds[i]);
-    
-    if(ptd.kind == pkResetModel) {
-      pmodel = eModel(ptd.col);
-      continue;
-      }
-
-    if(ptd.kind == pkPoly) {
-      drawpolyline(ptd.u.poly.V, ptd.u.poly.tab, ptd.u.poly.cnt, ptd.col, ptd.u.poly.outline);
-      }
-    else if(ptd.kind == pkLine) {
-      prettyline(ptd.u.line.H1, ptd.u.line.H2, ptd.col, ptd.u.line.prf);
-      }
-    else if(ptd.kind == pkString) {
-      qchr& q(ptd.u.chr);
-
-        if(q.frame) {
-          displaystr(q.x-q.frame, q.y, q.shift, q.size, q.str, 0, q.align);
-          displaystr(q.x+q.frame, q.y, q.shift, q.size, q.str, 0, q.align);
-          displaystr(q.x, q.y-q.frame, q.shift, q.size, q.str, 0, q.align);
-          displaystr(q.x, q.y+q.frame, q.shift, q.size, q.str, 0, q.align);
-          }
-        displaystr(q.x, q.y, q.shift, q.size, q.str, ptd.col, q.align);
-        
-      }
-    else if(ptd.kind == pkCircle) {
-      drawCircle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
-      }
+    drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
     }
 
   }
@@ -1414,15 +1379,14 @@ unsigned char& part(int& col, int i) {
 
 void queuepolyat(const transmatrix& V, const hpcshape& h, int col, int prio) {
   polytodraw& ptd = nextptd();
-  ptd.kind = pkPoly;
-  ptd.u.poly.V = V;
-  ptd.u.poly.cnt = h.e-h.s;
-  ptd.u.poly.tab = &ourshape[3*h.s];
-  ptd.u.poly.curveindex = -1;
+  ptd.poly.V = V;
+  ptd.poly.cnt = h.e-h.s;
+  ptd.poly.tab = &ourshape[3*h.s];
+  ptd.poly.curveindex = -1;
 
   ptd.col = col;
   ptd.prio = prio << PSHIFT;
-  ptd.u.poly.outline = poly_outline;
+  ptd.poly.outline = poly_outline;
   }
 
 void addfloats(vector<GLfloat>& v, hyperpoint h) {
@@ -1430,22 +1394,18 @@ void addfloats(vector<GLfloat>& v, hyperpoint h) {
   }
 
 void queuereset(eModel md, int prio) {
-  polytodraw& ptd = nextptd();
-  ptd.kind = pkResetModel;
-  ptd.col = md;
-  ptd.prio = prio << PSHIFT;
+
   }
 
 void queuetable(const transmatrix& V, GLfloat *f, int cnt, int linecol, int fillcol, int prio) {
   polytodraw& ptd = nextptd();
-  ptd.kind = pkPoly;
-  ptd.u.poly.V = V;
-  ptd.u.poly.cnt = cnt;
-  ptd.u.poly.tab = f;
-  ptd.u.poly.curveindex = -1;
+  ptd.poly.V = V;
+  ptd.poly.cnt = cnt;
+  ptd.poly.tab = f;
+  ptd.poly.curveindex = -1;
   ptd.col = fillcol;
   ptd.prio = prio << PSHIFT;
-  ptd.u.poly.outline = linecol;
+  ptd.poly.outline = linecol;
   }
 
 void queuepoly(const transmatrix& V, const hpcshape& h, int col) {
@@ -1500,53 +1460,19 @@ void qfloor(cell *c, const transmatrix& V, const transmatrix& Vspin, const hpcsh
   }
 
 void queueline(const hyperpoint& H1, const hyperpoint& H2, int col, int prf = 0, int prio = PPR_LINE) {
-  polytodraw& ptd = nextptd();
-  ptd.kind = pkLine;
-  ptd.u.line.H1 = H1;
-  ptd.u.line.H2 = H2;
-  ptd.u.line.prf = prf;
-  ptd.col = (darkened(col >> 8) << 8) + (col & 0xFF);
-  ptd.prio = prio << PSHIFT;
+
   }
 
 void queuestr(int x, int y, int shift, int size, string str, int col, int frame = 0, int align = 8) {
-  polytodraw& ptd = nextptd();
-  ptd.kind = pkString;
-  ptd.u.chr.x = x;
-  ptd.u.chr.y = y;
-  int ss = (int) str.size(); if(ss>=MAXQCHR) ss=MAXQCHR-1;
-  {for(int i=0; i<ss; i++) ptd.u.chr.str[i] = str[i];} ptd.u.chr.str[ss] = 0;
-  ptd.u.chr.align = align;
-  ptd.u.chr.shift = shift;
-  ptd.u.chr.size = size;
-  ptd.col = darkened(col);
-  ptd.u.chr.frame = frame;
-  ptd.prio = PPR_TEXT << PSHIFT;
+
   }
 
 void queuechr(int x, int y, int shift, int size, char chr, int col, int frame = 0, int align = 8) {
-  polytodraw& ptd = nextptd();
-  ptd.kind = pkString;
-  ptd.u.chr.x = x;
-  ptd.u.chr.y = y;
-  ptd.u.chr.str[0] = chr;
-  ptd.u.chr.str[1] = 0;
-  ptd.u.chr.shift = shift;
-  ptd.u.chr.size = size;
-  ptd.u.chr.align = align;
-  ptd.col = col;
-  ptd.u.chr.frame = frame;
-  ptd.prio = PPR_TEXT << PSHIFT;
+
   }
 
 void queuecircle(int x, int y, int size, int color, int prio = PPR_CIRCLE) {
-  polytodraw& ptd = nextptd();
-  ptd.kind = pkCircle;
-  ptd.u.cir.x = x;
-  ptd.u.cir.y = y;
-  ptd.u.cir.size = size;
-  ptd.col = color;
-  ptd.prio = prio << PSHIFT;
+
   }
 
 void getcoord0(const hyperpoint& h, int& xc, int &yc, int &sc) {

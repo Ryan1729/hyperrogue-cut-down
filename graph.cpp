@@ -3377,11 +3377,10 @@ void pushdown(cell *c, int& q, const transmatrix &V, double down, bool rezoom, b
   
   while(q < int(ptds.size())) {
     polytodraw& ptd = ptds[q++];
-    if(ptd.kind == pkPoly) {
     
       double z2;
       
-      double z = zlevel(tC0(ptd.u.poly.V));
+      double z = zlevel(tC0(ptd.poly.V));
       double lev = geom3::factor_to_lev(z);
       double nlev = lev - down;
       
@@ -3391,8 +3390,8 @@ void pushdown(cell *c, int& q, const transmatrix &V, double down, bool rezoom, b
       
       // xyscale = xyscale + (zscale-xyscale) * (1+sin(ticks / 1000.0)) / 2;
       
-      ptd.u.poly.V = xyzscale( V, xyscale*zscale, zscale)
-        * inverse(V) * ptd.u.poly.V;
+      ptd.poly.V = xyzscale( V, xyscale*zscale, zscale)
+        * inverse(V) * ptd.poly.V;
       
       if(!repriority) ;
       else if(nlev < -geom3::lake_bottom-1e-3) {
@@ -3404,7 +3403,7 @@ void pushdown(cell *c, int& q, const transmatrix &V, double down, bool rezoom, b
         ptd.prio = PPR_INLAKEWALL;
       else if(nlev < 0)
         ptd.prio = PPR_LAKEWALL;
-      }
+      
     }
   }
 
