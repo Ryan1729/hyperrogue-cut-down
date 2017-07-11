@@ -254,19 +254,8 @@ else if(args()[0] == '-' && args()[1] == x && args()[2] == '0') { PHASE(2); para
     printf("saving PNG screenshot to %s\n", args());
     saveHighQualityShot(args());
     }
-  else if(argis("-svgsize")) {
-    shift(); sscanf(args(), "%d/%d", &svg::svgsize, &svg::divby);
-    }
   else if(argis("-pngsize")) {
     shift(); sscanf(args(), "%d", &pngres);
-    }
-  else if(argis("-svggamma")) {
-    shift(); svg::gamma = argf();
-    }
-  else if(argis("-svgshot")) {
-    PHASE(3); shift(); 
-    printf("saving SVG screenshot to %s\n", args());
-    svg::render(args());
     }
   else if(argis("--help") || argis("-h")) {
     printf("Press F1 while playing to get ingame options.\n\n");

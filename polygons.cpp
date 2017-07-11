@@ -167,9 +167,7 @@ void initPolyForGL() {
   
   if(ourshape) delete[] ourshape;
   ourshape = new GLfloat[3 * qhpc];
-  
-  // GLfloat ourshape[3*qhpc];
-  
+
   int id = 0;
   for(int i=0; i<qhpc; i++) {
     ourshape[id++] = hpc[i][0];
@@ -432,9 +430,7 @@ void drawqueue() {
       }
     else if(ptd.kind == pkString) {
       qchr& q(ptd.u.chr);
-      if(svg::in) 
-        svg::text(q.x, q.y, q.size, q.str, q.frame, ptd.col, q.align);
-      else {
+
         if(q.frame) {
           displaystr(q.x-q.frame, q.y, q.shift, q.size, q.str, 0, q.align);
           displaystr(q.x+q.frame, q.y, q.shift, q.size, q.str, 0, q.align);
@@ -442,12 +438,9 @@ void drawqueue() {
           displaystr(q.x, q.y+q.frame, q.shift, q.size, q.str, 0, q.align);
           }
         displaystr(q.x, q.y, q.shift, q.size, q.str, ptd.col, q.align);
-        }
+        
       }
     else if(ptd.kind == pkCircle) {
-      if(svg::in) 
-        svg::circle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
-      else
       drawCircle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
       }
     }
@@ -1623,173 +1616,6 @@ void queuecircle(int x, int y, int size, int color, int prio = PPR_CIRCLE) {
   ptd.u.cir.size = size;
   ptd.col = color;
   ptd.prio = prio << PSHIFT;
-  }
-
-
-// svg renderer
-namespace svg {
-  FILE *f;
-  bool in = false;
-  
-  ld cta(int col) {
-    // col >>= 24;
-    col &= 0xFF;
-    return col / 255.0;
-    }
-  
-  bool invisible(int col) { return (col & 0xFF) == 0; }
-  
-  ld gamma = .5;
-  
-  void fixgamma(unsigned int& color) {
-    unsigned char *c = (unsigned char*) (&color);
-    for(int i=1; i<4; i++) c[i] = 255 * pow(float(c[i] / 255.0), float(gamma));
-    }
-  
-  int svgsize;
-  int divby = 10;
-  
-  const char* coord(int val) {
-    static char buf[10][20];
-    static int id;
-    id++; id %= 10;
-    if(divby == 1) {
-      sprintf(buf[id], "%d", val); return buf[id];
-      }
-    else if(divby <= 10) {
-      sprintf(buf[id], "%.1f", val*1./divby); return buf[id];
-      }
-    else {
-      sprintf(buf[id], "%.2f", val*1./divby); return buf[id];
-      }
-    }
-  
-  char* stylestr(unsigned int fill, unsigned int stroke, ld width=1) {
-    fixgamma(fill);
-    fixgamma(stroke);
-    static char buf[600];
-    // printf("fill = %08X stroke = %08x\n", fill, stroke);
-  
-    if(stroke == 0xFF00FF) {
-      stroke = 0x000000FF;
-      
-      if(fill == 0x332a22ff) fill = 0x000000FF;
-      else if(fill == 0x686868FF) fill = 0x000000FF;
-      else if(fill == 0xd0d0d0FF) fill = 0x000000FF;
-      else fill = 0xFFFFFFFF;
-      }
-    
-    sprintf(buf, "style=\"stroke:#%06x;stroke-opacity:%.3" PLDF ";stroke-width:%" PLDF "px;fill:#%06x;fill-opacity:%.3" PLDF "\"",
-      (stroke>>8) & 0xFFFFFF, cta(stroke),
-      width/divby,
-      (fill>>8) & 0xFFFFFF, cta(fill)
-      );
-    return buf;
-    }
-  
-  void circle(int x, int y, int size, int col) {
-    int ba = (backcolor << 8) + 0xFF;
-    if(!invisible(col))
-    fprintf(f, "<circle cx='%s' cy='%s' r='%s' %s/>\n",
-      coord(x), coord(y), coord(size), stylestr(ba, col));
-    }
-  
-  string *info;
-  
-  void startstring() {
-    if(info) fprintf(f, "<a xlink:href=\"%s\" xlink:show=\"replace\">", info->c_str());
-    }
-
-  void stopstring() {
-    if(info) fprintf(f, "</a>");
-    }
-
-  void text(int x, int y, int size, const string& str, bool frame, int col, int align) {
-
-    double dfc = (x - vid.xcenter) * (x - vid.xcenter) + 
-      (y - vid.ycenter) * (y - vid.ycenter);
-    dfc /= vid.radius;
-    dfc /= vid.radius;
-    // 0 = center, 1 = edge
-    dfc = 1 - dfc;
-    
-    col = 0xFF + (col << 8);
-
-    if(!invisible(col)) {
-      startstring();
-      fprintf(f, "<text x='%s' y='%s' font-family='Times' text-anchor='%s' font-size='%s' %s>%s</text>",
-        coord(x), coord(y+size/2), 
-        align == 8 ? "middle" :
-        align < 8 ? "start" :
-        "end",
-        coord(size), stylestr(col, frame ? 0x0000000FF : 0, (1<<sightrange)*dfc/40), str.c_str());
-      stopstring();
-      fprintf(f, "\n");
-      }
-    }
-  
-  void polygon(int *polyx, int *polyy, int polyi, int col, int outline) {
-  
-    if(invisible(col) && invisible(outline)) return;
-    double dfc = 0.8;
-    if(!pmodel && !euclid) {
-      int avgx = 0, avgy = 0;
-      for(int i=0; i<polyi; i++) 
-        avgx += polyx[i],
-        avgy += polyy[i];
-      avgx /= polyi;
-      avgy /= polyi;
-      dfc = (avgx - vid.xcenter) * (avgx - vid.xcenter) + 
-        (avgy - vid.ycenter) * (avgy - vid.ycenter);
-      dfc /= vid.radius;
-      dfc /= vid.radius;
-      // 0 = center, 1 = edge
-      dfc = 1 - dfc;
-      
-      if(dfc < 0) dfc = 1;
-      }
-    
-    startstring();
-    for(int i=0; i<polyi; i++) {
-      if(i == 0)
-        fprintf(f, "<path d=\"M ");
-      else
-        fprintf(f, " L ");
-      fprintf(f, "%s %s", coord(polyx[i]), coord(polyy[i]));
-      }
-    
-    fprintf(f, "\" %s/>", stylestr(col, outline, vid.radius*dfc/256));
-    stopstring();
-    fprintf(f, "\n");
-    }
-  
-  void render(const char *fname) {
-
-    if(cheater) doOvergenerate();
-
-    dynamicval<videopar> v(vid, vid);
-    dynamicval<bool> v2(in, true);
-    dynamicval<int> v4(cheater, 0);
-    
-    vid.usingGL = false;
-    vid.xres = vid.yres = svgsize ? svgsize : min(1 << (sightrange+7), 16384);
-    calcparam();
-    inHighQual = true; 
-
-    
-    time_t timer;
-    timer = time(NULL);
-
-    char buf[128]; strftime(buf, 128, "svgshot-%y%m%d-%H%M%S.svg", localtime(&timer));
-    if(!fname) fname = buf;
-
-    f = fopen(fname, "wt");
-    fprintf(f, "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"%s\" height=\"%s\">\n", coord(vid.xres), coord(vid.yres));
-    drawfullmap();
-    fprintf(f, "</svg>\n");
-    fclose(f);
-    addMessage(XLAT("Saved the SVG shot to %1 (sightrange %2)", fname, its(sightrange)));
-    }
   }
 
 void getcoord0(const hyperpoint& h, int& xc, int &yc, int &sc) {

@@ -759,15 +759,6 @@ void clearMessages();
 
 void resetGeometry();
 
-namespace svg {
-  void circle(int x, int y, int size, int col);
-  void polygon(int *polyx, int *polyy, int polyi, int col, int outline);
-  void text(int x, int y, int size, const string& str, bool frame, int col, int align);
-  extern bool in;
-  extern string *info;
-  void render(const char *fname = NULL);
-  }
-
 extern int sightrange;
 
 namespace halloween {

@@ -6363,7 +6363,7 @@ void drawfullmap() {
         rad /= sqrt(vid.alphax*vid.alphax - 1);
       }
     queuecircle(vid.xcenter, vid.ycenter, rad, 
-      svg::in ? 0x808080FF : darkena(0xFF, 0, 0xFF), 
+      darkena(0xFF, 0, 0xFF), 
       vid.usingGL ? PPR_CIRCLE : PPR_OUTCIRCLE);
     if(pmodel == mdBall) ballgeometry();
     }
