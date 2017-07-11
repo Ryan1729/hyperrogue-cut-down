@@ -2588,14 +2588,10 @@ void drawCircle(int x, int y, int size, int color) {
     }
   #endif
 
-#ifdef GFX
-  (vid.usingAA?aacircleColor:circleColor) (s, x, y, size, color);
-#else
   int pts = size * 4;
   if(pts > 1500) pts = 1500;
   for(int r=0; r<pts; r++)
     qpixel(s, x + int(size * sin(r)), y + int(size * cos(r))) = color;
-#endif
   }
 
 int fnt[100][7];
@@ -6287,10 +6283,8 @@ int pngres = 2000;
 
 void saveHighQualityShot(const char *fname) {
 
-#ifndef GFX
   addMessage(XLAT("High quality shots not available on this platform"));
   return;
-#endif
 
   dynamicval<int> v3(sightrange, (cheater && sightrange < 10) ? 10 : sightrange);
 
@@ -6868,11 +6862,9 @@ void mainloopiter() {
 
   DEBB(DF_GRAPH, (debugfile,"main loop\n"));
 
-  #ifndef GFX
   #ifndef GL
   vid.wallmode = 0;
   vid.monmode = 0;
-  #endif
   #endif
   
   optimizeview();

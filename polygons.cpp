@@ -1,9 +1,6 @@
 // HyperRogue, shapes used for the vector graphics
 // Copyright (C) 2011-2016 Zeno Rogue, see 'hyper.cpp' for details
 
-#ifdef GFX
-#include <SDL/SDL_gfxPrimitives.h>
-#endif
 
 #ifdef WINDOWS
 #include <GL/glew.h>
@@ -194,10 +191,6 @@ void activateGlcoords() {
   }
 
 
-#ifdef GFX
-#define POLYMAX 60000
-#define USEPOLY
-#endif
 
 int polyi;
 
@@ -259,24 +252,6 @@ void addpoly(const transmatrix& V, GLfloat *tab, int cnt) {
     }
   }
 
-#ifdef GFX
-void aapolylineColor(SDL_Surface *s, int*x, int *y, int polyi, int col) {
-  for(int i=1; i<polyi; i++)
-    aalineColor(s, x[i-1], y[i-1], x[i], y[i], col);
-  }
-
-void polylineColor(SDL_Surface *s, int *x, int *y, int polyi, int col) {
-  for(int i=1; i<polyi; i++)
-    lineColor(s, x[i-1], y[i-1], x[i], y[i], col);
-  }
-
-void filledPolygonColorI(SDL_Surface *s, int* polyx, int *polyy, int polyi, int col) {
-  Sint16 spolyx[polyi], spolyy[polyi];
-  for(int i=0; i<polyi; i++) spolyx[i] = polyx[i], spolyy[i] = polyy[i];
-  filledPolygonColor(s, spolyx, spolyy, polyi, col);
-  }
-
-#endif
 
 void glcolor2(int color) {
   unsigned char *c = (unsigned char*) (&color);
@@ -358,25 +333,6 @@ void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outl
   addpoly(V, tab, cnt);
 
 
-#ifdef GFX
-  filledPolygonColorI(s, polyx, polyy, polyi, col);
-  if(svg::in) svg::polygon(polyx, polyy, polyi, col, outline);
-  if(vid.goteyes) filledPolygonColorI(aux, polyxr, polyy, polyi, col);
-  
-  (vid.usingAA?aapolylineColor:polylineColor)(s, polyx, polyy, polyi, outline);
-  if(vid.goteyes) aapolylineColor(aux, polyxr, polyy, polyi, outline);
-  
-  if(vid.xres >= 2000 || fatborder) {
-    int xmi = 3000, xma = -3000;
-    for(int t=0; t<polyi; t++) xmi = min(xmi, polyx[t]), xma = max(xma, polyx[t]);
-    
-    if(xma > xmi + 20) for(int x=-1; x<2; x++) for(int y=-1; y<=2; y++) if(x*x+y*y == 1) {
-      for(int t=0; t<polyi; t++) polyx[t] += x, polyy[t] += y;
-      aapolylineColor(s, polyx, polyy, polyi, outline);
-      for(int t=0; t<polyi; t++) polyx[t] -= x, polyy[t] -= y;
-      }
-    }
-#endif
   }
 
 vector<float> prettylinepoints;

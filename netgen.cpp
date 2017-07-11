@@ -214,27 +214,12 @@ namespace netgen {
   //============================
   
   void blackline(vec v1, vec v2, int col = 0x000000FF) {
-#ifdef GFX
-    aalineColor(s, int(v1.x), int(v1.y), int(v2.x), int(v2.y), col);
-#endif
     }
   
   void drawtriangle(vec v1, vec v2, vec v3, int col) {
-#ifdef GFX
-    polyx[0] = int(v1.x);
-    polyx[1] = int(v2.x);
-    polyx[2] = int(v3.x);
-    polyy[0] = int(v1.y);
-    polyy[1] = int(v2.y);
-    polyy[2] = int(v3.y);
-    filledPolygonColorI(s, polyx, polyy, 3, col);
-#endif
     }
     
   void blackcircle(vec v, int r, int col = 0x000000FF) {
-#ifdef GFX
-    aacircleColor(s, int(v.x), int(v.y), r, col);
-#endif
     }
   
   void blacktext(vec v, char c) {
@@ -297,10 +282,8 @@ namespace netgen {
   // draw the model
   void createPapermodel() {
 
-    #ifndef GFX
       addMessage(XLAT("High quality shots not available on this platform"));
       return;
-    #endif
     
     loadData();
 
