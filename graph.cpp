@@ -6332,9 +6332,14 @@ void drawfullmap() {
     } */
 
   drawthemap();
-  profile_start(2);
-  drawqueue();
-  profile_stop(2);
+  
+  glClear(GL_STENCIL_BUFFER_BIT);
+
+  int siz = int(ptds.size());
+  for(int i=0; i<siz; i++) {
+    polytodraw& ptd (ptds[i]);
+    drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
+    }
   }
 
 void drawscreen() {

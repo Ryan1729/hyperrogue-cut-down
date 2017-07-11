@@ -361,19 +361,6 @@ void prettyline(hyperpoint h1, hyperpoint h2, int col, int lev) {
   drawpolyline(Id, &prettylinepoints[0], int(prettylinepoints.size())/3, 0, col);
   }
 
-void drawqueue() {
-  int siz = int(ptds.size());
-  
-  if(vid.usingGL) 
-    glClear(GL_STENCIL_BUFFER_BIT);
-
-  for(int i=0; i<siz; i++) {
-    polytodraw& ptd (ptds[i]);
-    drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
-    }
-
-  }
-
 hpcshape 
   shFloorSide[SIDEPARS][2], shSemiFloorSide[SIDEPARS], shTriheptaSide[SIDEPARS][2], shMFloorSide[SIDEPARS][2],
   shFloor[2], shBFloor[2], shMFloor2[2], shMFloor3[2], shMFloor4[2],
