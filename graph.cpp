@@ -4397,26 +4397,14 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
       else if(mines > 0)
         queuepoly(V, shMineMark[ct6], (minecolors[mines] << 8) | 0xFF);
       }
-
-    if(c->land == laWhirlwind && c->wall != waBoat) {
-      double footphase = 0;
-      Vboat = &(Vboat0 = *Vboat);
-      applyAnimation(c, Vboat0, footphase, LAYER_BOAT);
-      }
     
     if(conformal::includeHistory && eq(c->aitmp, sval)) poly_outline = OUTLINE_DEAD;
 
-    if(true) {
       int q = ptds.size();
       error |= drawMonster(V, ct, c, moncol); 
       if(Vboat != &V && Vboat != &Vboat0 && q != int(ptds.size())) 
         pushdown(c, q, V, -geom3::factor_to_lev(zlevel(tC0((*Vboat)))),
           !isMultitile(c->monst), false);
-      }
-      
-    if(sword::at(c)) {
-      queuepolyat(V, shDisk, 0xC0404040, PPR_SWORDMARK);
-      }
     
     int ad = airdist(c);
     if(ad == 1 || ad == 2) {
