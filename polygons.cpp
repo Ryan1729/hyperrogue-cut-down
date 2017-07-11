@@ -318,21 +318,10 @@ void gldraw(const transmatrix& V, int ps, int pq, int col, int outline) {
   }
 
 void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outline) {
-#ifdef GL
-  if(vid.usingGL) {
-      const int pq = cnt;
-      if(currentvertices != tab)
-        activateVertexArray(tab, pq);
-      const int ps=0;
-      gldraw(V, ps, pq, col, outline);    
-    return;
-    }
-#endif
-  
-  polyi = 0;
-  addpoly(V, tab, cnt);
-
-
+    if(currentvertices != tab)
+       activateVertexArray(tab, cnt);
+      
+    gldraw(V, 0, cnt, col, outline);    
   }
 
 vector<float> prettylinepoints;
