@@ -951,7 +951,7 @@ int dlit;
 transmatrix View; // current rotation, relative to viewctr
 transmatrix cwtV; // player-relative view
 heptspin viewctr; // heptagon and rotation where the view is centered at
-bool playerfound; // has player been found in the last drawing?
+
 
 ld spina(cell *c, int dir) {
   return 2 * M_PI * dir / c->type;
@@ -3508,7 +3508,7 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
   
   // save the player's view center
   if(isPlayerOn(c)) {
-    playerfound = true;
+
       playerV = V * ddspin(c, cwt.spin);
       if(cwt.mirrored) playerV = playerV * Mirror;
       if(orig) cwtV = playerV;
@@ -5409,23 +5409,7 @@ void drawthemap() {
   mmhigh = vid.monmode == 3 || vid.monmode == 5;
   mmspatial = vid.monmode == 4 || vid.monmode == 5;
 
-  DEBB(DF_GRAPH, (debugfile,"draw the map\n"));
-  fanframe = ticks / (purehepta ? 300 : 150.0) / M_PI;
-
-  keycell = NULL;
-  
-  modist = 1e20; mouseover = NULL; 
-  modist2 = 1e20; mouseover2 = NULL; 
-  mouseovers = XLAT("Press F1 or right click for help");
-  centdist = 1e20; centerover = NULL; 
-
-  if(outofmap(mouseh)) 
-    modist = -5;
-  playerfound = false;
-
   drawrec(viewctr, 11, hsOrigin, ypush(vid.yshift) * Id * View);  
-  
-  lmouseover = mouseover;
   }
 
 void spinEdge(ld aspd) { 
@@ -5441,9 +5425,6 @@ void centerpc(ld aspd) {
   if(H[0] == 0 && H[1] == 0) return; // either already centered or direction unknown
   ld R = hdist0(H); // = sqrt(H[0] * H[0] + H[1] * H[1]);
   if(R < 1e-9) {
-    /* if(playerfoundL && playerfoundR) {
-      
-      } */
     spinEdge(aspd);
     fixmatrix(View);
     return;
@@ -5469,51 +5450,6 @@ void centerpc(ld aspd) {
       
     fixmatrix(View);
     spinEdge(aspd);
-    }
-  }
-
-void drawmovestar(double dx, double dy) {
-
-  if(viewdists) return;
-
-  DEBB(DF_GRAPH, (debugfile,"draw movestar\n"));
-  if(!playerfound) return;
-  
-
-  hyperpoint H = tC0(cwtV);
-  ld R = sqrt(H[0] * H[0] + H[1] * H[1]);
-  transmatrix Centered = Id;
-
-  if(euclid) 
-    Centered = eupush(H[0], H[1]);
-  else if(R > 1e-9) Centered = rgpushxto0(H);
-  
-  Centered = Centered * rgpushxto0(hpxy(dx*5, dy*5));
-  if(multi::cpid >= 0) multi::crosscenter[multi::cpid] = Centered;
-  
-  int rax = vid.axes;
-  if(rax == 1) rax = drawstaratvec(dx, dy) ? 2 : 0;
-  
-  if(rax == 0 || vid.axes == 4) return;
-
-  int starcol = getcs().uicolor;
-  
-  if(vid.axes == 3)
-    queuepoly(Centered, shMovestar, starcol);
-  
-  else for(int d=0; d<8; d++) {
-    int col = starcol;
-#ifdef PANDORA
-    if(leftclick && (d == 2 || d == 6 || d == 1 || d == 7)) col &= 0xFFFFFF3F;
-    if(rightclick && (d == 2 || d == 6 || d == 3 || d == 5)) col &= 0xFFFFFF3F;
-    if(!leftclick && !rightclick && (d&1)) col &= 0xFFFFFF3F;
-#endif
-//  EUCLIDEAN
-    if(euclid)
-      queueline(tC0(Centered), Centered * ddi0(d * 10.5, 0.5) , col, 0);
-    else
-
-      queueline(tC0(Centered), Centered * xspinpush0(M_PI*d/4, d==0?.7:d==2?.5:.2), col, 3);
     }
   }
 
@@ -6542,13 +6478,11 @@ bool needConfirmation() {
   }
 
 void fullcenter() {
-  if(playerfound && false) centerpc(INF);
-  else {
+  
     bfs();
     resetview();
     drawthemap();
     centerpc(INF);
-    }
   playermoved = true;
   }
 
