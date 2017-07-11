@@ -204,29 +204,6 @@ int darkena(int c, int lev, int a) {
   return (c << 8) + a;
   }
 
-
-bool cameraangle_on;
-
-void setcameraangle(bool b) {
-  if(cameraangle_on != b) {
-    glMatrixMode(GL_PROJECTION);
-    cameraangle_on = b;
-    ld cam = vid.camera_angle * M_PI / 180;
-
-    GLfloat cc = cos(cam);
-    GLfloat ss = sin(cam * (b?1:-1));
-    
-    GLfloat yzspin[16] = {
-      1, 0, 0, 0,
-      0, cc, ss, 0,
-      0, -ss, cc, 0,
-      0, 0, 0, 1
-      };
-  
-    glMultMatrixf(yzspin);
-    }
-  }
-
 void selectEyeGL(int ed) {
   DEBB(DF_GRAPH, (debugfile,"selectEyeGL\n"));
 
@@ -279,8 +256,6 @@ void selectEyeGL(int ed) {
     if(ve) glTranslatef(ve, 0, vid.eye);
     vid.scrdist = vid.yres * sc / 2;
     }
-  
-  cameraangle_on = false;
   }
 
 void setGLProjection() {

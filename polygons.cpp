@@ -369,15 +369,9 @@ void prettyline(hyperpoint h1, hyperpoint h2, int col, int lev) {
   drawpolyline(Id, &prettylinepoints[0], int(prettylinepoints.size())/3, 0, col);
   }
 
-
-
-
 void drawqueue() {
-
   int siz = int(ptds.size());
-
-  setcameraangle(true);
-
+  
   if(vid.usingGL) 
     glClear(GL_STENCIL_BUFFER_BIT);
 
@@ -412,8 +406,6 @@ void drawqueue() {
       drawCircle(ptd.u.cir.x, ptd.u.cir.y, ptd.u.cir.size, ptd.col);
       }
     }
-
-  setcameraangle(false);
 
   }
 
