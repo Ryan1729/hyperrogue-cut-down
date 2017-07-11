@@ -387,42 +387,10 @@ void drawqueue() {
   if(vid.usingGL) 
     glClear(GL_STENCIL_BUFFER_BIT);
 #endif
-  
-  profile_start(3);
-#ifdef STLSORT
-  sort(ptds.begin(), ptds.end(), ptdsort);
-  
-#else
-  
-  int qp[PPR_MAX];
-  for(int a=0; a<PPR_MAX; a++) qp[a] = 0;
-  
-  for(int i = 0; i<siz; i++) {
-    if(ptds[i].prio < 0 || ptds[i].prio >= PPR_MAX) {
-      printf("Illegal priority %d of kind %d\n", ptds[i].prio, ptds[i].kind);
-      ptds[i].prio = rand() % PPR_MAX;
-      }
-    qp[ptds[i].prio]++;
-    }
-  
-  int total = 0;
-  for(int a=0; a<PPR_MAX; a++) {
-    int b = qp[a];
-    qp[a] = total; total += b;
-    }
-  
-  ptds2.resize(siz);
-  
-  for(int i = 0; i<siz; i++) ptds2[qp[ptds[i].prio]++] = &ptds[i];
 
-#endif
   for(int i=0; i<siz; i++) {
 
-#ifdef STLSORT
     polytodraw& ptd (ptds[i]);
-#else
-    polytodraw& ptd (*ptds2[i]);
-#endif
     
     if(ptd.kind == pkResetModel) {
       pmodel = eModel(ptd.col);
