@@ -438,7 +438,7 @@ namespace conformal {
         SDL_FillRect(s, NULL, 0);
         bool ugl = vid.usingGL;
         vid.usingGL = false;
-        drawfullmap();
+
         vid.usingGL = ugl;
     
         hyperpoint next = 

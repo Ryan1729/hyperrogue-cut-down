@@ -300,7 +300,7 @@ namespace netgen {
 
 
     SDL_FillRect(s, NULL, 0);
-    drawfullmap();
+
 
     mode = 0;
     

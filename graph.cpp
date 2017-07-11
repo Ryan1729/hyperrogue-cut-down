@@ -6141,42 +6141,6 @@ void IMAGESAVE(SDL_Surface *s, const char *fname) {
 int pngres = 2000;
 
 void saveHighQualityShot(const char *fname) {
-
-  addMessage(XLAT("High quality shots not available on this platform"));
-  return;
-
-  dynamicval<int> v3(sightrange, (cheater && sightrange < 10) ? 10 : sightrange);
-
-  if(cheater) doOvergenerate();
-
-  time_t timer;
-  timer = time(NULL);
-
-  dynamicval<videopar> v(vid, vid);
-  dynamicval<bool> v2(inHighQual, true);
-  dynamicval<int> v4(cheater, 0);
-  vid.xres = vid.yres = pngres;
-  vid.usingGL = false;
-  // if(vid.pmodel == 0) vid.scale = 0.99;
-  calcparam();
-
-  dynamicval<SDL_Surface*> v5(s, SDL_CreateRGBSurface(SDL_SWSURFACE,vid.xres,vid.yres,32,0,0,0,0));
-
-
-
-  for(int i=0; i<(fname?1:2); i++) {
-    SDL_FillRect(s, NULL, fname ? backcolor : i ? 0xFFFFFF : 0);
-    drawfullmap();
-  
-    char buf[128]; strftime(buf, 128, "bigshota-%y%m%d-%H%M%S" IMAGEEXT, localtime(&timer));
-    buf[7] += i;
-    if(!fname) fname = buf;
-    IMAGESAVE(s, fname);
-
-    if(i == 0) addMessage(XLAT("Saved the high quality shot to %1", fname));
-    }
-  
-  SDL_FreeSurface(s);
   }
 
 void addball(ld a, ld b, ld c) {
@@ -6203,20 +6167,6 @@ void ballgeometry() {
   queuereset(pmodel, PPR_CIRCLE);
   }
 
-void drawfullmap() {
-  ptds.clear();
-
-  drawthemap();
-  
-  glClear(GL_STENCIL_BUFFER_BIT);
-
-  int siz = int(ptds.size());
-  for(int i=0; i<siz; i++) {
-    polytodraw& ptd (ptds[i]);
-    drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
-    }
-  }
-
 void drawscreen() {
   if(vid.xres == 0 || vid.yres == 0) return;
 
@@ -6228,8 +6178,20 @@ void drawscreen() {
   
   if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
   
-  if(conformal::includeHistory) conformal::restore();
-  else drawfullmap();
+  ptds.clear();
+
+  swap(gmatrix0, gmatrix);
+  gmatrix.clear();
+
+  drawrec(viewctr, 11, hsOrigin, ypush(vid.yshift) * View);  
+  
+  glClear(GL_STENCIL_BUFFER_BIT);
+
+  int siz = int(ptds.size());
+  for(int i=0; i<siz; i++) {
+    polytodraw& ptd (ptds[i]);
+    drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
+    }
 
   if(conformal::includeHistory) conformal::restoreBack();
   
