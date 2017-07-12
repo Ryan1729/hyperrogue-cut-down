@@ -885,7 +885,7 @@ bool playerInBoat(int i);
 extern int lowfar;
 extern bool wmspatial, wmescher, wmplain, wmblack, wmascii;
 extern bool mmspatial, mmhigh, mmmon, mmitem;
-extern int maxreclevel, reclevel;
+
 
 string explain3D(ld *param);
 

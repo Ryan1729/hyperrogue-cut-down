@@ -8,7 +8,7 @@ bool quitsaves() { return (items[itOrbSafety] && havesave); }
 
 bool wmspatial = true, wmescher = true, wmplain, wmblack, wmascii;
 bool mmspatial = true, mmhigh, mmmon = true, mmitem = true;
-int maxreclevel, reclevel;
+
 
 int lastt;
 
@@ -5212,7 +5212,6 @@ void drawrec(const heptspin& hs, int lev, hstate s, const transmatrix& V) {
   const transmatrix& V1 = hs.mirrored ? (V10 = V * Mirror) : V;
   
   if(dodrawcell(c)) {
-    reclevel = maxreclevel - lev;
     drawcell(c, (hs.spin || purehepta) ? V1 * spin(hs.spin*2*M_PI/S7 + (purehepta ? M_PI:0)) : V1);
     }
   
@@ -5220,8 +5219,7 @@ void drawrec(const heptspin& hs, int lev, hstate s, const transmatrix& V) {
   
   if(!purehepta) for(int d=0; d<S7; d++) {
     int ds = fixrot(hs.spin + d);
-    reclevel = maxreclevel - lev + 1;
-    // createMov(c, ds);
+
     if(c->mov[ds] && c->spn(ds) == 0 && dodrawcell(c->mov[ds])) {
       drawcell(c->mov[ds], V1 * hexmove[d]);
       }
@@ -5269,7 +5267,7 @@ void drawEuclidean() {
   for(int dy=minsy; dy<=maxsy; dy++) {
     eucoord x = dx+px;
     eucoord y = dy+py;
-    reclevel = eudist(dx, dy);
+
     cell *c = euclideanAt(x,y);
     if(!c) continue;
     transmatrix Mat = eumove(x, y);
