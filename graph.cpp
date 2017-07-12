@@ -5548,48 +5548,6 @@ void drawscreen() {
 
 bool setfsize = true;
 
-void setvideomode() {
-
-  DEBB(DF_INIT, (debugfile,"setvideomode\n"));
-  
-  if(!vid.full) {
-    if(vid.xres > vid.xscr) vid.xres = vid.xscr * 9/10, setfsize = true;
-    if(vid.yres > vid.yscr) vid.yres = vid.yscr * 9/10, setfsize = true;    
-    }
-  
-  if(setfsize) vid.fsize = min(vid.yres / 32, vid.xres / 48), setfsize = false;
-
-  int flags = 0;
-  
-  if(vid.usingGL) {
-    flags = SDL_OPENGL | SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER;
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
-    }
-
-  int sizeflag = (vid.full ? SDL_FULLSCREEN : SDL_RESIZABLE);
-  
-  s= SDL_SetVideoMode(vid.xres, vid.yres, 32, flags | sizeflag);
-  
-  if(vid.full && !s) {
-    vid.xres = vid.xscr;
-    vid.yres = vid.yscr;
-    vid.fsize = min(vid.yres / 32, vid.xres / 48);
-    s = SDL_SetVideoMode(vid.xres, vid.yres, 32, flags | SDL_FULLSCREEN);
-    }
-
-  if(!s) {
-    addMessage("Failed to set the graphical mode: "+its(vid.xres)+"x"+its(vid.yres)+(vid.full ? " fullscreen" : " windowed"));
-    vid.xres = 640;
-    vid.yres = 480;
-    s = SDL_SetVideoMode(vid.xres, vid.yres, 32, flags | SDL_RESIZABLE);
-    }
-
-  if(vid.usingGL) {
-    glViewport(0, 0, vid.xres, vid.yres);
-    resetGL();
-    }
-  }
-
 void restartGraph() {
   DEBB(DF_INIT, (debugfile,"restartGraph\n"));
   
@@ -5656,9 +5614,6 @@ void closeJoysticks() {
   }
 
 void initgraph() {
-
-  DEBB(DF_INIT, (debugfile,"initgraph\n"));
-
   vid.usingGL = true;
   vid.usingAA = true;
   vid.flashtime = 8;
@@ -5682,11 +5637,6 @@ void initgraph() {
   vid.joyvalue = 4800;
   vid.joyvalue2 = 5600;
   vid.joypanthreshold = 2500;
-#ifdef PANDORA
-  vid.joypanspeed = 0.0001;
-#else
-  vid.joypanspeed = 0;
-#endif
 
   vid.framelimit = 75;
   vid.axes = 1;
@@ -5704,9 +5654,6 @@ void initgraph() {
   
   vid.drawmousecircle = false;
   revcontrol = false;
-#ifdef PANDORA
-  vid.drawmousecircle = true;
-#endif
   
   shmup::initConfig();
 
@@ -5747,9 +5694,6 @@ void initgraph() {
     printf("Failed to initialize TTF.\n");
     exit(2);
     }
-  
-  initJoysticks();
-
     
   }
 
@@ -6107,9 +6051,33 @@ void handleInput() {
  
 }
 
+void initGL() {
+    int flags = 0;
+    flags = SDL_OPENGL | SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER;
+    int sizeflag = (vid.full ? SDL_FULLSCREEN : SDL_RESIZABLE);
+  
+    s= SDL_SetVideoMode(vid.xres, vid.yres, 32, flags | sizeflag);
+  
+    if(vid.full && !s) {
+    vid.xres = vid.xscr;
+    vid.yres = vid.yscr;
+    vid.fsize = min(vid.yres / 32, vid.xres / 48);
+    s = SDL_SetVideoMode(vid.xres, vid.yres, 32, flags | SDL_FULLSCREEN);
+    }
 
+  if(!s) {
+    addMessage("Failed to set the graphical mode: "+its(vid.xres)+"x"+its(vid.yres)+(vid.full ? " fullscreen" : " windowed"));
+    vid.xres = 640;
+    vid.yres = 480;
+    s = SDL_SetVideoMode(vid.xres, vid.yres, 32, flags | SDL_RESIZABLE);
+    }
+    
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);    
+    glViewport(0, 0, vid.xres, vid.yres);
+}
 
 void mainloopiter() {
+    
     {
         int turn = 0;
   ld best = INF;
@@ -6208,6 +6176,26 @@ void mainloop() {
   lastt = 0;
   while(!quitmainloop) mainloopiter();
   }
+
+
+void setvideomode() {
+
+  DEBB(DF_INIT, (debugfile,"setvideomode\n"));
+  
+  if(!vid.full) {
+    if(vid.xres > vid.xscr) vid.xres = vid.xscr * 9/10, setfsize = true;
+    if(vid.yres > vid.yscr) vid.yres = vid.yscr * 9/10, setfsize = true;    
+    }
+  
+  if(setfsize) vid.fsize = min(vid.yres / 32, vid.xres / 48), setfsize = false;
+
+  if(vid.usingGL) {
+    initGL();
+    resetGL();
+    }
+  }
+
+
 
 void cleargraph() {
   DEBB(DF_INIT, (debugfile,"clear graph\n"));
