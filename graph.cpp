@@ -4818,29 +4818,6 @@ void centerpc(ld aspd) {
     }
   }
 
-void optimizeview() {
-  
-  DEBB(DF_GRAPH, (debugfile,"optimize view\n"));
-  int turn = 0;
-  ld best = INF;
-  
-  transmatrix TB = Id;
-  
-  for(int i=-1; i<S7; i++) {
-
-    ld trot = -i * M_PI * 2 / (S7+.0);
-    transmatrix T = i < 0 ? Id : spin(trot) * xpush(tessf) * pispin;
-    hyperpoint H = View * tC0(T);
-    if(H[2] < best) best = H[2], turn = i, TB = T;
-    }
-  
-  if(turn >= 0) {
-    View = View * TB;
-    fixmatrix(View);
-    viewctr = hsspin(viewctr, turn);
-    viewctr = hsstep(viewctr, 0);
-    }
-  }
 
 movedir vectodir(const hyperpoint& P) {
 
@@ -6133,9 +6110,27 @@ void handleInput() {
 
 
 void mainloopiter() {
-  optimizeview();
+    {
+        int turn = 0;
+  ld best = INF;
+  
+  transmatrix TB = Id;
+  
+  for(int i=-1; i<S7; i++) {
 
-  if(conformal::on) conformal::apply();
+    ld trot = -i * M_PI * 2 / (S7+.0);
+    transmatrix T = i < 0 ? Id : spin(trot) * xpush(tessf) * pispin;
+    hyperpoint H = View * tC0(T);
+    if(H[2] < best) best = H[2], turn = i, TB = T;
+    }
+  
+  if(turn >= 0) {
+    View = View * TB;
+    fixmatrix(View);
+    viewctr = hsspin(viewctr, turn);
+    viewctr = hsstep(viewctr, 0);
+    }
+}
   
   ticks = SDL_GetTicks();
     
@@ -6197,8 +6192,6 @@ void mainloopiter() {
             polytodraw& ptd (ptds[i]);
             drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
             }
-
-          if(conformal::includeHistory) conformal::restoreBack();
           
           getcstat = 0; inslider = false;
 
