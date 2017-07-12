@@ -2869,12 +2869,7 @@ void updateHi(eItem it, int v) {
     if(v > hiitems[modecode()][it]) hiitems[modecode()][it] = v;
   }
 
-void gainItem(eItem it) {
-  int g = gold();
-  items[it]++; if(it != itLotus) updateHi(it, items[it]);
-
-  multi::treasures[multi::cpid]++;
-  }
+void gainItem(eItem it) {}
 
 string itemcounter(int qty) {
   string s = ""; s += " ("; s += its(qty); s += ")"; return s;
@@ -5841,7 +5836,6 @@ bool movepcto(int d, int subdir, bool checkonly) {
     }
   if(d != -1 && !checkonly) playermoved = true;
   if(!checkonly) invismove = false;  
-  bool boatmove = false;
 
   if(d >= 0) {
     cell *c2 = cwt.c->mov[d];

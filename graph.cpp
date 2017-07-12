@@ -1002,33 +1002,9 @@ void drawSafety(const transmatrix& V, int ct) {
     queueline(V*ddi0(ds+a*S84/ct, 2*hexf), V*ddi0(ds+(a+(ct-1)/2)*S84/ct, 2*hexf), col);
   }
 
-void drawFlash(const transmatrix& V) {
-  float ds = ticks / 300.;
-  int col = darkena(iinf[itOrbFlash].color, 0, 0xFF);
-  col &= ~1;
-  for(int u=0; u<5; u++) {
-    ld rad = hexf * (2.5 + .5 * sin(ds+u*.3));
+void drawFlash(const transmatrix& V) {}
 
-
-    }
-  }
-
-void drawLove(const transmatrix& V, int hdir) {
-  float ds = ticks / 300.;
-  int col = darkena(iinf[itOrbLove].color, 0, 0xFF);
-  col &= ~1;
-  for(int u=0; u<5; u++) {
-    for(int a=0; a<=S84; a++) {
-      double d = (1 + cos(a * M_PI/S42)) / 2;
-      int z = a; if(z>S42) z = S84-z;
-      if(z <= 10) d += (10-z) * (10-z) * (10-z) / 3000.;
-
-      ld rad = hexf * (2.5 + .5 * sin(ds+u*.3)) * d;
-
-      }
-
-    }
-  }
+void drawLove(const transmatrix& V, int hdir) {}
 
 void drawWinter(const transmatrix& V, int hdir) {
   float ds = ticks / 300.;
@@ -3505,16 +3481,8 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
     
     if(c->land == laNone && c->wall == waNone) 
       queuepoly(V, shTriangle, 0xFFFF0000);
-    
-    bool hidden = itemHidden(c);
-    bool hiddens = itemHiddenFromSight(c);
-    
-    if(conformal::includeHistory && eq(c->aitmp, sval)) {
-      hidden = true;
-      hiddens = false;
-      }
 
-    int icol = 0, moncol = 0xFF00FF;
+    int moncol = 0xFF00FF;
     
     if(c->monst) {
       ch = minf[c->monst].glyph, moncol = minf[c->monst].color;
