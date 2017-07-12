@@ -259,8 +259,6 @@ void selectEyeGL(int ed) {
   }
 
 void setGLProjection() {
-  DEBB(DF_GRAPH, (debugfile,"setGLProjection\n"));
-
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   
@@ -271,17 +269,7 @@ void setGLProjection() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
-  if(pmodel == mdBall || pmodel == mdHyperboloid) {
-#ifdef GL_ES
-    glClearDepthf(1.0f);
-#else
-    glClearDepth(1.0f);
-#endif
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    }
-  else
-    glDisable(GL_DEPTH_TEST);
+  glDisable(GL_DEPTH_TEST);
   
   selectEyeGL(0);
   }
@@ -6654,8 +6642,31 @@ void mainloopiter() {
     
     tortoise::updateVals(ticks - lastt);
     frames++;
-    if(!outoffocus) {
-      drawscreen();
+    if((!outoffocus) && vid.xres != 0 && vid.yres != 0) {
+          calcparam();
+          setGLProjection();
+          
+          ptds.clear();
+
+          swap(gmatrix0, gmatrix);
+          gmatrix.clear();
+
+          drawrec(viewctr, 11, hsOrigin, ypush(vid.yshift) * View);  
+          
+          glClear(GL_STENCIL_BUFFER_BIT);
+
+          int siz = int(ptds.size());
+          for(int i=0; i<siz; i++) {
+            polytodraw& ptd (ptds[i]);
+            drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
+            }
+
+          if(conformal::includeHistory) conformal::restoreBack();
+          
+          getcstat = 0; inslider = false;
+
+          SDL_GL_SwapBuffers(); 
+        
       }
     lastt = ticks;
     }      
