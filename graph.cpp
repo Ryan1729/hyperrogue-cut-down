@@ -3338,17 +3338,7 @@ void pushdown(cell *c, int& q, const transmatrix &V, double down, bool rezoom, b
   }
 
 bool dodrawcell(cell *c) {
-  // todo: fix when scrolling
-  if(!buggyGeneration && c->land != laCanvas && sightrange < 10) {
-    // not yet created
-    if(c->mpdist > 7 && !cheater) return false;
-    // in the Yendor Challenge, scrolling back is forbidden
-    if(c->cpdist > 7 && (yendor::on && !cheater)) return false;
-    // (incorrect comment) too far, no bugs nearby
-    if(playermoved && sightrange <= 7 && c->cpdist > sightrange) return false;
-    }
-  
-  return true;
+  return !(playermoved && sightrange <= 7 && c->cpdist > sightrange);
   }
 
 // 1 : (floor, water); 2 : (water, bottom); 4 : (bottom, inf)
