@@ -6575,103 +6575,8 @@ void handlekey(int sym, int uni, extra& ev) {
   }
 
 
-// Warning: a very long function! todo: refactor
-
-
-void mainloopiter() {
-
-  DEBB(DF_GRAPH, (debugfile,"main loop\n"));
-
-  
-  optimizeview();
-
-  if(conformal::on) conformal::apply();
-  
-  ticks = SDL_GetTicks();
-    
-  int cframelimit = vid.framelimit;
-  if(outoffocus && cframelimit > 10) cframelimit = 10;
-  
-  int timetowait = lastt + 1000 / cframelimit - ticks;
-
-  if(vid.sspeed >= 5 && gmatrix.count(cwt.c) && !elliptic) {
-    cwtV = gmatrix[cwt.c] * ddspin(cwt.c, cwt.spin);
-    if(cwt.mirrored) playerV = playerV * Mirror;
-    }
-
-  if(timetowait > 0)
-    SDL_Delay(timetowait);
-  else {
-      if(playermoved && vid.sspeed > -4.99 && !outoffocus)
-        centerpc((ticks - lastt) / 1000.0 * exp(vid.sspeed));
-      if(panjoyx || panjoyy) 
-        checkpanjoy((ticks - lastt) / 1000.0);
-    
-    tortoise::updateVals(ticks - lastt);
-    frames++;
-    if((!outoffocus) && vid.xres != 0 && vid.yres != 0) {
-          calcparam();
-           unsigned char *c = (unsigned char*) (&backcolor);
-          glClearColor(c[2] / 255.0, c[1] / 255.0, c[0]/255.0, 1);
-          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-          
-          glEnable(GL_BLEND);
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-          
-          glDisable(GL_DEPTH_TEST);
-          
-            glMatrixMode(GL_PROJECTION);
-          glLoadIdentity();
-          
-          glTranslatef((vid.xcenter*2.)/vid.xres - 1, 1 - (vid.ycenter*2.)/vid.yres, 0);
-
-            float lowdepth = .1;
-            float hidepth = 1e9;
-          
-            // simulate glFrustum
-            GLfloat frustum[16] = {
-              GLfloat(vid.yres * 1./vid.xres), 0, 0, 0, 
-              0, 1, 0, 0, 
-              0, 0, -(hidepth+lowdepth)/(hidepth-lowdepth), -1,
-              0, 0, -2*lowdepth*hidepth/(hidepth-lowdepth), 0};
-          
-            glMultMatrixf(frustum);
-
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-          
-            GLfloat sc = vid.radius / (vid.yres/2.);
-            GLfloat mat[16] = {sc,0,0,0, 0,-sc,0,0, 0,0,-1,0, 0,0, 0,1};
-            glMultMatrixf(mat);
-            
-            vid.scrdist = vid.yres * sc / 2;
-          
-          ptds.clear();
-
-          swap(gmatrix0, gmatrix);
-          gmatrix.clear();
-
-          drawrec(viewctr, 11, hsOrigin, ypush(vid.yshift) * View);  
-          
-          glClear(GL_STENCIL_BUFFER_BIT);
-
-          int siz = int(ptds.size());
-          for(int i=0; i<siz; i++) {
-            polytodraw& ptd (ptds[i]);
-            drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
-            }
-
-          if(conformal::includeHistory) conformal::restoreBack();
-          
-          getcstat = 0; inslider = false;
-
-          SDL_GL_SwapBuffers(); 
-        
-      }
-    lastt = ticks;
-    }      
-
-  Uint8 *keystate = SDL_GetKeyState(NULL);
+void handleInput() {
+      Uint8 *keystate = SDL_GetKeyState(NULL);
   rightclick = keystate[SDLK_RCTRL];
   leftclick = keystate[SDLK_RSHIFT];
   lctrlclick = keystate[SDLK_LCTRL];
@@ -6804,7 +6709,93 @@ void mainloopiter() {
        quitmainloop = true;
        }
     }
-  }
+ 
+}
+
+
+
+void mainloopiter() {
+  optimizeview();
+
+  if(conformal::on) conformal::apply();
+  
+  ticks = SDL_GetTicks();
+    
+  int cframelimit = vid.framelimit;
+  if(outoffocus && cframelimit > 10) cframelimit = 10;
+
+   {
+      if(playermoved && vid.sspeed > -4.99 && !outoffocus)
+        centerpc((ticks - lastt) / 1000.0 * exp(vid.sspeed));
+      if(panjoyx || panjoyy) 
+        checkpanjoy((ticks - lastt) / 1000.0);
+    
+    tortoise::updateVals(ticks - lastt);
+    frames++;
+    if((!outoffocus) && vid.xres != 0 && vid.yres != 0) {
+          calcparam();
+           unsigned char *c = (unsigned char*) (&backcolor);
+          glClearColor(c[2] / 255.0, c[1] / 255.0, c[0]/255.0, 1);
+          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+          
+          glEnable(GL_BLEND);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          
+          glDisable(GL_DEPTH_TEST);
+          
+            glMatrixMode(GL_PROJECTION);
+          glLoadIdentity();
+          
+          glTranslatef((vid.xcenter*2.)/vid.xres - 1, 1 - (vid.ycenter*2.)/vid.yres, 0);
+
+            float lowdepth = .1;
+            float hidepth = 1e9;
+          
+            // simulate glFrustum
+            GLfloat frustum[16] = {
+              GLfloat(vid.yres * 1./vid.xres), 0, 0, 0, 
+              0, 1, 0, 0, 
+              0, 0, -(hidepth+lowdepth)/(hidepth-lowdepth), -1,
+              0, 0, -2*lowdepth*hidepth/(hidepth-lowdepth), 0};
+          
+            glMultMatrixf(frustum);
+
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+          
+            GLfloat sc = vid.radius / (vid.yres/2.);
+            GLfloat mat[16] = {sc,0,0,0, 0,-sc,0,0, 0,0,-1,0, 0,0, 0,1};
+            glMultMatrixf(mat);
+            
+            vid.scrdist = vid.yres * sc / 2;
+          
+          ptds.clear();
+
+          swap(gmatrix0, gmatrix);
+          gmatrix.clear();
+
+          drawrec(viewctr, 11, hsOrigin, ypush(vid.yshift) * View);  
+          
+          glClear(GL_STENCIL_BUFFER_BIT);
+
+          int siz = int(ptds.size());
+          for(int i=0; i<siz; i++) {
+            polytodraw& ptd (ptds[i]);
+            drawpolyline(ptd.poly.V, ptd.poly.tab, ptd.poly.cnt, ptd.col, ptd.poly.outline);
+            }
+
+          if(conformal::includeHistory) conformal::restoreBack();
+          
+          getcstat = 0; inslider = false;
+
+          SDL_GL_SwapBuffers(); 
+        
+      }
+    lastt = ticks;
+    }      
+
+    handleInput();
+ }
 
 void mainloop() {
   lastt = 0;
