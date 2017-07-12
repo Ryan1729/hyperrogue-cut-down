@@ -3366,9 +3366,6 @@ bool allemptynear(cell *c) {
   }
 
 void drawcell(cell *c, transmatrix V) {
-
-  qfi.shape = NULL; qfi.special = false;
-
   transmatrix& gm = gmatrix[c];
   bool orig = (gm[2][2] == 0 || fabs(gm[2][2]-1) >= fabs(V[2][2]-1) - 1e-8);
   
@@ -3457,8 +3454,6 @@ void drawcell(cell *c, transmatrix V) {
     int ct = c->type;
     int ct6 = K(c);
 
-    bool error = false;
-    
     chasmg = chasmgraph(c);
     
     int fd = 
@@ -4086,284 +4081,16 @@ void drawcell(cell *c, transmatrix V) {
         queuepoly(V, shBigCarpet2, darkena(0x600000, 0, 0xFF));
         queuepoly(V, shBigCarpet3, darkena(0xC09F00, 0, 0xFF));
         }
-
-      else if(xch != '.' && xch != '+' && xch != '>' && xch != ':'&& xch != '-' && xch != ';' && c->wall != waSulphur && xch != ',')
-        error = true;
       }
-    else if(!(c->monst || c->cpdist == 0)) error = true;
-    
-    int sha = shallow(c);
 
-    if(wmspatial && sha) {
-      bool w = isWarped(c);
-      int col = (highwall(c) || c->wall == waTower) ? wcol : fcol;
-      if(!chasmg) {
-        if(sha & 1) {
-          forCellIdEx(c2, i, c) if(chasmgraph(c2)) 
-            placeSidewallX(c, i, SIDE_LAKE, V, w, false, darkena(gradient(0, col, 0, .8, 1), fd, 0xFF));
-          }
-        if(sha & 2) {
-          forCellIdEx(c2, i, c) if(chasmgraph(c2)) 
-            placeSidewallX(c, i, SIDE_LTOB, V, w, false, darkena(gradient(0, col, 0, .7, 1), fd, 0xFF));
-          }
-        if(sha & 4) {
-          bool dbot = true;
-          forCellIdEx(c2, i, c) if(chasmgraph(c2) == 2) {
-            if(dbot) dbot = false,
-              warpfloor(c, mscale(V, geom3::BOTTOM), 0x080808FF, PPR_LAKEBOTTOM, isWarped(c));
-            placeSidewallX(c, i, SIDE_BTOI, V, w, false, darkena(gradient(0, col, 0, .6, 1), fd, 0xFF));
-            }
-          }
-        }
-      // wall between lake and chasm -- no Escher here
-      if(chasmg == 1) forCellIdEx(c2, i, c) if(chasmgraph(c2) == 2) {
-        placeSidewall(c, i, SIDE_LAKE, V, w, false, 0x202030FF);
-        placeSidewall(c, i, SIDE_LTOB, V, w, false, 0x181820FF);
-        placeSidewall(c, i, SIDE_BTOI, V, w, false, 0x101010FF);
-        }
-      }
-    
     if(chasmg == 1 && wmspatial) {
       int fd0 = fd ? fd-1 : 0;
       warpfloor(c, (*Vdp), darkena(fcol, fd0, 0x80), PPR_LAKELEV, isWarped(c));
       }
-    
-    if(chasmg) {
-      int q = int(ptds.size());
-      if(fallanims.count(c)) {
-         fallanim& fa = fallanims[c];
-         bool erase = true;
-         if(fa.t_floor) {
-           int t = (ticks - fa.t_floor);
-           if(t <= 1500) {
-             erase = false;
-             if(fa.walltype == waNone)
-               warpfloor(c, V, darkena(fcol, fd, 0xFF), PPR_FLOOR, isWarped(c));
-             else {
-               int wcol2, fcol2;
-               eWall w = c->wall; int p = c->wparam;
-               c->wall = fa.walltype; c->wparam = fa.m;
-               setcolors(c, wcol2, fcol2);
-               int starcol = c->wall == waVinePlant ? 0x60C000 : wcol2;
-               c->wall = w; c->wparam = p;
-               bool warp = isWarped(c);
-               warpfloor(c, mscale(V, geom3::WALL), darkena(starcol, fd, 0xFF), PPR_WALL3, warp);
-               queuepolyat(mscale(V, geom3::WALL), shWall[ct6], darkena(wcol2, 0, 0xFF), PPR_WALL3A);
-               forCellIdEx(c2, i, c)
-                 placeSidewallX(c, i, SIDE_WALL, V, warp, false, darkena(wcol2, 1, 0xFF));
-               }
-             pushdown(c, q, V, t*t / 1000000. + t / 1000., true, true);
-             }
-           }
-         if(fa.t_mon) {
-           int t = (ticks - fa.t_mon);
-           if(t <= 1500) {
-             erase = false;
-             c->stuntime = 0;
-             transmatrix V2 = V;
-             double footphase = t / 200.0;
-             applyAnimation(c, V2, footphase, LAYER_SMALL);
-             drawMonsterType(fa.m, c, V2, minf[fa.m].color, footphase);
-             pushdown(c, q, V2, t*t / 1000000. + t / 1000., true, true);
-             }
-           }
-         if(erase) fallanims.erase(c);
-         }
-       }
-
-    if(c->wall == waMineOpen) {
-      int mines = countMinesAround(c);
+      drawMonster(V, ct, c, moncol); 
       
-      if(wmascii) {
-        if(ch == '.') {
-          if(mines == 0) ch = ' ';
-          else ch = '0' + mines, asciicol = minecolors[mines];
-          }
-        else if(ch == '@') asciicol = minecolors[mines];
-        }
-      else if(mines > 0)
-        queuepoly(V, shMineMark[ct6], (minecolors[mines] << 8) | 0xFF);
-      }
-    
-    if(conformal::includeHistory && eq(c->aitmp, sval)) poly_outline = OUTLINE_DEAD;
-
-      int q = ptds.size();
-      error |= drawMonster(V, ct, c, moncol); 
-      if(Vboat != &V && Vboat != &Vboat0 && q != int(ptds.size())) 
-        pushdown(c, q, V, -geom3::factor_to_lev(zlevel(tC0((*Vboat)))),
-          !isMultitile(c->monst), false);
-    
-    int ad = airdist(c);
-    if(ad == 1 || ad == 2) {
-
-     for(int i=0; i<c->type; i++) {
-       cell *c2 = c->mov[i]; 
-       if(airdist(c2) < airdist(c)) {
-         calcAirdir(c2); // printf("airdir = %d\n", airdir);
-         transmatrix V0 = ddspin(c, i, S42);
-         
-         double ph = ticks / (purehepta?150:75.0) + airdir * M_PI / (S21+.0);
-         
-         int aircol = 0x8080FF00 | int(32 + 32 * -cos(ph));
-         
-         double ph0 = ph/2;
-         ph0 -= floor(ph0/M_PI)*M_PI;
-
-         poly_outline = OUTLINE_TRANS;
-         queuepoly((*Vdp)*V0*xpush(hexf*-cos(ph0)), shDisk, aircol);
-         poly_outline = OUTLINE_NONE;
-         }
-       }
-
-//    queuepoly(V*ddi(rand() % S84, hexf*(rand()%100)/100), shDisk, aircolor(airdir));
-      }
-
-    /* int rd = rosedist(c);
-    if(rd > 0 && ((rd&7) == (turncount&7))) {
-
-     for(int i=0; i<c->type; i++) {
-       cell *c2 = c->mov[i]; 
-       if(rosedist(c2) == rosedist(c)-1) {
-         int hdir = displaydir(c, i);
-         transmatrix V0 = spin((S42+hdir) * M_PI / S42);
-         
-         double ph = ticks / 75.0; // + airdir * M_PI / (S21+.0);
-         
-         int rosecol = 0x764e7c00 | int(32 + 32 * -cos(ph));
-         
-         double ph0 = ph/2;
-         ph0 -= floor(ph0/M_PI)*M_PI;
-
-         poly_outline = OUTLINE_TRANS;
-         queuepoly(V*V0*ddi(0, hexf*-cos(ph0)), shDisk, rosecol);
-         poly_outline = OUTLINE_NONE;
-         }
-       }
-      } */
-
-    if(c->land == laWhirlwind) {
-      whirlwind::calcdirs(c);
-      
-      for(int i=0; i<whirlwind::qdirs; i++) {
-        int hdir0 = displaydir(c, whirlwind::dfrom[i]) + S42;
-        int hdir1 = displaydir(c, whirlwind::dto[i]);
- 
-        double ph1 = fanframe;
-        
-        int aircol = 0xC0C0FF40;
-        
-        ph1 -= floor(ph1);
-        
-        if(hdir1 < hdir0-S42) hdir1 += S84;
-        if(hdir1 >= hdir0+S42) hdir1 -= S84;
-        
-        int hdir = (hdir1*ph1+hdir0*(1-ph1));
- 
-        transmatrix V0 = spin((hdir) * M_PI / S42);
-        
-        double ldist = purehepta ? crossf : c->type == 6 ? .2840 : 0.3399;
- 
-        poly_outline = OUTLINE_TRANS;
-        queuepoly((*Vdp)*V0*xpush(ldist*(2*ph1-1)), shDisk, aircol);
-        poly_outline = OUTLINE_NONE;
-        }
-
-      }
-
-    if(error) {
-      queuechr(V, 1, ch, asciicol, 2);
-      }
-    
-    if(vid.grid) {
-      if(purehepta) {
-        double x = sphere?.645:.6150;
-        for(int t=0; t<S7; t++) 
-          if(c->mov[t] && c->mov[t] < c)
-          queueline(V * ddspin(c,t,-6) * xpush0(x), 
-                    V * ddspin(c,t,6) * xpush0(x), 
-                    gridcolor(c, c->mov[t]), 1);
-        }
-      else if(isWarped(c)) {
-        double x = sphere?.3651:euclid?.2611:.2849;
-        if(!ishept(c)) for(int t=0; t<6; t++) if(c->mov[t] && ishept(c->mov[t]))
-          queueline(V * ddspin(c,t,-S14) * xpush0(x), 
-                    V * ddspin(c,t,+S14) * xpush0(x), 
-                    gridcolor(c, c->mov[t]), 1);
-        }
-      else if(ishept(c) && !euclid) ;
-      else {
-        double x = sphere?.401:euclid?.3 : .328;
-        for(int t=0; t<6; t++) 
-          if(euclid ? c->mov[t]<c : (((t^1)&1) || c->mov[t] < c))
-          queueline(V * ddspin(c,t,-S7) * xpush0(x), 
-                    V * ddspin(c,t,+S7) * xpush0(x), 
-                    gridcolor(c, c->mov[t]), 1);
-        }
-      }
-
-    if(!euclid && (!pirateTreasureSeek || compassDist(c) < compassDist(pirateTreasureSeek)))
-      pirateTreasureSeek = c;
-
-    if(!euclid) {
-      bool usethis = false;
-      double spd = 1;
-      bool rev = false;
-      
-      if(isGravityLand(cwt.c->land)) {
-        if(cwt.c->land == laDungeon) rev = true;
-        if(!straightDownSeek || edgeDepth(c) < edgeDepth(straightDownSeek)) {
-          usethis = true;
-          spd = cwt.c->landparam / 10.;
-          }
-        }
-
-      if(c->master->alt && cwt.c->master->alt &&
-        (cwt.c->land == laMountain || 
-        (pmodel && 
-          (cwt.c->land == laTemple || cwt.c->land == laWhirlpool || 
-          (cheater && (cwt.c->land == laClearing || cwt.c->land == laCaribbean ||
-          cwt.c->land == laCamelot || cwt.c->land == laPalace))) 
-          ))
-        && c->land == cwt.c->land && c->master->alt->alt == cwt.c->master->alt->alt) {
-        if(!straightDownSeek || !straightDownSeek->master->alt || celldistAlt(c) < celldistAlt(straightDownSeek)) {
-          usethis = true;
-          spd = .5;
-          if(cwt.c->land == laMountain) rev = true;
-          }
-        }
-  
-      if(pmodel && cwt.c->land == laOcean && cwt.c->landparam < 25) {
-        if(!straightDownSeek || coastval(c, laOcean) < coastval(straightDownSeek, laOcean)) {
-          usethis = true;
-          spd = cwt.c->landparam / 10;
-          }
-          
-        }
-
-      if(usethis) {
-        straightDownSeek = c;
-        downspin = atan2(VC0[1], VC0[0]);
-        downspin -= M_PI/2;
-        if(rev) downspin += M_PI;
-        downspin += M_PI/2 * (conformal::rotation%4);
-        while(downspin < -M_PI) downspin += 2*M_PI;
-        while(downspin > +M_PI) downspin -= 2*M_PI;
-        downspin = downspin * min(spd, (double)1);
-        }
-      }
-    
-    if(c->bardir != NODIR && c->bardir != NOBARRIERS && c->land != laHauntedWall &&
-      c->barleft != NOWALLSEP_USED) {
-      int col = darkena(0x505050, 0, 0xFF);
-      queueline(tC0(V), V*tC0(heptmove[c->bardir]), col, 2);
-      queueline(tC0(V), V*tC0(hexmove[c->bardir]), col, 2);
-      }
-    
-#ifndef NOMODEL
-    netgen::buildVertexInfo(c, V);
-#endif
-
     }
+    
   }
 
 bool confusingGeometry() {
