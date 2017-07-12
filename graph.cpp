@@ -3368,62 +3368,18 @@ bool allemptynear(cell *c) {
 void drawcell(cell *c, transmatrix V) {
 
   qfi.shape = NULL; qfi.special = false;
-  ivoryz = isGravityLand(c->land);
 
   transmatrix& gm = gmatrix[c];
   bool orig = (gm[2][2] == 0 || fabs(gm[2][2]-1) >= fabs(V[2][2]-1) - 1e-8);
   
-  if(orig) gm = V;
-
-  ld dist0 = hdist0(tC0(V)) - 1e-6;
-  if(dist0 < geom3::highdetail) detaillevel = 2;
-  else if(dist0 < geom3::middetail) detaillevel = 1;
-  else detaillevel = 0;
-
-#ifdef BUILDZEBRA
-  if(c->type == 6 && c->tmp > 0) {
-    int i = c->tmp;
-    zebra(cellwalker(c, i&15), 1, i>>4, "", 0);
-    }
-  
-  c->item = eItem(c->heat / 4);
-  buildAutomatonRule(c);
-#endif
-
-  viewBuggyCells(c,V);
-  
-  if(conformal::on || inHighQual) checkTide(c);
-  
-  if(!euclid) {
-    // draw a web-like map
-    if(webdisplay & 1) {
-      if(c->type == 6) {
-        for(int a=0; a<3; a++)
-        queueline(V*Crad[a*S7], V*Crad[a*S7+S42/2], darkena(0xd0d0, 0, 0xFF), 2);
-        }
-      else {
-        for(int a=0; a<S7; a++)
-        queueline(tC0(V), V*Crad[(3*S7+a*6)%S42], darkena(0xd0d0, 0, 0xFF), 2);
-        }
-      }
-  
-    if(webdisplay & 2) if(c->type != 6) {
-      queueline(tC0(V), V*ddi0(purehepta?S42:0, tessf), darkena(0xd0d0, 0, 0xFF), 2);
-      }
-    
-    if(webdisplay & 4) if(c->type != 6 && !euclid && c->master->alt) {
-      for(int i=0; i<S7; i++)
-        if(c->master->move[i] && c->master->move[i]->alt == c->master->alt->move[0])
-          queueline(tC0(V), V*xspinpush0((purehepta?M_PI:0) -2*M_PI*i/S7, tessf), darkena(0xd000d0, 0, 0xFF), 2);
-      }
-    }
+  gm = V;
   
   // save the player's view center
   if(isPlayerOn(c)) {
 
       playerV = V * ddspin(c, cwt.spin);
       if(cwt.mirrored) playerV = playerV * Mirror;
-      if(orig) cwtV = playerV;
+      cwtV = playerV;
     }
   
   if(1) {
