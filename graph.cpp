@@ -6145,13 +6145,9 @@ void mainloopiter() {
    {
       if(playermoved && vid.sspeed > -4.99 && !outoffocus)
         centerpc((ticks - lastt) / 1000.0 * exp(vid.sspeed));
-      if(panjoyx || panjoyy) 
-        checkpanjoy((ticks - lastt) / 1000.0);
-    
-    tortoise::updateVals(ticks - lastt);
+        
     frames++;
     if((!outoffocus) && vid.xres != 0 && vid.yres != 0) {
-          calcparam();
            unsigned char *c = (unsigned char*) (&backcolor);
           glClearColor(c[2] / 255.0, c[1] / 255.0, c[0]/255.0, 1);
           glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
