@@ -3365,22 +3365,15 @@ bool allemptynear(cell *c) {
   return true;
   }
 
-void drawcell(cell *c, transmatrix V) {
-  transmatrix& gm = gmatrix[c];
-  bool orig = (gm[2][2] == 0 || fabs(gm[2][2]-1) >= fabs(V[2][2]-1) - 1e-8);
-  
-  gm = V;
-  
+void drawcell(cell *c, transmatrix V) {  
   // save the player's view center
   if(isPlayerOn(c)) {
-
       playerV = V * ddspin(c, cwt.spin);
       if(cwt.mirrored) playerV = playerV * Mirror;
       cwtV = playerV;
     }
   
   if(1) {
-  
     hyperpoint VC0 = tC0(V);
   
     if(intval(mouseh, VC0) < modist) {
@@ -3393,7 +3386,7 @@ void drawcell(cell *c, transmatrix V) {
       mouseover2 = c;
       }
 
-    double dfc = euclid ? intval(VC0, C0) : VC0[2];
+    double dfc = intval(VC0, C0);
     
     if(dfc < centdist) {
       centdist = dfc;
@@ -3406,21 +3399,9 @@ void drawcell(cell *c, transmatrix V) {
       queuepoly(V, shTriangle, 0xFF0000FF);
       }
   
-    char ch = winf[c->wall].glyph;
-    int wcol, fcol, asciicol;
+    int wcol, fcol;
     
     setcolors(c, wcol, fcol);
-
-    if(viewdists) {
-      int cd = celldistance(c, cwt.c);
-      string label = its(cd);
-      int dc = distcolors[cd&7];
-      wcol = gradient(wcol, dc, 0, .4, 1);
-      fcol = gradient(fcol, dc, 0, .4, 1);
-      queuestr(V, (cd > 9 ? .6 : 1) * .2, label, 0xFF000000 + distcolors[cd&7], 1);
-      }
-
-    asciicol = wcol;
     
     if(c->land == laNone && c->wall == waNone) 
       queuepoly(V, shTriangle, 0xFFFF0000);
@@ -3428,7 +3409,6 @@ void drawcell(cell *c, transmatrix V) {
     int moncol = 0xFF00FF;
     
     if(c->monst) {
-      ch = minf[c->monst].glyph, moncol = minf[c->monst].color;
       if(c->monst == moMutant) {
         // root coloring
         if(c->stuntime != mutantphase)
@@ -3442,13 +3422,6 @@ void drawcell(cell *c, transmatrix V) {
         moncol = winf[c->wall].color;
         moncol |= (moncol>>1);
         }
-      
-      asciicol = moncol;
-      }
-    
-    if(c->cpdist == 0 && mapeditor::drawplayer) { 
-      ch = '@'; 
-      if(!mmitem) asciicol = moncol = cheater ? 0xFF3030 : 0xD0D0D0; 
       }
     
     int ct = c->type;
