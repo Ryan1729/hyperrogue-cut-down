@@ -252,7 +252,7 @@ else if(args()[0] == '-' && args()[1] == x && args()[2] == '0') { PHASE(2); para
   else if(argis("-pngshot")) {
     PHASE(3); shift(); 
     printf("saving PNG screenshot to %s\n", args());
-    saveHighQualityShot(args());
+
     }
   else if(argis("-pngsize")) {
     shift(); sscanf(args(), "%d", &pngres);

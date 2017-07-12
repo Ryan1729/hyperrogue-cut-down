@@ -3375,7 +3375,7 @@ bool allemptynear(cell *c) {
   return true;
   }
 
-void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
+void drawcell(cell *c, transmatrix V) {
 
   qfi.shape = NULL; qfi.special = false;
   ivoryz = isGravityLand(c->land);
@@ -5223,8 +5223,7 @@ void drawrec(const heptspin& hs, int lev, hstate s, const transmatrix& V) {
   
   if(dodrawcell(c)) {
     reclevel = maxreclevel - lev;
-    drawcell(c, (hs.spin || purehepta) ? V1 * spin(hs.spin*2*M_PI/S7 + (purehepta ? M_PI:0)) : V1, hs.spin,
-      hs.mirrored);
+    drawcell(c, (hs.spin || purehepta) ? V1 * spin(hs.spin*2*M_PI/S7 + (purehepta ? M_PI:0)) : V1);
     }
   
   if(lev <= 0) return;
@@ -5234,7 +5233,7 @@ void drawrec(const heptspin& hs, int lev, hstate s, const transmatrix& V) {
     reclevel = maxreclevel - lev + 1;
     // createMov(c, ds);
     if(c->mov[ds] && c->spn(ds) == 0 && dodrawcell(c->mov[ds])) {
-      drawcell(c->mov[ds], V1 * hexmove[d], 0, hs.mirrored ^ c->mirror(ds));
+      drawcell(c->mov[ds], V1 * hexmove[d]);
       }
     }
 
@@ -5303,7 +5302,7 @@ void drawEuclidean() {
       }
     
     if(dodrawcell(c)) {
-      drawcell(c, Mat, 0, false);
+      drawcell(c, Mat);
       }
     }
   }
@@ -6053,9 +6052,6 @@ void IMAGESAVE(SDL_Surface *s, const char *fname) {
 #endif
 
 int pngres = 2000;
-
-void saveHighQualityShot(const char *fname) {
-  }
 
 void addball(ld a, ld b, ld c) {
   hyperpoint h;
