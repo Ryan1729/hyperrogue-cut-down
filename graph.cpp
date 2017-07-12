@@ -6168,15 +6168,10 @@ void ballgeometry() {
   }
 
 void drawscreen() {
-  if(vid.xres == 0 || vid.yres == 0) return;
-
-  DEBB(DF_GRAPH, (debugfile,"drawscreen\n"));
+  if(vid.xres != 0 && vid.yres != 0) {
 
   calcparam();
-  if(vid.usingGL) setGLProjection();
-  help = "@";
-  
-  if(!vid.usingGL) SDL_FillRect(s, NULL, backcolor);
+  setGLProjection();
   
   ptds.clear();
 
@@ -6197,9 +6192,8 @@ void drawscreen() {
   
   getcstat = 0; inslider = false;
 
-  DEBT("swapbuffers");
-  if(vid.usingGL) SDL_GL_SwapBuffers(); else
-  SDL_UpdateRect(s, 0, 0, vid.xres, vid.yres);
+  SDL_GL_SwapBuffers(); 
+}
   }
 
 bool setfsize = true;
@@ -6653,7 +6647,6 @@ void mainloopiter() {
   if(timetowait > 0)
     SDL_Delay(timetowait);
   else {
-    
       if(playermoved && vid.sspeed > -4.99 && !outoffocus)
         centerpc((ticks - lastt) / 1000.0 * exp(vid.sspeed));
       if(panjoyx || panjoyy) 
