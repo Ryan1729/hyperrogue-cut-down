@@ -204,35 +204,23 @@ int darkena(int c, int lev, int a) {
   return (c << 8) + a;
   }
 
-void selectEyeGL(int ed) {
-  DEBB(DF_GRAPH, (debugfile,"selectEyeGL\n"));
-
+void setGLProjection() {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   
-  glTranslatef((vid.xcenter*2.)/vid.xres - 1, 1 - (vid.ycenter*2.)/vid.yres, 0);
-
-  if(pmodel) {
-    vid.scrdist = 4 * vid.radius;
-
-    // simulate glOrtho
-    GLfloat ortho[16] = {
-      GLfloat(2. / vid.xres), 0, 0, 0, 
-      0, GLfloat(-2. / vid.yres), 0, 0, 
-      0, 0, GLfloat(.4 / vid.scrdist), 0,
-      0, 0, 0, 1};
+  unsigned char *c = (unsigned char*) (&backcolor);
+  glClearColor(c[2] / 255.0, c[1] / 255.0, c[0]/255.0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-    vid.scrdist = -vid.scrdist;
-    glMultMatrixf(ortho);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    }
-  else {
-    float ve = ed*vid.eye;
-    ve *= 2; // vid.xres; ve /= vid.radius;
-    if(ve)
-      glTranslatef(-(ve * vid.radius) * (vid.alpha - (vid.radius*1./vid.xres) * vid.eye) / vid.xres, 0, 0);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+  glDisable(GL_DEPTH_TEST);
+  
+    glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  
+  glTranslatef((vid.xcenter*2.)/vid.xres - 1, 1 - (vid.ycenter*2.)/vid.yres, 0);
 
     float lowdepth = .1;
     float hidepth = 1e9;
@@ -253,25 +241,7 @@ void selectEyeGL(int ed) {
     GLfloat mat[16] = {sc,0,0,0, 0,-sc,0,0, 0,0,-1,0, 0,0, 0,1};
     glMultMatrixf(mat);
     
-    if(ve) glTranslatef(ve, 0, vid.eye);
     vid.scrdist = vid.yres * sc / 2;
-    }
-  }
-
-void setGLProjection() {
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  
-  unsigned char *c = (unsigned char*) (&backcolor);
-  glClearColor(c[2] / 255.0, c[1] / 255.0, c[0]/255.0, 1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
-  glDisable(GL_DEPTH_TEST);
-  
-  selectEyeGL(0);
   }
 
 void buildpolys();
