@@ -3406,15 +3406,6 @@ void drawcell(cell *c, transmatrix V, int spinv, bool mirrored) {
 
   transmatrix& gm = gmatrix[c];
   bool orig = (gm[2][2] == 0 || fabs(gm[2][2]-1) >= fabs(V[2][2]-1) - 1e-8);
-
-  if(sphere && vid.alpha > 1) {
-     long double d = V[2][2];
-     if(d > -1/vid.alpha) return;
-     }  
-  
-  if(sphere && vid.alpha <= 1) {
-    if(V[2][2] < -.8) return;
-    }
   
   if(orig) gm = V;
 
