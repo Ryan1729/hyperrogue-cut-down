@@ -205,10 +205,7 @@ int darkena(int c, int lev, int a) {
   }
 
 void setGLProjection() {
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  
-  unsigned char *c = (unsigned char*) (&backcolor);
+    unsigned char *c = (unsigned char*) (&backcolor);
   glClearColor(c[2] / 255.0, c[1] / 255.0, c[0]/255.0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
@@ -6614,7 +6611,40 @@ void mainloopiter() {
     frames++;
     if((!outoffocus) && vid.xres != 0 && vid.yres != 0) {
           calcparam();
-          setGLProjection();
+           unsigned char *c = (unsigned char*) (&backcolor);
+          glClearColor(c[2] / 255.0, c[1] / 255.0, c[0]/255.0, 1);
+          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+          
+          glEnable(GL_BLEND);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          
+          glDisable(GL_DEPTH_TEST);
+          
+            glMatrixMode(GL_PROJECTION);
+          glLoadIdentity();
+          
+          glTranslatef((vid.xcenter*2.)/vid.xres - 1, 1 - (vid.ycenter*2.)/vid.yres, 0);
+
+            float lowdepth = .1;
+            float hidepth = 1e9;
+          
+            // simulate glFrustum
+            GLfloat frustum[16] = {
+              GLfloat(vid.yres * 1./vid.xres), 0, 0, 0, 
+              0, 1, 0, 0, 
+              0, 0, -(hidepth+lowdepth)/(hidepth-lowdepth), -1,
+              0, 0, -2*lowdepth*hidepth/(hidepth-lowdepth), 0};
+          
+            glMultMatrixf(frustum);
+
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+          
+            GLfloat sc = vid.radius / (vid.yres/2.);
+            GLfloat mat[16] = {sc,0,0,0, 0,-sc,0,0, 0,0,-1,0, 0,0, 0,1};
+            glMultMatrixf(mat);
+            
+            vid.scrdist = vid.yres * sc / 2;
           
           ptds.clear();
 
