@@ -3408,50 +3408,12 @@ void drawcell(cell *c, transmatrix V) {
 
     int moncol = 0xFF00FF;
     
-    if(c->monst) {
-      if(c->monst == moMutant) {
-        // root coloring
-        if(c->stuntime != mutantphase)
-          moncol = 
-            gradient(0xC00030, 0x008000, 0, (c->stuntime-mutantphase) & 15, 15);
-        }
-      if(isMetalBeast(c->monst) && c->stuntime) 
-        moncol >>= 1;
-
-      if(c->monst == moSlime) {
-        moncol = winf[c->wall].color;
-        moncol |= (moncol>>1);
-        }
-      }
-    
     int ct = c->type;
     int ct6 = K(c);
 
     chasmg = chasmgraph(c);
     
-    int fd = 
-      c->land == laRedRock ? 0 : 
-      (c->land == laOcean || c->land == laLivefjord || c->land == laWhirlpool) ? 1 :
-      c->land == laAlchemist || c->land == laIce || c->land == laGraveyard ||
-      c->land == laRlyeh || c->land == laTemple || c->land == laWineyard ||
-      c->land == laDeadCaves || c->land == laPalace || c->land == laCA ? 1 : 
-      c->land == laCanvas ? 0 :
-      c->land == laKraken ? 1 :
-      c->land == laBurial ? 1 :
-      c->land == laIvoryTower ? 1 :
-      c->land == laDungeon ? 1 :
-      c->land == laMountain ? 1 :
-      c->land == laEndorian ? 1 :
-      c->land == laCaribbean ? 1 :
-      c->land == laWhirlwind ? 1 :
-      c->land == laRose ? 1 :
-      c->land == laWarpSea ? 1 :
-      c->land == laTortoise ? 1 :
-      c->land == laDragon ? 1 :
-      c->land == laHalloween ? 1 :
-      c->land == laTrollheim ? 2 :
-      c->land == laReptile ? 0 :
-      2;
+    int fd = 1;
 
     poly_outline = OUTLINE_NONE;
 
@@ -3474,8 +3436,6 @@ void drawcell(cell *c, transmatrix V) {
     if(!wmascii) {
     
       // floor
-      
-        
       bool eoh = euclid || purehepta;
 
 
@@ -3574,155 +3534,14 @@ void drawcell(cell *c, transmatrix V) {
         if(wmspatial && highwall(c)) ;
         else qfloor(c, Vf, shFloor[ct6], darkena(fcol, fd, 0xFF));
         }
-
-      else if(randomPatternsMode && c->land != laBarrier && !isWarped(c->land)) {
-        int j = (randompattern[c->land]/5) % 15;
-        int dfcol = darkena(fcol, fd, 0xFF);
-        int k = randompattern[c->land] % RPV_MODULO;
-        int k7 = randompattern[c->land] % 7;
-        
-        if(k == RPV_ZEBRA && k7 < 2) drawZebraFloor(Vf, c, dfcol);
-        else if(k == RPV_EMERALD && k7 == 0) drawEmeraldFloor(Vf, c, dfcol);
-        else if(k == RPV_CYCLE && k7 < 4) drawTowerFloor(Vf, c, dfcol, celldist);
- 
-        else switch(j) {
-          case 0:  qfloor(c, Vf, shCloudFloor[ct6], dfcol); break;
-          case 1:  qfloor(c, Vf, shFeatherFloor[ECT], dfcol); break;
-          case 2:  qfloor(c, Vf, shStarFloor[ct6], dfcol); break;
-          case 3:  qfloor(c, Vf, shTriFloor[ct6], dfcol); break;
-          case 4:  qfloor(c, Vf, shSStarFloor[ct6], dfcol); break;
-          case 5:  qfloor(c, Vf, shOverFloor[ECT], dfcol); break;
-          case 6:  qfloor(c, Vf, shFeatherFloor[ECT], dfcol); break;
-          case 7:  qfloor(c, Vf, shDemonFloor[ct6], dfcol); break;
-          case 8:  qfloor(c, Vf, shCrossFloor[ct6], dfcol); break;
-          case 9:  qfloor(c, Vf, shMFloor[ct6], dfcol); break;
-          case 10: qfloor(c, Vf, shCaveFloor[ECT], dfcol); break;
-          case 11: qfloor(c, Vf, shPowerFloor[ct6], dfcol); break;
-          case 12: qfloor(c, Vf, shDesertFloor[ct6], dfcol); break;
-          case 13: qfloor(c, Vf, purehepta ? shChargedFloor[3] : shChargedFloor[ct6], dfcol); break;
-          case 14: qfloor(c, Vf, ct==6?shChargedFloor[2]:shFloor[1], dfcol); break;
-          }
-        }
-
-      // else if(c->land == laPrairie && !eoh && allemptynear(c) && fieldpattern::getflowerdist(c) <= 1)
-      //   queuepoly(Vf, shLeafFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      /* else if(c->land == laPrairie && prairie::isriver(c))
-        drawTowerFloor(Vf, c, darkena(fcol, fd, 0xFF), 
-          prairie::isleft(c) ? river::towerleft : river::towerright); */
-      
-      else if(c->land == laPrairie)
-        qfloor(c, Vf, shCloudFloor[ct6], darkena(fcol, fd, 0xFF));
-      
-      else if(c->land == laWineyard) {
-        qfloor(c, Vf, shFeatherFloor[euclid?2:ct6], darkena(fcol, fd, 0xFF));
-        }
-
-      else if(c->land == laZebra) 
-        drawZebraFloor(Vf, c, darkena(fcol, fd, 0xFF));
-      
-      else if(c->wall == waTrunk) 
-        qfloor(c, Vf, shFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->wall == waCanopy || c->wall == waSolidBranch || c->wall == waWeakBranch) 
-        qfloor(c, Vf, shFeatherFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laMountain) 
-        drawTowerFloor(Vf, c, darkena(fcol, fd, 0xFF), 
-          euclid ? celldist : c->master->alt ? celldistAltPlus : celldist);
-
-      else if(isGravityLand(c->land)) 
-        drawTowerFloor(Vf, c, darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laEmerald) 
-        drawEmeraldFloor(Vf, c, darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laRlyeh)
-        qfloor(c, Vf, (eoh ? shFloor: shTriFloor)[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laTemple)
-        qfloor(c, Vf, (eoh ? shFloor: shTriFloor)[ct6], darkena(fcol, fd, 0xFF));
-
       else if(c->land == laAlchemist)
         qfloor(c, Vf, shCloudFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laRose)
-        qfloor(c, Vf, shRoseFloor[purehepta ? 2 : ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laTortoise)
-        qfloor(c, Vf, shTurtleFloor[purehepta ? 2 : ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laDragon && !purehepta) {
-        /* if(!wmspatial || noAdjacentChasms(c)) */
-          qfloor(c, Vf, shDragonFloor[euclid?2:ct6], darkena(fcol, fd, 0xFF));
-        /* if(wmspatial)
-          qfloor(c, Vf, shFloor[euclid?2:ct6], darkena(fcol, fd, 0xFF)); */
-        }
-
-      else if((isElemental(c->land) || c->land == laElementalWall) && !eoh)
-        qfloor(c, Vf, shNewFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laBurial)
-        qfloor(c, Vf, shBarrowFloor[euclid?0:purehepta?2:ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laTrollheim && !eoh)
-        qfloor(c, Vf, shTrollFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laTrollheim)
-        qfloor(c, Vf, shCaveFloor[euclid?2:1], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laJungle)
-        qfloor(c, Vf, shFeatherFloor[euclid?2:ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laMountain)
-        qfloor(c, Vf, shFeatherFloor[euclid?2:ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laGraveyard)
-        qfloor(c, Vf, (eoh ? shFloor : shCrossFloor)[ct6], darkena(fcol, fd, 0xFF));
 
       else if(c->land == laDeadCaves) {
         qfloor(c, Vf, shCaveFloor[euclid?2:ct6], darkena(fcol, fd, 0xFF));
         }
-
-      else if(c->land == laMotion)
-        qfloor(c, Vf, shMFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laWhirlwind)
-//      drawZebraFloor(V, c, darkena(fcol, fd, 0xFF));
-        qfloor(c, Vf, (eoh ? shCloudFloor : shNewFloor)[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laHell)
-        qfloor(c, Vf, (euclid ? shStarFloor : shDemonFloor)[ct6], darkena(fcol, fd, 0xFF));
-
       else if(c->land == laIce)
-//      qfloor(c, V, shFloor[ct6], darkena(fcol, 2, 0xFF));
         qfloor(c, Vf, shStarFloor[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laCocytus)
-        qfloor(c, Vf, (eoh ? shCloudFloor : shDesertFloor)[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laStorms) {
-        if(euclid) 
-          qfloor(c, ishex1(c) ? V*pispin : Vf, 
-            ishept(c) ? shFloor[0] : shChargedFloor[2], darkena(fcol, fd, 0xFF));
-        else 
-          qfloor(c, Vf, (purehepta ? shChargedFloor[3] : ct==6 ? shChargedFloor[2] : shFloor[1]), darkena(fcol, fd, 0xFF));
-        }
-
-      else if(c->land == laWildWest)
-        qfloor(c, Vf, (eoh ? shCloudFloor : shSStarFloor)[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laPower)
-        qfloor(c, Vf, (eoh ? shStarFloor : shPowerFloor)[ct6], darkena(fcol, fd, 0xFF));
-
-      else if(c->land == laHive && c->wall != waFloorB && c->wall != waFloorA && c->wall != waMirror && c->wall != waCloud) {
-        qfloor(c, Vf, shFloor[ct6], darkena(fcol, 1, 0xFF));
-        if(c->wall != waMirror && c->wall != waCloud)
-          qfloor(c, Vf, shMFloor[ct6], darkena(fcol, 2, 0xFF));
-        if(c->wall != waMirror && c->wall != waCloud)
-          qfloor(c, Vf, shMFloor2[ct6], darkena(fcol, fcol==wcol ? 1 : 2, 0xFF));
-        }
-
       else if(c->land == laCaves)
         qfloor(c, Vf, shCaveFloor[ECT], darkena(fcol, fd, 0xFF));
 
