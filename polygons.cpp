@@ -309,7 +309,6 @@ void drawpolyline(const transmatrix& V, GLfloat* tab, int cnt, int col, int outl
         glVertexPointer(3, GL_FLOAT, 0, tab);
     }
       
-    gldraw(V, cnt, col, outline);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glapplymatrix(V);
