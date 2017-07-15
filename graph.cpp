@@ -6120,32 +6120,6 @@ void mainloopiter() {
           
           glDisable(GL_DEPTH_TEST);
           
-            glMatrixMode(GL_PROJECTION);
-          glLoadIdentity();
-          
-          glTranslatef((vid.xcenter*2.)/vid.xres - 1, 1 - (vid.ycenter*2.)/vid.yres, 0);
-
-            float lowdepth = .1;
-            float hidepth = 1e9;
-          
-            // simulate glFrustum
-            GLfloat frustum[16] = {
-              GLfloat(vid.yres * 1./vid.xres), 0, 0, 0, 
-              0, 1, 0, 0, 
-              0, 0, -(hidepth+lowdepth)/(hidepth-lowdepth), -1,
-              0, 0, -2*lowdepth*hidepth/(hidepth-lowdepth), 0};
-          
-            glMultMatrixf(frustum);
-
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-          
-            GLfloat sc = vid.radius / (vid.yres/2.);
-            GLfloat mat[16] = {sc,0,0,0, 0,-sc,0,0, 0,0,-1,0, 0,0, 0,1};
-            glMultMatrixf(mat);
-            
-            vid.scrdist = vid.yres * sc / 2;
-          
           ptds.clear();
 
           swap(gmatrix0, gmatrix);
